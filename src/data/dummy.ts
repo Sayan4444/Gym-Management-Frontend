@@ -1,9 +1,9 @@
 import { User, Gym, MembershipPlan, Subscription, Payment, Attendance, WorkoutPlan } from "./types";
 
 export const gyms: Gym[] = [
-  { id: 1, createdAt: "2024-01-01", updatedAt: "2024-01-01", name: "Iron Forge Fitness", address: "123 Main St, Downtown, NY 10001" },
-  { id: 2, createdAt: "2024-02-01", updatedAt: "2024-02-01", name: "Peak Performance Gym", address: "456 Oak Ave, Midtown, LA 90001" },
-  { id: 3, createdAt: "2024-03-01", updatedAt: "2024-03-01", name: "Titan Strength Hub", address: "789 Pine Rd, Uptown, CHI 60601" },
+  { id: 1, createdAt: "2024-01-01", updatedAt: "2024-01-01", name: "Iron Forge Fitness", slug: "iron-forge-fitness", address: "123 Main St, Downtown, NY 10001", whatsapp: "+15550100" },
+  { id: 2, createdAt: "2024-02-01", updatedAt: "2024-02-01", name: "Peak Performance Gym", slug: "peak-performance-gym", address: "456 Oak Ave, Midtown, LA 90001", whatsapp: "+15550200" },
+  { id: 3, createdAt: "2024-03-01", updatedAt: "2024-03-01", name: "Titan Strength Hub", slug: "titan-strength-hub", address: "789 Pine Rd, Uptown, CHI 60601", whatsapp: "+15550300" },
 ];
 
 export const users: User[] = [
