@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import LandingPage from "./pages/LandingPage";
 import GymHomePage from "./pages/GymHomePage";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import PricingPage from "./pages/PricingPage";
 import DemoPage from "./pages/DemoPage";
 import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
@@ -51,7 +51,6 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
 
             {/* Super Admin routes (no gymName prefix) */}
             <Route path="/super-admin" element={<DashboardLayout role="super-admin" />}>
@@ -63,7 +62,7 @@ const App = () => (
             {/* Gym-specific routes */}
             <Route path="/:gymName" element={<GymHomePage />} />
             <Route path="/:gymName/demo" element={<DemoPage />} />
-            <Route path="/:gymName/pricing" element={<LandingPage />} />
+            <Route path="/:gymName/pricing" element={<PricingPage />} />
 
             {/* Gym Admin routes */}
             <Route path="/:gymName/admin" element={<DashboardLayout role="admin" />}>
