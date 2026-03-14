@@ -57,8 +57,8 @@
     --chart-4: 0 84% 60%;
     --chart-5: 262 83% 58%;
 
-    --gold: 45 93% 47%;
-    --gold-foreground: 0 0% 0%;
+    --brand: 160 84% 39%;
+    --brand-foreground: 0 0% 100%;
   }
 
   .dark {
@@ -111,8 +111,8 @@
     --chart-4: 0 84% 60%;
     --chart-5: 262 83% 58%;
 
-    --gold: 45 93% 47%;
-    --gold-foreground: 0 0% 0%;
+    --brand: 160 84% 39%;
+    --brand-foreground: 0 0% 100%;
   }
 }
 
@@ -129,13 +129,4 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   }
-}
-
-@keyframes ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.animate-ticker {
-  animation: ticker 30s linear infinite;
 }
