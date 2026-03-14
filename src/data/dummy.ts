@@ -127,3 +127,4 @@ export const getAttendanceByDate = (date: string) => attendanceRecords.filter(a 
 export const getWorkoutPlansByTrainer = (trainerId: number) => workoutPlans.filter(w => w.trainerId === trainerId);
 export const getWorkoutPlansByMember = (memberId: number) => workoutPlans.filter(w => w.memberId === memberId);
 export const getPlansByGym = (gymId: number) => membershipPlans.filter(p => p.gymId === gymId);
+export const getGymBySlug = (slug: string) => gyms.find(g => g.slug === slug);

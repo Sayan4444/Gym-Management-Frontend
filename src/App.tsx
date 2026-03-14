@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 import LandingPage from "./pages/LandingPage";
-import PricingPage from "./pages/PricingPage";
+import GymHomePage from "./pages/GymHomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DemoPage from "./pages/DemoPage";
@@ -50,13 +50,23 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/demo" element={<DemoPage />} />
+
+            {/* Super Admin routes (no gymName prefix) */}
+            <Route path="/super-admin" element={<DashboardLayout role="super-admin" />}>
+              <Route index element={<SuperAdminDashboard />} />
+              <Route path="gyms" element={<GymManagement />} />
+              <Route path="users" element={<SuperAdminUsers />} />
+            </Route>
+
+            {/* Gym-specific routes */}
+            <Route path="/:gymName" element={<GymHomePage />} />
+            <Route path="/:gymName/demo" element={<DemoPage />} />
+            <Route path="/:gymName/pricing" element={<LandingPage />} />
 
             {/* Gym Admin routes */}
-            <Route path="/admin" element={<DashboardLayout role="admin" />}>
+            <Route path="/:gymName/admin" element={<DashboardLayout role="admin" />}>
               <Route index element={<AdminDashboard />} />
               <Route path="members" element={<MembersList />} />
               <Route path="members/:id" element={<MemberProfile />} />
@@ -69,23 +79,16 @@ const App = () => (
             </Route>
 
             {/* Trainer routes */}
-            <Route path="/trainer" element={<DashboardLayout role="trainer" />}>
+            <Route path="/:gymName/trainer" element={<DashboardLayout role="trainer" />}>
               <Route index element={<TrainerDashboard />} />
               <Route path="workouts" element={<WorkoutPlansPage />} />
             </Route>
 
             {/* Member routes */}
-            <Route path="/member" element={<DashboardLayout role="member" />}>
+            <Route path="/:gymName/member" element={<DashboardLayout role="member" />}>
               <Route index element={<MemberDashboard />} />
               <Route path="attendance" element={<MemberAttendanceHistory />} />
               <Route path="subscription" element={<MemberSubscription />} />
-            </Route>
-
-            {/* Super Admin routes */}
-            <Route path="/super-admin" element={<DashboardLayout role="super-admin" />}>
-              <Route index element={<SuperAdminDashboard />} />
-              <Route path="gyms" element={<GymManagement />} />
-              <Route path="users" element={<SuperAdminUsers />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
