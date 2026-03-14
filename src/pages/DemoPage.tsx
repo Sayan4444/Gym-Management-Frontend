@@ -25,6 +25,7 @@ const industries = [
 
 export default function DemoPage() {
   const navigate = useNavigate();
+  const { gymName } = useParams();
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
