@@ -19,7 +19,9 @@ export interface Gym {
   createdAt: string;
   updatedAt: string;
   name: string;
+  slug: string;
   address: string;
+  whatsapp?: string;
 }
 
 export interface MembershipPlan {

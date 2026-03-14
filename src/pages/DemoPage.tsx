@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +25,7 @@ const industries = [
 
 export default function DemoPage() {
   const navigate = useNavigate();
+  const { gymName } = useParams();
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
@@ -49,14 +50,14 @@ export default function DemoPage() {
       {/* Header */}
       <header className="border-b border-border/20 bg-background/90 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to={gymName ? `/${gymName}` : "/"} className="flex items-center gap-2">
             <Dumbbell className="h-7 w-7 text-brand" />
             <span className="font-display text-xl font-bold">GymFlow</span>
           </Link>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Button variant="ghost" onClick={() => navigate("/")} className="gap-2">
-              <ArrowLeft className="h-4 w-4" /> Back to Home
+            <Button variant="ghost" onClick={() => navigate(gymName ? `/${gymName}` : "/")} className="gap-2">
+              <ArrowLeft className="h-4 w-4" /> Back
             </Button>
           </div>
         </div>
@@ -78,7 +79,7 @@ export default function DemoPage() {
             <h2 className="font-display text-2xl font-bold">Thank You!</h2>
             <p className="text-muted-foreground">Your demo request has been submitted successfully.</p>
             <p className="text-muted-foreground">Our team will get in touch with you within 24 hours!</p>
-            <Button onClick={() => navigate("/")} className="mt-6 bg-brand text-brand-foreground hover:bg-brand/90">
+            <Button onClick={() => navigate(gymName ? `/${gymName}` : "/")} className="mt-6 bg-brand text-brand-foreground hover:bg-brand/90">
               Back to Home
             </Button>
           </div>
