@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import LandingPage from "./pages/LandingPage";
 import GymHomePage from "./pages/GymHomePage";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import PricingPage from "./pages/PricingPage";
 import DemoPage from "./pages/DemoPage";
 import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
