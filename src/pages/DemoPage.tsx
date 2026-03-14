@@ -50,7 +50,7 @@ export default function DemoPage() {
       {/* Header */}
       <header className="border-b border-border/20 bg-background/90 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to={gymName ? `/${gymName}` : "/"} className="flex items-center gap-2">
             <Dumbbell className="h-7 w-7 text-brand" />
             <span className="font-display text-xl font-bold">GymFlow</span>
           </Link>
