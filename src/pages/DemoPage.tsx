@@ -79,7 +79,7 @@ export default function DemoPage() {
             <h2 className="font-display text-2xl font-bold">Thank You!</h2>
             <p className="text-muted-foreground">Your demo request has been submitted successfully.</p>
             <p className="text-muted-foreground">Our team will get in touch with you within 24 hours!</p>
-            <Button onClick={() => navigate("/")} className="mt-6 bg-brand text-brand-foreground hover:bg-brand/90">
+            <Button onClick={() => navigate(gymName ? `/${gymName}` : "/")} className="mt-6 bg-brand text-brand-foreground hover:bg-brand/90">
               Back to Home
             </Button>
           </div>
