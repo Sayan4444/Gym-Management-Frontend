@@ -56,8 +56,8 @@ export default function DemoPage() {
           </Link>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Button variant="ghost" onClick={() => navigate("/")} className="gap-2">
-              <ArrowLeft className="h-4 w-4" /> Back to Home
+            <Button variant="ghost" onClick={() => navigate(gymName ? `/${gymName}` : "/")} className="gap-2">
+              <ArrowLeft className="h-4 w-4" /> Back
             </Button>
           </div>
         </div>
