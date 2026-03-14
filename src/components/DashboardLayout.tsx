@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
@@ -20,32 +20,35 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const roleNavItems: Record<string, NavItem[]> = {
-  admin: [
-    { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-    { title: "Members", url: "/admin/members", icon: Users },
-    { title: "Attendance", url: "/admin/attendance", icon: CalendarCheck },
-    { title: "Membership Plans", url: "/admin/plans", icon: ClipboardList },
-    { title: "Payments", url: "/admin/payments", icon: CreditCard },
-    { title: "Trainers", url: "/admin/trainers", icon: Dumbbell },
-    { title: "Reports", url: "/admin/reports", icon: BarChart3 },
-    { title: "Settings", url: "/admin/settings", icon: Settings },
-  ],
-  trainer: [
-    { title: "Dashboard", url: "/trainer", icon: LayoutDashboard },
-    { title: "Workout Plans", url: "/trainer/workouts", icon: Dumbbell },
-  ],
-  member: [
-    { title: "Dashboard", url: "/member", icon: LayoutDashboard },
-    { title: "Attendance", url: "/member/attendance", icon: CalendarCheck },
-    { title: "Subscription", url: "/member/subscription", icon: ClipboardList },
-  ],
-  "super-admin": [
-    { title: "Dashboard", url: "/super-admin", icon: LayoutDashboard },
-    { title: "Gyms", url: "/super-admin/gyms", icon: Building2 },
-    { title: "Users", url: "/super-admin/users", icon: UserCog },
-  ],
-};
+function getNavItems(role: string, prefix: string): NavItem[] {
+  const items: Record<string, NavItem[]> = {
+    admin: [
+      { title: "Dashboard", url: `${prefix}/admin`, icon: LayoutDashboard },
+      { title: "Members", url: `${prefix}/admin/members`, icon: Users },
+      { title: "Attendance", url: `${prefix}/admin/attendance`, icon: CalendarCheck },
+      { title: "Membership Plans", url: `${prefix}/admin/plans`, icon: ClipboardList },
+      { title: "Payments", url: `${prefix}/admin/payments`, icon: CreditCard },
+      { title: "Trainers", url: `${prefix}/admin/trainers`, icon: Dumbbell },
+      { title: "Reports", url: `${prefix}/admin/reports`, icon: BarChart3 },
+      { title: "Settings", url: `${prefix}/admin/settings`, icon: Settings },
+    ],
+    trainer: [
+      { title: "Dashboard", url: `${prefix}/trainer`, icon: LayoutDashboard },
+      { title: "Workout Plans", url: `${prefix}/trainer/workouts`, icon: Dumbbell },
+    ],
+    member: [
+      { title: "Dashboard", url: `${prefix}/member`, icon: LayoutDashboard },
+      { title: "Attendance", url: `${prefix}/member/attendance`, icon: CalendarCheck },
+      { title: "Subscription", url: `${prefix}/member/subscription`, icon: ClipboardList },
+    ],
+    "super-admin": [
+      { title: "Dashboard", url: "/super-admin", icon: LayoutDashboard },
+      { title: "Gyms", url: "/super-admin/gyms", icon: Building2 },
+      { title: "Users", url: "/super-admin/users", icon: UserCog },
+    ],
+  };
+  return items[role] || [];
+}
 
 const roleLabels: Record<string, string> = {
   admin: "Gym Admin",
@@ -54,10 +57,11 @@ const roleLabels: Record<string, string> = {
   "super-admin": "Super Admin",
 };
 
-function SidebarNav({ role }: { role: string }) {
+function SidebarNav({ role, prefix }: { role: string; prefix: string }) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const items = roleNavItems[role] || [];
+  const items = getNavItems(role, prefix);
+  const baseUrl = role === "super-admin" ? "/super-admin" : `${prefix}/${role}`;
 
   return (
     <Sidebar collapsible="icon">
@@ -78,7 +82,7 @@ function SidebarNav({ role }: { role: string }) {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end={item.url === `/${role}`} className="hover:bg-accent/50" activeClassName="bg-accent text-primary font-medium">
+                    <NavLink to={item.url} end={item.url === baseUrl} className="hover:bg-accent/50" activeClassName="bg-accent text-primary font-medium">
                       <item.icon className="mr-2 h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
@@ -95,11 +99,13 @@ function SidebarNav({ role }: { role: string }) {
 
 export default function DashboardLayout({ role }: { role: string }) {
   const navigate = useNavigate();
+  const { gymName } = useParams();
+  const prefix = gymName ? `/${gymName}` : "";
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <SidebarNav role={role} />
+        <SidebarNav role={role} prefix={prefix} />
         <div className="flex-1 flex flex-col">
           <header className="h-14 flex items-center justify-between border-b px-4 bg-card">
             <div className="flex items-center gap-2">
