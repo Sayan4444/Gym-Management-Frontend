@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,20 +30,21 @@ const plans = [
 ];
 
 export default function PricingPage() {
+  const { gymName } = useParams();
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2">
-            <Dumbbell className="h-7 w-7 text-primary" />
+          <Link to={gymName ? `/${gymName}` : "/"} className="flex items-center gap-2">
+            <Dumbbell className="h-7 w-7 text-brand" />
             <span className="font-display text-xl font-bold">GymFlow</span>
           </Link>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Button variant="ghost" onClick={() => navigate("/login")}>Sign In</Button>
-            <Button onClick={() => navigate("/register")}>Get Started</Button>
+            <Button onClick={() => navigate("/login")} className="bg-brand text-brand-foreground hover:bg-brand/90">Get Started</Button>
           </div>
         </div>
       </header>
@@ -56,9 +57,9 @@ export default function PricingPage() {
 
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {plans.map((plan) => (
-            <Card key={plan.name} className={`relative flex flex-col ${plan.popular ? "border-primary shadow-lg scale-105" : "shadow-sm"}`}>
+            <Card key={plan.name} className={`relative flex flex-col ${plan.popular ? "border-brand shadow-lg scale-105" : "shadow-sm"}`}>
               {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 px-4">Most Popular</Badge>
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 bg-brand text-brand-foreground">Most Popular</Badge>
               )}
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">{plan.name}</CardTitle>
@@ -72,14 +73,14 @@ export default function PricingPage() {
                 <ul className="space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-brand shrink-0" />
                       {f}
                     </li>
                   ))}
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full" variant={plan.popular ? "default" : "outline"} onClick={() => navigate("/register")}>
+                <Button className="w-full" variant={plan.popular ? "default" : "outline"} onClick={() => navigate("/login")}>
                   Start Free Trial
                 </Button>
               </CardFooter>

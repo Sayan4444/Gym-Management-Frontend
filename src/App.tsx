@@ -51,7 +51,6 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
 
             {/* Super Admin routes (no gymName prefix) */}
             <Route path="/super-admin" element={<DashboardLayout role="super-admin" />}>
@@ -63,7 +62,7 @@ const App = () => (
             {/* Gym-specific routes */}
             <Route path="/:gymName" element={<GymHomePage />} />
             <Route path="/:gymName/demo" element={<DemoPage />} />
-            <Route path="/:gymName/pricing" element={<LandingPage />} />
+            <Route path="/:gymName/pricing" element={<PricingPage />} />
 
             {/* Gym Admin routes */}
             <Route path="/:gymName/admin" element={<DashboardLayout role="admin" />}>
