@@ -53,6 +53,7 @@ const App = () => (
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/demo" element={<DemoPage />} />
 
             {/* Gym Admin routes */}
             <Route path="/admin" element={<DashboardLayout role="admin" />}>
