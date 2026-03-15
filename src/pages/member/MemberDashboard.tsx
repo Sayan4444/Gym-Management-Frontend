@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router-dom";
 import { users, getSubscriptionByUser, getPlanById, getAttendanceByUser } from "@/data/dummy";
-import { CalendarCheck, CreditCard, Clock } from "lucide-react";
+import { CalendarCheck, CreditCard, Clock, Crown } from "lucide-react";
 import MemberAttendanceHistory from "./MemberAttendanceHistory";
 import MemberSubscription from "./MemberSubscription";
 
@@ -29,7 +29,12 @@ export default function MemberDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold font-display">Welcome, {member.name.split(" ")[0]}</h1>
+        <h1 className="text-3xl font-bold font-display flex items-center gap-2">
+          Welcome, {member.name.split(" ")[0]}
+          {plan?.name.toLowerCase().includes("premium") && (
+            <Crown className="h-6 w-6 text-yellow-500 fill-yellow-400" />
+          )}
+        </h1>
         <p className="text-muted-foreground">Your fitness dashboard</p>
       </div>
 

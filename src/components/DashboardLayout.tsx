@@ -11,8 +11,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard, Users, CalendarCheck, CreditCard, ClipboardList, Dumbbell,
-  BarChart3, Settings, Building2, UserCog, LogOut,
+  BarChart3, Settings, Building2, UserCog, LogOut, Crown,
 } from "lucide-react";
+import { users, getSubscriptionByUser, getPlanById } from "@/data/dummy";
 
 interface NavItem {
   title: string;
@@ -141,11 +142,22 @@ export default function DashboardLayout({ role }: { role: string }) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                        {role === "admin" ? "SC" : role === "trainer" ? "MJ" : role === "member" ? "JW" : "AR"}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                          {role === "admin" ? "SC" : role === "trainer" ? "MJ" : role === "member" ? "JW" : "AR"}
+                        </AvatarFallback>
+                      </Avatar>
+                      {role === "member" && (() => {
+                        const member = users.find(u => u.id === 7);
+                        if (!member) return null;
+                        const sub = getSubscriptionByUser(member.id);
+                        const plan = sub ? getPlanById(sub.planId) : null;
+                        return plan?.name.toLowerCase().includes("premium") ? (
+                          <Crown className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 text-yellow-500 fill-yellow-400 drop-shadow" />
+                        ) : null;
+                      })()}
+                    </div>
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">

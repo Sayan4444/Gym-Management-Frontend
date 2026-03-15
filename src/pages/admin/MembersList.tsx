@@ -8,7 +8,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getMembersByGym, getSubscriptionByUser, getPlanById } from "@/data/dummy";
-import { Search, Plus, Eye } from "lucide-react";
+import { Search, Plus, Eye, Crown } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const members = getMembersByGym(1);
 
@@ -26,12 +28,16 @@ export default function MembersList() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [premiumOnly, setPremiumOnly] = useState(false);
 
   const filtered = members.filter((m) => {
     const sub = getSubscriptionByUser(m.id);
+    const plan = sub ? getPlanById(sub.planId) : null;
     const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase()) || m.email.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filterStatus === "all" || sub?.status === filterStatus || (!sub && filterStatus === "none");
-    return matchesSearch && matchesFilter;
+    if (!matchesSearch || !matchesFilter) return false;
+    if (premiumOnly && !plan?.name.toLowerCase().includes("premium")) return false;
+    return true;
   });
 
   return (
@@ -63,6 +69,12 @@ export default function MembersList() {
                 <SelectItem value="none">No Plan</SelectItem>
               </SelectContent>
             </Select>
+            <div className="flex items-center gap-2">
+              <Checkbox id="premium-filter-admin" checked={premiumOnly} onCheckedChange={(checked) => setPremiumOnly(checked === true)} />
+              <Label htmlFor="premium-filter-admin" className="text-sm font-medium flex items-center gap-1 cursor-pointer">
+                <Crown className="h-3.5 w-3.5 text-yellow-500 fill-yellow-400" /> Premium only
+              </Label>
+            </div>
           </div>
 
           <Table>
@@ -85,9 +97,14 @@ export default function MembersList() {
                   <TableRow key={m.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs">{m.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
-                        </Avatar>
+                        <div className="relative">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="bg-primary/10 text-primary text-xs">{m.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                          </Avatar>
+                          {plan?.name.toLowerCase().includes("premium") && (
+                            <Crown className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 text-yellow-500 fill-yellow-400 drop-shadow" />
+                          )}
+                        </div>
                         <span className="font-medium">{m.name}</span>
                       </div>
                     </TableCell>

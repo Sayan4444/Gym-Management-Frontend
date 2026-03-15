@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { attendanceRecords, getUserById, getMembersByGym } from "@/data/dummy";
-import { CalendarCheck, Plus } from "lucide-react";
+import { attendanceRecords, getUserById, getMembersByGym, getSubscriptionByUser, getPlanById } from "@/data/dummy";
+import { CalendarCheck, Plus, Crown } from "lucide-react";
 
 const gymMembers = getMembersByGym(1);
 const memberIds = new Set(gymMembers.map(m => m.id));
@@ -45,6 +45,9 @@ export default function AttendancePage() {
             <TableBody>
               {dayRecords.map((a) => {
                 const user = getUserById(a.userId);
+                const sub = getSubscriptionByUser(a.userId);
+                const plan = sub ? getPlanById(sub.planId) : null;
+                const isPremium = plan?.name.toLowerCase().includes("premium");
                 const timeIn = new Date(a.timeIn);
                 const timeOut = a.timeOut ? new Date(a.timeOut) : null;
                 const duration = timeOut ? `${Math.round((timeOut.getTime() - timeIn.getTime()) / 60000)} min` : "In progress";
@@ -52,11 +55,16 @@ export default function AttendancePage() {
                   <TableRow key={a.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                            {user?.name.split(" ").map(n => n[0]).join("") || "?"}
-                          </AvatarFallback>
-                        </Avatar>
+                        <div className="relative">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                              {user?.name.split(" ").map(n => n[0]).join("") || "?"}
+                            </AvatarFallback>
+                          </Avatar>
+                          {isPremium && (
+                            <Crown className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 text-yellow-500 fill-yellow-400 drop-shadow" />
+                          )}
+                        </div>
                         <span className="font-medium">{user?.name || "Unknown"}</span>
                       </div>
                     </TableCell>
