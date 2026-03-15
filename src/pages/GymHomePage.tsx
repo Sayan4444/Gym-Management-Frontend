@@ -107,11 +107,8 @@ export default function GymHomePage() {
           </nav>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Button onClick={() => navigate("/login")} variant="outline" className="border-brand/30 text-brand hover:bg-brand/10">
+            <Button onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")} variant="outline" className="border-brand/30 text-brand hover:bg-brand/10">
               Sign In
-            </Button>
-            <Button onClick={() => navigate(`/${gymName}/demo`)} className="bg-brand text-brand-foreground hover:bg-brand/90">
-              Book A Demo
             </Button>
           </div>
         </div>
@@ -130,11 +127,11 @@ export default function GymHomePage() {
               Your complete fitness destination with state-of-the-art equipment, expert trainers, and a community that keeps you motivated.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" onClick={() => navigate("/login")} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
+              <Button size="lg" onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
                 Join Now <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate(`/${gymName}/demo`)} className="text-base px-8 rounded-full border-border/50">
-                Book A Demo
+              <Button size="lg" variant="outline" onClick={() => navigate(`/${gymName}/pricing`)} className="text-base px-8 rounded-full border-border/50">
+                Pricing
               </Button>
             </div>
           </div>
@@ -239,26 +236,19 @@ export default function GymHomePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 bg-brand">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-foreground mb-4">Ready to Start Your Fitness Journey?</h2>
-          <p className="text-brand-foreground/80 text-lg mb-8 max-w-xl mx-auto">Join {gym.name} today and transform your health.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate("/login")} className="bg-background text-foreground hover:bg-background/90 text-base px-8 rounded-full">
-              Sign Up Now <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate(`/${gymName}/demo`)} className="border-brand-foreground/30 text-brand-foreground hover:bg-brand-foreground/10 text-base px-8 rounded-full">
-              Book A Demo
-            </Button>
-          </div>
-        </div>
-      </section>
+
 
       {/* Footer */}
-      <footer className="border-t border-border/20 py-8 bg-card/30">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm text-muted-foreground">© 2026 {gym.name}. All rights reserved.</p>
+      <footer className="py-12 bg-brand">
+        <div className="container mx-auto px-4 text-center pb-4">
+          <p className="text-xl font-display font-bold text-brand-foreground mb-3">{gym.name}</p>
+          <p className="text-sm text-brand-foreground/80 mb-2 max-w-md mx-auto leading-relaxed">{gym.address}</p>
+          {gym.whatsapp && (
+             <p className="text-sm font-medium text-brand-foreground/90 mb-1">Phone: {gym.whatsapp}</p>
+          )}
+        </div>
+        <div className="container mx-auto px-4 text-center mt-6 border-t border-brand-foreground/20 pt-8">
+          <p className="text-sm text-brand-foreground/60">© {new Date().getFullYear()} {gym.name}. All rights reserved.</p>
         </div>
       </footer>
 

@@ -43,8 +43,6 @@ function getNavItems(role: string, prefix: string): NavItem[] {
     ],
     "super-admin": [
       { title: "Dashboard", url: "/super-admin", icon: LayoutDashboard },
-      { title: "Gyms", url: "/super-admin/gyms", icon: Building2 },
-      { title: "Users", url: "/super-admin/users", icon: UserCog },
     ],
   };
   return items[role] || [];
@@ -127,7 +125,7 @@ export default function DashboardLayout({ role }: { role: string }) {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate("/login")}>
+                  <DropdownMenuItem onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")}>
                     <LogOut className="mr-2 h-4 w-4" /> Sign out
                   </DropdownMenuItem>
                 </DropdownMenuContent>

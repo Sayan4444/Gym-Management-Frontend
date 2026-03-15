@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Dumbbell, CheckCircle2 } from "lucide-react";
+import { getGymBySlug } from "@/data/dummy";
 
 const plans = [
   {
@@ -32,6 +33,7 @@ const plans = [
 export default function PricingPage() {
   const { gymName } = useParams();
   const navigate = useNavigate();
+  const gym = gymName ? getGymBySlug(gymName) : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,12 +41,12 @@ export default function PricingPage() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to={gymName ? `/${gymName}` : "/"} className="flex items-center gap-2">
             <Dumbbell className="h-7 w-7 text-brand" />
-            <span className="font-display text-xl font-bold">GymFlow</span>
+            <span className="font-display text-xl font-bold">{gym ? gym.name : "GymFlow"}</span>
           </Link>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Button variant="ghost" onClick={() => navigate("/login")}>Sign In</Button>
-            <Button onClick={() => navigate("/login")} className="bg-brand text-brand-foreground hover:bg-brand/90">Get Started</Button>
+            <Button variant="ghost" onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")}>Sign In</Button>
+            <Button onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")} className="bg-brand text-brand-foreground hover:bg-brand/90">Get Started</Button>
           </div>
         </div>
       </header>
@@ -80,7 +82,7 @@ export default function PricingPage() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full" variant={plan.popular ? "default" : "outline"} onClick={() => navigate("/login")}>
+                <Button className="w-full" variant={plan.popular ? "default" : "outline"} onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")}>
                   Start Free Trial
                 </Button>
               </CardFooter>

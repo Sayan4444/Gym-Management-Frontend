@@ -109,7 +109,7 @@ export default function LandingPage() {
           </nav>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Button onClick={() => navigate("/demo")} className="bg-brand text-brand-foreground hover:bg-brand/90">Book A Demo</Button>
+            <Button onClick={() => navigate("/bookslot")} className="bg-brand text-brand-foreground hover:bg-brand/90">Book A Demo</Button>
           </div>
         </div>
       </header>
@@ -126,7 +126,7 @@ export default function LandingPage() {
               An all-in-one gym management software to manage memberships, billing, attendance, workouts, staff, and reports from a single dashboard. Built for growing gyms and multi-location fitness businesses.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" onClick={() => navigate("/demo")} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
+              <Button size="lg" onClick={() => navigate("/bookslot")} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
                 Schedule A Demo <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button size="lg" variant="outline" onClick={() => navigate("/admin")} className="text-base px-8 rounded-full border-border/50">
@@ -232,7 +232,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-foreground mb-4">Ready to Transform Your Gym Management?</h2>
           <p className="text-brand-foreground/80 text-lg mb-8 max-w-xl mx-auto">Join gyms worldwide using GymFlow to streamline operations and boost revenue.</p>
-          <Button size="lg" onClick={() => navigate("/demo")} className="bg-background text-foreground hover:bg-background/90 text-base px-8 rounded-full">
+          <Button size="lg" onClick={() => navigate("/bookslot")} className="bg-background text-foreground hover:bg-background/90 text-base px-8 rounded-full">
             Schedule A Demo <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>

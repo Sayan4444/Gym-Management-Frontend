@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { Dumbbell } from "lucide-react";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { gymName } = useParams();
   const [step, setStep] = useState(1);
 
   const handleRegister = (e: React.FormEvent) => {
@@ -120,7 +121,7 @@ export default function RegisterPage() {
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Already have an account? <Link to="/login" className="text-primary hover:underline">Sign in</Link>
+              Already have an account? <Link to={gymName ? `/${gymName}/login` : "/super-admin/login"} className="text-primary hover:underline">Sign in</Link>
             </p>
           </CardFooter>
         </form>
