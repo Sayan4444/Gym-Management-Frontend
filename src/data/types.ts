@@ -78,3 +78,13 @@ export interface WorkoutPlan {
   title: string;
   description: string;
 }
+
+export interface Addon {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  gymId: number;
+  name: string;
+  price: number;
+  isActive: boolean;
+}

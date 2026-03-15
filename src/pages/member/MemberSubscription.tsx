@@ -1,14 +1,22 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getSubscriptionByUser, getPlanById, getPaymentsByUser } from "@/data/dummy";
+import { getSubscriptionByUser, getPlanById, getPaymentsByUser, getPlansByGym, getAddonsByGym } from "@/data/dummy";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { PackagePlus, RotateCcw } from "lucide-react";
 
 const sub = getSubscriptionByUser(7);
 const plan = sub ? getPlanById(sub.planId) : null;
 const memberPayments = getPaymentsByUser(7);
+const gymPlans = getPlansByGym(1).filter(p => p.isActive);
+const gymAddons = getAddonsByGym(1).filter(a => a.isActive);
 
 export default function MemberSubscription() {
+  const [showRenewDialog, setShowRenewDialog] = useState(false);
+  const [showAddonDialog, setShowAddonDialog] = useState(false);
+
   const statusBadge = (status: string) => {
     const cls: Record<string, string> = { Active: "bg-success/10 text-success", Expired: "bg-destructive/10 text-destructive", Frozen: "bg-warning/10 text-warning", Paid: "bg-success/10 text-success", Pending: "bg-warning/10 text-warning", Failed: "bg-destructive/10 text-destructive" };
     return <Badge variant="outline" className={cls[status] || ""}>{status}</Badge>;
@@ -35,8 +43,15 @@ export default function MemberSubscription() {
                   {label === "Status" ? statusBadge(sub.status) : <p className="font-medium">{value}</p>}
                 </div>
               ))}
-              <div className="col-span-2 mt-2">
-                <Button>Renew Subscription</Button>
+              <div className="col-span-2 mt-2 flex gap-3">
+                <Button onClick={() => setShowRenewDialog(true)}>
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Renew Subscription
+                </Button>
+                <Button variant="outline" onClick={() => setShowAddonDialog(true)}>
+                  <PackagePlus className="mr-2 h-4 w-4" />
+                  Add Addon
+                </Button>
               </div>
             </div>
           ) : (
@@ -68,6 +83,53 @@ export default function MemberSubscription() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Renew Subscription Dialog */}
+      <Dialog open={showRenewDialog} onOpenChange={setShowRenewDialog}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Renew Subscription</DialogTitle>
+            <DialogDescription>Choose a plan to subscribe to</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+            {gymPlans.map((p) => (
+              <div key={p.id} className="flex items-center justify-between rounded-lg border p-4">
+                <div>
+                  <p className="font-medium">{p.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {p.durationMonths} month{p.durationMonths > 1 ? "s" : ""}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-semibold">${p.price.toFixed(2)}</span>
+                  <Button size="sm" onClick={() => setShowRenewDialog(false)}>Buy Now</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Addon Dialog */}
+      <Dialog open={showAddonDialog} onOpenChange={setShowAddonDialog}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Add Addon</DialogTitle>
+            <DialogDescription>Choose an add-on to purchase</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+            {gymAddons.map((a) => (
+              <div key={a.id} className="flex items-center justify-between rounded-lg border p-4">
+                <p className="font-medium">{a.name}</p>
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-semibold">${a.price.toFixed(2)}</span>
+                  <Button size="sm" onClick={() => setShowAddonDialog(false)}>Buy Now</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

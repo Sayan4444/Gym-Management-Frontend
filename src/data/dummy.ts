@@ -1,4 +1,4 @@
-import { User, Gym, MembershipPlan, Subscription, Payment, Attendance, WorkoutPlan } from "./types";
+import { User, Gym, MembershipPlan, Subscription, Payment, Attendance, WorkoutPlan, Addon } from "./types";
 
 export const gyms: Gym[] = [
   { id: 1, createdAt: "2024-01-01", updatedAt: "2024-01-01", name: "Iron Forge Fitness", slug: "iron-forge-fitness", address: "123 Main St, Downtown, NY 10001", whatsapp: "+15550100" },
@@ -115,6 +115,11 @@ export const workoutPlans: WorkoutPlan[] = [
   { id: 7, createdAt: "2024-02-12", updatedAt: "2024-02-12", gymId: 2, trainerId: 6, memberId: 15, title: "Functional Fitness", description: "Functional movement patterns for everyday strength. Kettlebells, bodyweight, and mobility work. 4 days/week." },
 ];
 
+export const addons: Addon[] = [
+  { id: 1, createdAt: "2024-01-01", updatedAt: "2024-01-01", gymId: 1, name: "Oxygen Tube1", price: 15.00, isActive: true },
+  { id: 2, createdAt: "2024-01-01", updatedAt: "2024-01-01", gymId: 1, name: "Oxygen Tube2", price: 20.00, isActive: true },
+];
+
 // Helper functions
 export const getUserById = (id: number) => users.find(u => u.id === id);
 export const getGymById = (id: number) => gyms.find(g => g.id === id);
@@ -128,4 +133,5 @@ export const getAttendanceByDate = (date: string) => attendanceRecords.filter(a 
 export const getWorkoutPlansByTrainer = (trainerId: number) => workoutPlans.filter(w => w.trainerId === trainerId);
 export const getWorkoutPlansByMember = (memberId: number) => workoutPlans.filter(w => w.memberId === memberId);
 export const getPlansByGym = (gymId: number) => membershipPlans.filter(p => p.gymId === gymId);
+export const getAddonsByGym = (gymId: number) => addons.filter(a => a.gymId === gymId);
 export const getGymBySlug = (slug: string) => gyms.find(g => g.slug === slug);
