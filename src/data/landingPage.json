@@ -1,0 +1,168 @@
+{
+  "header": {
+    "brandName": "GymFlow"
+  },
+  "hero": {
+    "title": "Gym Management Software for",
+    "titleHighlight": "Fitness Centers, Studios & Chains",
+    "subtitle": "An all-in-one gym management software to manage memberships, billing, attendance, workouts, staff, and reports from a single dashboard. Built for growing gyms and multi-location fitness businesses."
+  },
+  "valueProps": [
+    {
+      "iconName": "Zap",
+      "title": "Everything in One Place",
+      "desc": "Manage members, enquiries, follow-ups, payments, attendance, expenses — all from a single dashboard. No spreadsheets, no confusion."
+    },
+    {
+      "iconName": "UserCheck",
+      "title": "Better Control Over Staff & Trainers",
+      "desc": "Assign staff roles, manage attendance & salaries, track PT sessions, set sales targets, and measure performance."
+    },
+    {
+      "iconName": "Users",
+      "title": "Happier, More Engaged Members",
+      "desc": "Members track calories, PRs, steps, and water intake through a branded app with exclusive brand vouchers."
+    },
+    {
+      "iconName": "TrendingUp",
+      "title": "Ready to Grow With You",
+      "desc": "Whether you run one gym or multiple branches, the software scales with your business without breaking workflows."
+    },
+    {
+      "iconName": "MessageSquare",
+      "title": "Support That Actually Helps",
+      "desc": "Smooth onboarding with complete data migration, a dedicated relationship manager, WhatsApp support, and monthly check-ins."
+    },
+    {
+      "iconName": "LineChart",
+      "title": "Clear View of Your Revenue",
+      "desc": "See exactly how much you earn, pending payments, upcoming payments, and which memberships are due for renewal."
+    }
+  ],
+  "showcases": [
+    {
+      "iconName": "Fingerprint",
+      "title": "Biometric Check-In & Access Control",
+      "desc": "Control gym entry with biometric check-in/check-out and track accurate attendance for members and staff across devices.",
+      "bullets": [
+        "Biometric check-in/check-out at entry",
+        "Secure access even without internet connectivity",
+        "Accurate attendance reports for members & staff"
+      ]
+    },
+    {
+      "iconName": "MessageSquare",
+      "title": "WhatsApp Integration",
+      "desc": "Seamless communication with automated messages directly to members via WhatsApp.",
+      "bullets": [
+        "Automated reminders, updates, and alerts",
+        "Two-way communication for personalized support",
+        "Automated birthday and festival wishes"
+      ]
+    },
+    {
+      "iconName": "Gift",
+      "title": "Brand Collaboration & Rewards",
+      "desc": "Reward members with exclusive brand offers through strategic collaborations.",
+      "bullets": [
+        "Partner with top fitness and lifestyle brands",
+        "Increase conversions with instant rewards at payment",
+        "Offers shared via email, WhatsApp, and App"
+      ]
+    },
+    {
+      "iconName": "Share2",
+      "title": "Referral Program",
+      "desc": "Create a structured referral program to encourage members to refer prospects to your gym.",
+      "bullets": [
+        "Increase retention with transparent rewards",
+        "Strengthen reputation through word-of-mouth",
+        "Reduce marketing costs while generating leads"
+      ]
+    },
+    {
+      "iconName": "Target",
+      "title": "Lead Management",
+      "desc": "Capture and manage leads in real-time from multiple sources like Instagram, Facebook, and walk-ins.",
+      "bullets": [
+        "Track leads through sales funnel",
+        "Personalized communication for better conversion",
+        "Clear insights into lead performance trends"
+      ]
+    }
+  ],
+  "benefits": {
+    "sectionTitle": "Why Gym Owners Choose",
+    "sectionTitleHighlight": "GymFlow",
+    "sectionSubtitle": "Streamline operations, boost revenue, and deliver an exceptional member experience.",
+    "items": [
+      {
+        "iconName": "Clock",
+        "title": "Save Time on Daily Operations",
+        "desc": "Automate memberships, billing, attendance, follow-ups, and communication."
+      },
+      {
+        "iconName": "Users",
+        "title": "Improve Member Experience",
+        "desc": "Clear schedules, timely reminders, easy payments, and progress tracking."
+      },
+      {
+        "iconName": "TrendingUp",
+        "title": "Increase Revenue & Reduce Leakages",
+        "desc": "Track renewals, pending payments, and conversions accurately."
+      },
+      {
+        "iconName": "UserCheck",
+        "title": "Better Control Over Staff",
+        "desc": "Monitor attendance, schedules, follow-ups, and performance from one system."
+      },
+      {
+        "iconName": "BarChart3",
+        "title": "Make Data-Driven Decisions",
+        "desc": "Access detailed reports on enquiries, conversions, attendance, and revenue."
+      },
+      {
+        "iconName": "Building2",
+        "title": "Scale Your Gym with Confidence",
+        "desc": "Supports growth for single or multi-location gyms without breaking processes."
+      }
+    ]
+  },
+  "faqs": [
+    {
+      "q": "Will this gym management software work for my type of gym?",
+      "a": "Yes. The software is designed for single gyms, fitness studios, personal training centers, and multi-location gym chains. You can configure memberships, billing, and access rules based on how your gym operates."
+    },
+    {
+      "q": "How long does it take to set up the software for my gym?",
+      "a": "Most gyms can go live within a few days. Setup includes gym configuration, member import, billing setup, and staff access. Our onboarding team guides you through the entire process."
+    },
+    {
+      "q": "Can I manage multiple gym branches under one account?",
+      "a": "Yes. You can manage multiple gym branches from a single dashboard while keeping branch-wise access, reports, and staff control."
+    },
+    {
+      "q": "What happens to my existing member data?",
+      "a": "Your existing member data can be securely imported into the system, including member details, memberships, and payment history — ensuring a smooth transition without data loss."
+    },
+    {
+      "q": "Will this software help reduce membership drop-outs?",
+      "a": "Yes. Automated reminders, follow-ups, progress tracking, and clear communication help improve member engagement and reduce drop-outs over time."
+    },
+    {
+      "q": "Is this gym management software secure?",
+      "a": "Yes. The software uses secure cloud infrastructure with controlled access for owners, managers, trainers, and staff to protect business and member data."
+    }
+  ],
+  "cta": {
+    "title": "Ready to Transform Your Gym Management?",
+    "subtitle": "Join gyms worldwide using GymFlow to streamline operations and boost revenue."
+  },
+  "footer": {
+    "copyright": "© 2026 GymFlow. All rights reserved.",
+    "contactName": "Sayan Banerjee",
+    "phone": "+91 98765 43210",
+    "address": "123 Fitness Lane, Sector 5",
+    "location": "Kolkata, West Bengal, India"
+  }
+}
