@@ -23,14 +23,14 @@ interface NavItem {
 function getNavItems(role: string, prefix: string): NavItem[] {
   const items: Record<string, NavItem[]> = {
     admin: [
-      { title: "Dashboard", url: `${prefix}/admin`, icon: LayoutDashboard },
-      { title: "Members", url: `${prefix}/admin/members`, icon: Users },
-      { title: "Attendance", url: `${prefix}/admin/attendance`, icon: CalendarCheck },
-      { title: "Membership Plans", url: `${prefix}/admin/plans`, icon: ClipboardList },
-      { title: "Payments", url: `${prefix}/admin/payments`, icon: CreditCard },
-      { title: "Trainers", url: `${prefix}/admin/trainers`, icon: Dumbbell },
-      { title: "Reports", url: `${prefix}/admin/reports`, icon: BarChart3 },
-      { title: "Settings", url: `${prefix}/admin/settings`, icon: Settings },
+      { title: "Dashboard", url: `${prefix}/admin?tab=dashboard`, icon: LayoutDashboard },
+      { title: "Members", url: `${prefix}/admin?tab=members`, icon: Users },
+      { title: "Attendance", url: `${prefix}/admin?tab=attendance`, icon: CalendarCheck },
+      { title: "Membership Plans", url: `${prefix}/admin?tab=plans`, icon: ClipboardList },
+      { title: "Payments", url: `${prefix}/admin?tab=payments`, icon: CreditCard },
+      { title: "Trainers", url: `${prefix}/admin?tab=trainers`, icon: Dumbbell },
+      { title: "Reports", url: `${prefix}/admin?tab=reports`, icon: BarChart3 },
+      { title: "Settings", url: `${prefix}/admin?tab=settings`, icon: Settings },
     ],
     trainer: [
       { title: "Dashboard", url: `${prefix}/trainer?tab=dashboard`, icon: LayoutDashboard },
@@ -63,7 +63,8 @@ function SidebarNav({ role, prefix }: { role: string; prefix: string }) {
   const items = getNavItems(role, prefix);
   const baseUrl = role === "super-admin" ? "/super-admin" : `${prefix}/${role}`;
   const [searchParams] = useSearchParams();
-  const currentTab = searchParams.get("tab") || "overview";
+  const defaultTab = role === "super-admin" ? "overview" : "dashboard";
+  const currentTab = searchParams.get("tab") || defaultTab;
 
   return (
     <Sidebar collapsible="icon">
@@ -82,7 +83,7 @@ function SidebarNav({ role, prefix }: { role: string; prefix: string }) {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                const isTabbedRole = role === "super-admin" || role === "trainer" || role === "member";
+                const isTabbedRole = role === "super-admin" || role === "trainer" || role === "member" || role === "admin";
                 const isTabActive = isTabbedRole && (
                   item.url.includes(`tab=${currentTab}`) || 
                   (item.url.endsWith(`/${role}`) && currentTab === "dashboard") ||

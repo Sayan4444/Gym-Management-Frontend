@@ -88,21 +88,21 @@ const generateAttendanceRecords = (): Attendance[] => {
 export const attendanceRecords: Attendance[] = generateAttendanceRecords();
 
 export const payments: Payment[] = [
-  { id: 1, createdAt: "2024-01-10", updatedAt: "2024-01-10", userId: 7, amount: 59.99, paymentDate: "2024-01-10", status: "Paid" },
-  { id: 2, createdAt: "2024-01-11", updatedAt: "2024-01-11", userId: 8, amount: 599.99, paymentDate: "2024-01-11", status: "Paid" },
-  { id: 3, createdAt: "2024-01-12", updatedAt: "2024-01-12", userId: 9, amount: 59.99, paymentDate: "2024-01-12", status: "Paid" },
-  { id: 4, createdAt: "2024-01-15", updatedAt: "2024-01-15", userId: 10, amount: 29.99, paymentDate: "2024-01-15", status: "Paid" },
-  { id: 5, createdAt: "2024-02-01", updatedAt: "2024-02-01", userId: 11, amount: 299.99, paymentDate: "2024-02-01", status: "Paid" },
-  { id: 6, createdAt: "2024-02-05", updatedAt: "2024-02-05", userId: 12, amount: 59.99, paymentDate: "2024-02-05", status: "Paid" },
-  { id: 7, createdAt: "2024-02-10", updatedAt: "2024-02-10", userId: 13, amount: 29.99, paymentDate: "2024-02-10", status: "Pending" },
-  { id: 8, createdAt: "2024-02-10", updatedAt: "2024-02-10", userId: 14, amount: 39.99, paymentDate: "2024-02-10", status: "Paid" },
-  { id: 9, createdAt: "2024-02-12", updatedAt: "2024-02-12", userId: 15, amount: 399.99, paymentDate: "2024-02-12", status: "Paid" },
-  { id: 10, createdAt: "2024-02-15", updatedAt: "2024-02-15", userId: 16, amount: 39.99, paymentDate: "2024-02-15", status: "Failed" },
-  { id: 11, createdAt: "2024-03-01", updatedAt: "2024-03-01", userId: 7, amount: 59.99, paymentDate: "2025-03-01", status: "Paid" },
-  { id: 12, createdAt: "2024-03-01", updatedAt: "2024-03-01", userId: 9, amount: 59.99, paymentDate: "2025-03-01", status: "Paid" },
-  { id: 13, createdAt: "2024-03-05", updatedAt: "2024-03-05", userId: 10, amount: 29.99, paymentDate: "2025-03-05", status: "Pending" },
-  { id: 14, createdAt: "2024-03-10", updatedAt: "2024-03-10", userId: 17, amount: 39.99, paymentDate: "2025-03-10", status: "Paid" },
-  { id: 15, createdAt: "2024-03-11", updatedAt: "2024-03-11", userId: 18, amount: 39.99, paymentDate: "2025-03-11", status: "Paid" },
+  { id: 1, createdAt: "2024-01-10", updatedAt: "2024-01-10", userId: 7, amount: 59.99, paymentDate: "2024-01-10", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 2, createdAt: "2024-01-11", updatedAt: "2024-01-11", userId: 8, amount: 599.99, paymentDate: "2024-01-11", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 3, createdAt: "2024-01-12", updatedAt: "2024-01-12", userId: 9, amount: 59.99, paymentDate: "2024-01-12", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 4, createdAt: "2024-01-15", updatedAt: "2024-01-15", userId: 10, amount: 29.99, paymentDate: "2024-01-15", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 5, createdAt: "2024-02-01", updatedAt: "2024-02-01", userId: 11, amount: 299.99, paymentDate: "2024-02-01", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 6, createdAt: "2024-02-05", updatedAt: "2024-02-05", userId: 12, amount: 59.99, paymentDate: "2024-02-05", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 7, createdAt: "2024-02-10", updatedAt: "2024-02-10", userId: 13, amount: 29.99, paymentDate: "2024-02-10", status: "Pending", paymentFor: "Membership Plan" },
+  { id: 8, createdAt: "2024-02-10", updatedAt: "2024-02-10", userId: 14, amount: 39.99, paymentDate: "2024-02-10", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 9, createdAt: "2024-02-12", updatedAt: "2024-02-12", userId: 15, amount: 399.99, paymentDate: "2024-02-12", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 10, createdAt: "2024-02-15", updatedAt: "2024-02-15", userId: 16, amount: 39.99, paymentDate: "2024-02-15", status: "Failed", paymentFor: "Add-On" },
+  { id: 11, createdAt: "2024-03-01", updatedAt: "2024-03-01", userId: 7, amount: 59.99, paymentDate: "2025-03-01", status: "Paid", paymentFor: "Add-On" },
+  { id: 12, createdAt: "2024-03-01", updatedAt: "2024-03-01", userId: 9, amount: 59.99, paymentDate: "2025-03-01", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 13, createdAt: "2024-03-05", updatedAt: "2024-03-05", userId: 10, amount: 29.99, paymentDate: "2025-03-05", status: "Pending", paymentFor: "Add-On" },
+  { id: 14, createdAt: "2024-03-10", updatedAt: "2024-03-10", userId: 17, amount: 39.99, paymentDate: "2025-03-10", status: "Paid", paymentFor: "Membership Plan" },
+  { id: 15, createdAt: "2024-03-11", updatedAt: "2024-03-11", userId: 18, amount: 39.99, paymentDate: "2025-03-11", status: "Paid", paymentFor: "Membership Plan" },
 ];
 
 export const workoutPlans: WorkoutPlan[] = [

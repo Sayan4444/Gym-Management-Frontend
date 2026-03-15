@@ -65,6 +65,7 @@ export default function PaymentsPage() {
               <TableRow>
                 <TableHead>Member</TableHead>
                 <TableHead>Amount</TableHead>
+                <TableHead>Payment For</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
@@ -76,6 +77,11 @@ export default function PaymentsPage() {
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{user?.name || "Unknown"}</TableCell>
                     <TableCell>${p.amount.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={p.paymentFor === "Membership Plan" ? "bg-primary/10 text-primary border-primary/20" : "bg-purple-500/10 text-purple-600 border-purple-500/20"}>
+                        {p.paymentFor}
+                      </Badge>
+                    </TableCell>
                     <TableCell className="text-muted-foreground">{p.paymentDate}</TableCell>
                     <TableCell>{statusBadge(p.status)}</TableCell>
                   </TableRow>

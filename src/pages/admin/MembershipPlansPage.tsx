@@ -56,6 +56,61 @@ export default function MembershipPlansPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Add Ons Section */}
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold font-display">Add Ons</h2>
+          <p className="text-muted-foreground">Optional extras members can add to their plans</p>
+        </div>
+        <Button><Plus className="mr-2 h-4 w-4" /> Add Add-On</Button>
+      </div>
+
+      <Card>
+        <CardContent className="pt-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Add-On Name</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Active</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="font-medium">Oxygen Tube1</TableCell>
+                <TableCell>$15.00</TableCell>
+                <TableCell>
+                  <Badge variant="default" className="bg-success/10 text-success border-success/20">Active</Badge>
+                </TableCell>
+                <TableCell><Switch checked={true} /></TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Oxygen Tube2</TableCell>
+                <TableCell>$20.00</TableCell>
+                <TableCell>
+                  <Badge variant="default" className="bg-success/10 text-success border-success/20">Active</Badge>
+                </TableCell>
+                <TableCell><Switch checked={true} /></TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

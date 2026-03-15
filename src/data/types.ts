@@ -54,6 +54,7 @@ export interface Payment {
   amount: number;
   paymentDate: string;
   status: "Paid" | "Pending" | "Failed";
+  paymentFor: "Membership Plan" | "Add-On";
 }
 
 export interface Attendance {

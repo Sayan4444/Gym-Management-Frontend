@@ -14,15 +14,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
 // Admin pages
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import MembersList from "./pages/admin/MembersList";
-import MemberProfile from "./pages/admin/MemberProfile";
-import AttendancePage from "./pages/admin/AttendancePage";
-import MembershipPlansPage from "./pages/admin/MembershipPlansPage";
-import PaymentsPage from "./pages/admin/PaymentsPage";
-import TrainersPage from "./pages/admin/TrainersPage";
-import ReportsPage from "./pages/admin/ReportsPage";
-import SettingsPage from "./pages/admin/SettingsPage";
+import AdminPanel from "./pages/admin/AdminPanel";
 
 // Trainer pages
 import TrainerDashboard from "./pages/trainer/TrainerDashboard";
@@ -64,15 +56,7 @@ const App = () => (
 
             {/* Gym Admin routes */}
             <Route path="/:gymName/admin" element={<DashboardLayout role="admin" />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="members" element={<MembersList />} />
-              <Route path="members/:id" element={<MemberProfile />} />
-              <Route path="attendance" element={<AttendancePage />} />
-              <Route path="plans" element={<MembershipPlansPage />} />
-              <Route path="payments" element={<PaymentsPage />} />
-              <Route path="trainers" element={<TrainersPage />} />
-              <Route path="reports" element={<ReportsPage />} />
-              <Route path="settings" element={<SettingsPage />} />
+              <Route index element={<AdminPanel />} />
             </Route>
 
             {/* Trainer routes */}

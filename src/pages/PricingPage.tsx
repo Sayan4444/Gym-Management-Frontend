@@ -46,7 +46,6 @@ export default function PricingPage() {
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Button variant="ghost" onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")}>Sign In</Button>
-            <Button onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")} className="bg-brand text-brand-foreground hover:bg-brand/90">Get Started</Button>
           </div>
         </div>
       </header>
