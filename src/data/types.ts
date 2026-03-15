@@ -12,6 +12,13 @@ export interface User {
   role: "SuperAdmin" | "GymAdmin" | "Trainer" | "Member";
   gymId?: number;
   trainerId?: number;
+  address?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  bloodGroup?: string;
+  height?: number;
+  weight?: number;
+  medicalConditions?: string;
 }
 
 export interface Gym {

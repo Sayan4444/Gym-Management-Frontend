@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Outlet, useNavigate, useParams, Link, useSearchParams } from "react-router-dom";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -5,13 +6,14 @@ import {
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ProfileDialog } from "@/components/ProfileDialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard, Users, CalendarCheck, CreditCard, ClipboardList, Dumbbell,
-  BarChart3, Settings, Building2, UserCog, LogOut, Crown,
+  BarChart3, Settings, Building2, UserCog, LogOut, Crown, User as UserIcon,
 } from "lucide-react";
 import { users, getSubscriptionByUser, getPlanById } from "@/data/dummy";
 
@@ -124,6 +126,13 @@ export default function DashboardLayout({ role }: { role: string }) {
   const navigate = useNavigate();
   const { gymName } = useParams();
   const prefix = gymName ? `/${gymName}` : "";
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  // Determine the current user based on role
+  const currentUser = role === "member" ? users.find(u => u.id === 7)
+    : role === "admin" ? users.find(u => u.id === 2)
+    : role === "trainer" ? users.find(u => u.id === 4)
+    : users.find(u => u.id === 1);
 
   return (
     <SidebarProvider>
@@ -161,6 +170,10 @@ export default function DashboardLayout({ role }: { role: string }) {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setProfileOpen(true)}>
+                    <UserIcon className="mr-2 h-4 w-4" /> Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")}>
                     <LogOut className="mr-2 h-4 w-4" /> Sign out
                   </DropdownMenuItem>
@@ -171,6 +184,9 @@ export default function DashboardLayout({ role }: { role: string }) {
           <main className="flex-1 p-6 overflow-auto">
             <Outlet />
           </main>
+          {currentUser && (
+            <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} user={currentUser} />
+          )}
         </div>
       </div>
     </SidebarProvider>
