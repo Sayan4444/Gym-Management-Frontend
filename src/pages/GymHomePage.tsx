@@ -130,7 +130,7 @@ export default function GymHomePage() {
               <Button size="lg" onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
                 Join Now <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate(`/${gymName}/pricing`)} className="text-base px-8 rounded-full border-border/50">
+              <Button size="lg" onClick={() => navigate(`/${gymName}/pricing`)} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
                 Pricing
               </Button>
             </div>

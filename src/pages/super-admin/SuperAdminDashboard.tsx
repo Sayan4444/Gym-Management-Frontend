@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { gyms, users, payments, subscriptions } from "@/data/dummy";
 import { Building2, Users, CreditCard, TrendingUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useSearchParams } from "react-router-dom";
 import GymManagement from "./GymManagement";
 import SuperAdminUsers from "./SuperAdminUsers";
 
@@ -27,6 +28,9 @@ const kpis = [
 ];
 
 export default function SuperAdminDashboard() {
+  const [searchParams] = useSearchParams();
+  const currentTab = searchParams.get("tab") || "overview";
+
   return (
     <div className="space-y-6">
       <div>
@@ -34,14 +38,8 @@ export default function SuperAdminDashboard() {
         <p className="text-muted-foreground">Overview of all gyms</p>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="gyms">Gyms</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview" className="space-y-6">
+      {currentTab === "overview" && (
+        <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {kpis.map((k) => (
               <Card key={k.title}>
@@ -72,16 +70,11 @@ export default function SuperAdminDashboard() {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </TabsContent>
-        
-        <TabsContent value="gyms">
-          <GymManagement />
-        </TabsContent>
-        
-        <TabsContent value="users">
-          <SuperAdminUsers />
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
+
+      {currentTab === "gyms" && <GymManagement />}
+      {currentTab === "users" && <SuperAdminUsers />}
     </div>
   );
 }

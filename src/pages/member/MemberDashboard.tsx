@@ -1,7 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useSearchParams } from "react-router-dom";
 import { users, getSubscriptionByUser, getPlanById, getAttendanceByUser } from "@/data/dummy";
 import { CalendarCheck, CreditCard, Clock } from "lucide-react";
+import MemberAttendanceHistory from "./MemberAttendanceHistory";
+import MemberSubscription from "./MemberSubscription";
 
 const member = users.find(u => u.id === 7)!;
 const sub = getSubscriptionByUser(member.id);
@@ -12,6 +15,17 @@ const recentAttendance = attendance.slice(-5).reverse();
 const daysLeft = sub ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
 export default function MemberDashboard() {
+  const [searchParams] = useSearchParams();
+  const currentTab = searchParams.get("tab") || "dashboard";
+
+  if (currentTab === "attendance") {
+    return <MemberAttendanceHistory />;
+  }
+
+  if (currentTab === "subscription") {
+    return <MemberSubscription />;
+  }
+
   return (
     <div className="space-y-6">
       <div>

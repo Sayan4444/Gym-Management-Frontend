@@ -2,7 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSearchParams } from "react-router-dom";
 import { users, attendanceRecords, getWorkoutPlansByTrainer } from "@/data/dummy";
+import WorkoutPlansPage from "./WorkoutPlansPage";
 
 const trainer = users.find(u => u.id === 4)!;
 const assignedMembers = users.filter(u => u.trainerId === trainer.id);
@@ -11,6 +13,13 @@ const today = new Date().toISOString().split("T")[0];
 const todayAttendance = attendanceRecords.filter(a => a.date === today && assignedMembers.some(m => m.id === a.userId));
 
 export default function TrainerDashboard() {
+  const [searchParams] = useSearchParams();
+  const currentTab = searchParams.get("tab") || "dashboard";
+
+  if (currentTab === "workouts") {
+    return <WorkoutPlansPage />;
+  }
+
   return (
     <div className="space-y-6">
       <div>

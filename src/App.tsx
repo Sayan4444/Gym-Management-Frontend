@@ -78,14 +78,11 @@ const App = () => (
             {/* Trainer routes */}
             <Route path="/:gymName/trainer" element={<DashboardLayout role="trainer" />}>
               <Route index element={<TrainerDashboard />} />
-              <Route path="workouts" element={<WorkoutPlansPage />} />
             </Route>
 
             {/* Member routes */}
             <Route path="/:gymName/member" element={<DashboardLayout role="member" />}>
               <Route index element={<MemberDashboard />} />
-              <Route path="attendance" element={<MemberAttendanceHistory />} />
-              <Route path="subscription" element={<MemberSubscription />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams, Link, useSearchParams } from "react-router-dom";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
@@ -33,16 +33,18 @@ function getNavItems(role: string, prefix: string): NavItem[] {
       { title: "Settings", url: `${prefix}/admin/settings`, icon: Settings },
     ],
     trainer: [
-      { title: "Dashboard", url: `${prefix}/trainer`, icon: LayoutDashboard },
-      { title: "Workout Plans", url: `${prefix}/trainer/workouts`, icon: Dumbbell },
+      { title: "Dashboard", url: `${prefix}/trainer?tab=dashboard`, icon: LayoutDashboard },
+      { title: "Workout Plans", url: `${prefix}/trainer?tab=workouts`, icon: Dumbbell },
     ],
     member: [
-      { title: "Dashboard", url: `${prefix}/member`, icon: LayoutDashboard },
-      { title: "Attendance", url: `${prefix}/member/attendance`, icon: CalendarCheck },
-      { title: "Subscription", url: `${prefix}/member/subscription`, icon: ClipboardList },
+      { title: "Dashboard", url: `${prefix}/member?tab=dashboard`, icon: LayoutDashboard },
+      { title: "Attendance", url: `${prefix}/member?tab=attendance`, icon: CalendarCheck },
+      { title: "Subscription", url: `${prefix}/member?tab=subscription`, icon: ClipboardList },
     ],
     "super-admin": [
-      { title: "Dashboard", url: "/super-admin", icon: LayoutDashboard },
+      { title: "Dashboard", url: "/super-admin?tab=overview", icon: LayoutDashboard },
+      { title: "Gyms", url: "/super-admin?tab=gyms", icon: Building2 },
+      { title: "Users", url: "/super-admin?tab=users", icon: Users },
     ],
   };
   return items[role] || [];
@@ -60,6 +62,8 @@ function SidebarNav({ role, prefix }: { role: string; prefix: string }) {
   const collapsed = state === "collapsed";
   const items = getNavItems(role, prefix);
   const baseUrl = role === "super-admin" ? "/super-admin" : `${prefix}/${role}`;
+  const [searchParams] = useSearchParams();
+  const currentTab = searchParams.get("tab") || "overview";
 
   return (
     <Sidebar collapsible="icon">
@@ -77,16 +81,35 @@ function SidebarNav({ role, prefix }: { role: string; prefix: string }) {
           <SidebarGroupLabel>{roleLabels[role]}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end={item.url === baseUrl} className="hover:bg-accent/50" activeClassName="bg-accent text-primary font-medium">
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const isTabbedRole = role === "super-admin" || role === "trainer" || role === "member";
+                const isTabActive = isTabbedRole && (
+                  item.url.includes(`tab=${currentTab}`) || 
+                  (item.url.endsWith(`/${role}`) && currentTab === "dashboard") ||
+                  (item.url.endsWith("/super-admin") && currentTab === "overview")
+                );
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      {isTabbedRole ? (
+                        <Link 
+                          to={item.url} 
+                          className={`hover:bg-accent/50 ${isTabActive ? "bg-accent text-primary font-medium" : ""}`}
+                        >
+                          <item.icon className="mr-2 h-4 w-4" />
+                          {!collapsed && <span>{item.title}</span>}
+                        </Link>
+                      ) : (
+                        <NavLink to={item.url} end={item.url === baseUrl} className="hover:bg-accent/50" activeClassName="bg-accent text-primary font-medium">
+                          <item.icon className="mr-2 h-4 w-4" />
+                          {!collapsed && <span>{item.title}</span>}
+                        </NavLink>
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
