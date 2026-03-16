@@ -3,46 +3,42 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Dumbbell, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Dumbbell, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-
-const industries = [
-  "Gym / Fitness Center",
-  "Multi-Chain - Gym / Fitness Center",
-  "Pilates Studio",
-  "EMS Studio",
-  "Fitness Studio",
-  "Yoga Studio",
-  "Dance Studio",
-  "Personal Trainer / Fitness Coach",
-  "Nutritionist / Dietician",
-  "Wellness Coach",
-  "Other",
-];
+import { api } from "@/lib/api";
 
 export default function DemoPage() {
   const navigate = useNavigate();
   const { gymName } = useParams();
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     fullName: "",
     mobile: "",
     email: "",
-    industry: "",
+    preferredDate: "",
+    preferredTime: "",
     notes: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.fullName || !form.mobile || !form.industry) {
+    if (!form.fullName || !form.mobile) {
       toast({ title: "Please fill in all required fields", variant: "destructive" });
       return;
     }
-    setSubmitted(true);
+    setLoading(true);
+    try {
+      await api.submitDemoRequest(form);
+      setSubmitted(true);
+    } catch (err: any) {
+      toast({ title: err.message || "Something went wrong", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -122,18 +118,27 @@ export default function DemoPage() {
                 />
               </div>
 
-              <div>
-                <Label>Industry / Business Type <span className="text-destructive">*</span></Label>
-                <Select value={form.industry} onValueChange={(val) => setForm({ ...form, industry: val })}>
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue placeholder="Select your industry" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {industries.map((ind) => (
-                      <SelectItem key={ind} value={ind}>{ind}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="preferredDate">Preferred Date <span className="text-muted-foreground text-xs">(Optional)</span></Label>
+                  <Input
+                    id="preferredDate"
+                    type="date"
+                    value={form.preferredDate}
+                    onChange={(e) => setForm({ ...form, preferredDate: e.target.value })}
+                    className="mt-1.5"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="preferredTime">Preferred Time <span className="text-muted-foreground text-xs">(Optional)</span></Label>
+                  <Input
+                    id="preferredTime"
+                    type="time"
+                    value={form.preferredTime}
+                    onChange={(e) => setForm({ ...form, preferredTime: e.target.value })}
+                    className="mt-1.5"
+                  />
+                </div>
               </div>
 
               <div>
@@ -147,8 +152,20 @@ export default function DemoPage() {
                 />
               </div>
 
-              <Button type="submit" size="lg" className="w-full bg-brand text-brand-foreground hover:bg-brand/90 text-base rounded-full">
-                Submit Demo Request
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full bg-brand text-brand-foreground hover:bg-brand/90 text-base rounded-full"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting…
+                  </>
+                ) : (
+                  "Submit Demo Request"
+                )}
               </Button>
             </form>
           </div>

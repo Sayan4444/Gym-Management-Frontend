@@ -31,6 +31,14 @@ export const api = {
   // Public / Unauthenticated
   getGyms: () => fetchApi("/gyms"),
   getGym: (identifier: string) => fetchApi(`/gyms/${identifier}`),
+  submitDemoRequest: (data: {
+    fullName: string;
+    mobile: string;
+    email: string;
+    preferredDate: string;
+    preferredTime: string;
+    notes: string;
+  }) => fetchApi("/demo-request", { method: "POST", body: JSON.stringify(data) }),
   
   // Protected
   getDashboardStats: (gymId?: number) => {
