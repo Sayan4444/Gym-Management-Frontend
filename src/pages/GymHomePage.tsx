@@ -9,7 +9,7 @@ import {
   Fingerprint, MessageSquare, Gift, Share2, Target, Star,
 } from "lucide-react";
 import { useState } from "react";
-import { getGymBySlug } from "@/data/dummy";
+import { useGyms } from "@/hooks/useApi";
 import heroImg from "@/assets/hero-gym.jpg";
 
 /* ─── Testimonials ─── */
@@ -75,7 +75,13 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function GymHomePage() {
   const { gymName } = useParams<{ gymName: string }>();
   const navigate = useNavigate();
-  const gym = getGymBySlug(gymName || "");
+  const { data: gyms = [], isLoading } = useGyms();
+  const generateSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-');
+  const gym = gyms.find((g) => generateSlug(g.name) === gymName);
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   if (!gym) {
     return (

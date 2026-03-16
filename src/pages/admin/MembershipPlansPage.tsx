@@ -3,13 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { getPlansByGym, getAddonsByGym } from "@/data/dummy";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-
-const plans = getPlansByGym(1);
-const addons = getAddonsByGym(1);
+import { usePlans, useAddons } from "@/hooks/useApi";
 
 export default function MembershipPlansPage() {
+  const gymId = 1;
+  const { data: plans = [] } = usePlans(gymId);
+  const { data: addons = [] } = useAddons(gymId);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between gap-4">

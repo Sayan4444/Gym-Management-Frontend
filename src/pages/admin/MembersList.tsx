@@ -7,12 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getMembersByGym, getSubscriptionByUser, getPlanById } from "@/data/dummy";
 import { Search, Plus, Eye, Crown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-
-const members = getMembersByGym(1);
+import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
 
 const statusBadge = (status?: string) => {
   if (!status) return <Badge variant="outline">No Plan</Badge>;
@@ -26,14 +24,22 @@ const statusBadge = (status?: string) => {
 
 export default function MembersList() {
   const navigate = useNavigate();
+  const gymId = 1;
+  const { data: members = [] } = useUsers(gymId, false, "Member");
+  const { data: subscriptions = [] } = useSubscriptions(gymId);
+  const { data: plans = [] } = usePlans(gymId);
+
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [premiumOnly, setPremiumOnly] = useState(false);
 
+  const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
+  const getPlanById = (planId: number) => plans.find((p) => p.id === planId);
+
   const filtered = members.filter((m) => {
     const sub = getSubscriptionByUser(m.id);
     const plan = sub ? getPlanById(sub.planId) : null;
-    const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase()) || m.email.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = m.name?.toLowerCase().includes(search.toLowerCase()) || m.email?.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filterStatus === "all" || sub?.status === filterStatus || (!sub && filterStatus === "none");
     if (!matchesSearch || !matchesFilter) return false;
     if (premiumOnly && !plan?.name.toLowerCase().includes("premium")) return false;
@@ -99,7 +105,7 @@ export default function MembersList() {
                       <div className="flex items-center gap-3">
                         <div className="relative">
                           <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-primary/10 text-primary text-xs">{m.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                            <AvatarFallback className="bg-primary/10 text-primary text-xs">{m.name?.split(" ").map(n => n[0]).join("")}</AvatarFallback>
                           </Avatar>
                           {plan?.name.toLowerCase().includes("premium") && (
                             <Crown className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 text-yellow-500 fill-yellow-400 drop-shadow" />

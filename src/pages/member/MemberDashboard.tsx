@@ -1,22 +1,32 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router-dom";
-import { users, getSubscriptionByUser, getPlanById, getAttendanceByUser } from "@/data/dummy";
 import { CalendarCheck, CreditCard, Clock, Crown } from "lucide-react";
 import MemberAttendanceHistory from "./MemberAttendanceHistory";
 import MemberSubscription from "./MemberSubscription";
-
-const member = users.find(u => u.id === 7)!;
-const sub = getSubscriptionByUser(member.id);
-const plan = sub ? getPlanById(sub.planId) : null;
-const attendance = getAttendanceByUser(member.id);
-const recentAttendance = attendance.slice(-5).reverse();
-
-const daysLeft = sub ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
+import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
 
 export default function MemberDashboard() {
   const [searchParams] = useSearchParams();
   const currentTab = searchParams.get("tab") || "dashboard";
+
+  const gymId = 1;
+  const { data: users = [] } = useUsers(gymId);
+  const { data: subscriptions = [] } = useSubscriptions(gymId);
+  const { data: plans = [] } = usePlans(gymId);
+
+  const member = users.find(u => u.id === 7);
+  const sub = member ? subscriptions.find(s => s.userId === member.id && s.status === "Active") : null;
+  const plan = sub ? plans.find(p => p.id === sub.planId) : null;
+  
+  // Local static mock for attendance
+  const attendance = [
+    { id: 1, date: new Date().toISOString().split("T")[0], timeIn: new Date().toISOString(), timeOut: new Date().toISOString(), source: "Biometric" }
+  ];
+  const recentAttendance = attendance.slice(-5).reverse();
+
+  const daysLeft = sub ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
+
 
   if (currentTab === "attendance") {
     return <MemberAttendanceHistory />;
@@ -30,7 +40,7 @@ export default function MemberDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold font-display flex items-center gap-2">
-          Welcome, {member.name.split(" ")[0]}
+          Welcome, {member?.name.split(" ")[0] || "Member"}
           {plan?.name.toLowerCase().includes("premium") && (
             <Crown className="h-6 w-6 text-yellow-500 fill-yellow-400" />
           )}

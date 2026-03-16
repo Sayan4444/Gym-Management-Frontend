@@ -4,20 +4,25 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { payments, getUserById, getMembersByGym } from "@/data/dummy";
 import { Search } from "lucide-react";
-
-const gymMembers = getMembersByGym(1);
-const memberIds = new Set(gymMembers.map(m => m.id));
-const gymPayments = payments.filter(p => memberIds.has(p.userId));
+import { useUsers } from "@/hooks/useApi";
 
 export default function PaymentsPage() {
+  const gymId = 1;
+  const { data: users = [] } = useUsers(gymId);
+  const gymMembers = users.filter((u) => u.role === "Member");
+
+  // Local static mock for payments
+  const gymPayments = [
+    { id: 1, userId: gymMembers[0]?.id || 0, amount: 49.99, paymentDate: "2023-11-01", status: "Paid", paymentFor: "Membership Plan" }
+  ];
+
   const [filterStatus, setFilterStatus] = useState("all");
   const [search, setSearch] = useState("");
 
   const filtered = gymPayments.filter((p) => {
-    const user = getUserById(p.userId);
-    const matchesSearch = !search || user?.name.toLowerCase().includes(search.toLowerCase());
+    const user = users.find((u) => u.id === p.userId);
+    const matchesSearch = !search || user?.name?.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filterStatus === "all" || p.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -72,7 +77,7 @@ export default function PaymentsPage() {
             </TableHeader>
             <TableBody>
               {filtered.map((p) => {
-                const user = getUserById(p.userId);
+                const user = users.find((u) => u.id === p.userId);
                 return (
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{user?.name || "Unknown"}</TableCell>

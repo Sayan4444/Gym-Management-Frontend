@@ -1,35 +1,36 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { gyms, users, payments, subscriptions } from "@/data/dummy";
+import { useGyms, useUsers, useDashboardStats } from "@/hooks/useApi";
 import { Building2, Users, CreditCard, TrendingUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useSearchParams } from "react-router-dom";
 import GymManagement from "./GymManagement";
 import SuperAdminUsers from "./SuperAdminUsers";
 
-const totalMembers = users.filter((u) => u.role === "Member").length;
-const totalTrainers = users.filter((u) => u.role === "Trainer").length;
-const totalRevenue = payments.filter((p) => p.status === "Paid").reduce((s, p) => s + p.amount, 0);
-const activeSubscriptions = subscriptions.filter((s) => s.status === "Active").length;
-
-const gymStats = gyms.map((g) => ({
-  name: g.name,
-  members: users.filter((u) => u.gymId === g.id && u.role === "Member").length,
-  revenue: payments
-    .filter((p) => p.status === "Paid" && users.find((u) => u.id === p.userId)?.gymId === g.id)
-    .reduce((s, p) => s + p.amount, 0),
-}));
-
-const kpis = [
-  { title: "Total Gyms", value: gyms.length, icon: Building2, color: "text-primary" },
-  { title: "Total Members", value: totalMembers, icon: Users, color: "text-success" },
-  { title: "Active Subs", value: activeSubscriptions, icon: TrendingUp, color: "text-primary" },
-  { title: "Total Revenue", value: `$${totalRevenue.toFixed(0)}`, icon: CreditCard, color: "text-success" },
-];
-
 export default function SuperAdminDashboard() {
   const [searchParams] = useSearchParams();
   const currentTab = searchParams.get("tab") || "overview";
+
+  const { data: gyms = [] } = useGyms();
+  const { data: users = [] } = useUsers();
+  const { data: stats } = useDashboardStats();
+
+  const totalMembers = stats?.total_members ?? 0;
+  const totalTrainers = users.filter((u) => u.role === "Trainer").length;
+  const totalRevenue = stats?.total_revenue ?? 0;
+  const activeSubscriptions = stats?.active_memberships ?? 0;
+
+  const gymStats = gyms.map((g) => ({
+    name: g.name,
+    members: users.filter((u) => u.gymId === g.id && u.role === "Member").length,
+  }));
+
+  const kpis = [
+    { title: "Total Gyms", value: gyms.length, icon: Building2, color: "text-primary" },
+    { title: "Total Members", value: totalMembers, icon: Users, color: "text-success" },
+    { title: "Active Subs", value: activeSubscriptions, icon: TrendingUp, color: "text-primary" },
+    { title: "Total Revenue", value: `$${totalRevenue.toFixed(0)}`, icon: CreditCard, color: "text-success" },
+  ];
 
   return (
     <div className="space-y-6">

@@ -5,13 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { attendanceRecords, getUserById, getMembersByGym, getSubscriptionByUser, getPlanById } from "@/data/dummy";
 import { CalendarCheck, Plus, Crown } from "lucide-react";
+import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
 
-const gymMembers = getMembersByGym(1);
-const memberIds = new Set(gymMembers.map(m => m.id));
+// Local static data for attendance records
+const attendanceRecords = [
+  { id: 1, userId: 7, date: new Date().toISOString().split("T")[0], timeIn: new Date().toISOString(), timeOut: null, source: "Biometric" }
+];
 
 export default function AttendancePage() {
+  const gymId = 1;
+  const { data: users = [] } = useUsers(gymId);
+  const { data: subscriptions = [] } = useSubscriptions(gymId);
+  const { data: plans = [] } = usePlans(gymId);
+
+  const gymMembers = users.filter(u => u.role === "Member");
+  const memberIds = new Set(gymMembers.map((m) => m.id));
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const dayRecords = attendanceRecords
     .filter(a => a.date === selectedDate && memberIds.has(a.userId))
@@ -44,9 +53,9 @@ export default function AttendancePage() {
             </TableHeader>
             <TableBody>
               {dayRecords.map((a) => {
-                const user = getUserById(a.userId);
-                const sub = getSubscriptionByUser(a.userId);
-                const plan = sub ? getPlanById(sub.planId) : null;
+                const user = users.find((u) => u.id === a.userId);
+                const sub = subscriptions.find((s) => s.userId === a.userId && s.status === "Active");
+                const plan = sub ? plans.find((p) => p.id === sub.planId) : null;
                 const isPremium = plan?.name.toLowerCase().includes("premium");
                 const timeIn = new Date(a.timeIn);
                 const timeOut = a.timeOut ? new Date(a.timeOut) : null;

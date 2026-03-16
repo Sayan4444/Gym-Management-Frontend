@@ -5,25 +5,34 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getUserById, getSubscriptionByUser, getPlanById, getPaymentsByUser, getAttendanceByUser, getWorkoutPlansByMember } from "@/data/dummy";
 import { ArrowLeft, Fingerprint, Snowflake, RefreshCw, Ban } from "lucide-react";
+import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
 
 export default function MemberProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const member = getUserById(Number(id));
-  if (!member) return <div>Member not found</div>;
+  const gymId = 1;
 
-  const sub = getSubscriptionByUser(member.id);
-  const plan = sub ? getPlanById(sub.planId) : null;
-  const memberPayments = getPaymentsByUser(member.id);
-  const attendance = getAttendanceByUser(member.id);
-  const workouts = getWorkoutPlansByMember(member.id);
+  const { data: users = [] } = useUsers(gymId);
+  const { data: subscriptions = [] } = useSubscriptions(gymId);
+  const { data: plans = [] } = usePlans(gymId);
+
+  const member = users.find((u) => u.id === Number(id));
+
+  // Local fake data for endpoints not currently in the backend
+  const memberPayments = [{ id: 1, amount: 49.99, paymentDate: "2023-11-01", status: "Paid" }];
+  const attendance = [{ id: 1, date: new Date().toISOString().split("T")[0], timeIn: new Date().toISOString(), timeOut: new Date().toISOString(), source: "Biometric" }];
+  const workouts = [{ id: 1, title: "Hypertrophy Program", description: "Standard 4-day split." }];
 
   const statusBadge = (status: string) => {
     const cls: Record<string, string> = { Active: "bg-success/10 text-success", Expired: "bg-destructive/10 text-destructive", Frozen: "bg-warning/10 text-warning", Paid: "bg-success/10 text-success", Pending: "bg-warning/10 text-warning", Failed: "bg-destructive/10 text-destructive" };
     return <Badge variant="outline" className={cls[status] || ""}>{status}</Badge>;
   };
+
+  if (!member) return <div>Member not found</div>;
+
+  const sub = subscriptions.find((s) => s.userId === member.id && s.status === "Active");
+  const plan = sub ? plans.find((p) => p.id === sub.planId) : null;
 
   return (
     <div className="space-y-6">

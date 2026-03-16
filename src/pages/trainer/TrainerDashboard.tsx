@@ -3,18 +3,21 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useSearchParams } from "react-router-dom";
-import { users, attendanceRecords, getWorkoutPlansByTrainer } from "@/data/dummy";
 import WorkoutPlansPage from "./WorkoutPlansPage";
-
-const trainer = users.find(u => u.id === 4)!;
-const assignedMembers = users.filter(u => u.trainerId === trainer.id);
-const workouts = getWorkoutPlansByTrainer(trainer.id);
-const today = new Date().toISOString().split("T")[0];
-const todayAttendance = attendanceRecords.filter(a => a.date === today && assignedMembers.some(m => m.id === a.userId));
+import { useUsers } from "@/hooks/useApi";
 
 export default function TrainerDashboard() {
   const [searchParams] = useSearchParams();
   const currentTab = searchParams.get("tab") || "dashboard";
+
+  const gymId = 1;
+  const { data: users = [] } = useUsers(gymId);
+  const trainer = users.find((u) => u.id === 4) || { id: 4, name: "Loading...", email: "" };
+  const assignedMembers = users.filter((u) => u.trainerId === trainer.id);
+
+  // Local static mock for trainer pages
+  const workouts = [{ id: 1, title: "Leg Day", description: "Legs", memberId: assignedMembers[0]?.id || 0 }];
+  const todayAttendance = [{ id: 1, userId: assignedMembers[0]?.id || 0 }];
 
   if (currentTab === "workouts") {
     return <WorkoutPlansPage />;

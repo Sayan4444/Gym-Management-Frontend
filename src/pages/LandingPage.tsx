@@ -236,10 +236,10 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
+        </div>
 
-          <div className="border-t border-border/20 mt-8 pt-6 text-center">
-            <p className="text-sm text-muted-foreground">{data.footer.copyright}</p>
-          </div>
+        <div className="border-t border-border/20 mt-8 pt-6 text-center">
+          <p className="text-sm text-muted-foreground">{data.footer.copyright}</p>
         </div>
       </footer>
     </div>

@@ -1,30 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { attendanceRecords, payments, getMembersByGym } from "@/data/dummy";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
+import { useUsers, useDashboardStats } from "@/hooks/useApi";
 
-const gymMembers = getMembersByGym(1);
-const memberIds = new Set(gymMembers.map(m => m.id));
-
-// Attendance over last 30 days
+// Local static data for charts since backend has no aggregation routes
 const attendanceData = Array.from({ length: 30 }, (_, i) => {
   const d = new Date();
   d.setDate(d.getDate() - (29 - i));
-  const dateStr = d.toISOString().split("T")[0];
-  return {
-    date: d.toLocaleDateString("en", { month: "short", day: "numeric" }),
-    count: attendanceRecords.filter(a => a.date === dateStr && memberIds.has(a.userId)).length,
-  };
+  return { date: d.toLocaleDateString("en", { month: "short", day: "numeric" }), count: Math.floor(Math.random() * 20) + 30 };
 });
 
-// Revenue summary
 const revenueData = [
   { month: "Jan '24", revenue: 1049.95, count: 5 },
   { month: "Feb '24", revenue: 689.96, count: 4 },
   { month: "Mar '25", revenue: 149.97, count: 3 },
 ];
-
-const totalRevenue = payments.filter(p => p.status === "Paid" && memberIds.has(p.userId)).reduce((s, p) => s + p.amount, 0);
-const avgDaily = (attendanceRecords.filter(a => memberIds.has(a.userId)).length / 30).toFixed(1);
 
 const tooltipStyle = {
   background: "hsl(var(--card))",
@@ -34,6 +23,14 @@ const tooltipStyle = {
 };
 
 export default function ReportsPage() {
+  const gymId = 1;
+  const { data: users = [] } = useUsers(gymId);
+  const { data: stats } = useDashboardStats(gymId);
+
+  const gymMembers = users.filter((u) => u.role === "Member");
+  const totalRevenue = stats?.total_revenue ?? 0;
+  const avgDaily = (45.2).toFixed(1); // placeholder for local testing
+
   return (
     <div className="space-y-6">
       <div>

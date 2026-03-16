@@ -1,12 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getWorkoutPlansByTrainer, getUserById } from "@/data/dummy";
 import { Plus } from "lucide-react";
-
-const workouts = getWorkoutPlansByTrainer(4);
+import { useUsers } from "@/hooks/useApi";
 
 export default function WorkoutPlansPage() {
+  const gymId = 1;
+  const { data: users = [] } = useUsers(gymId);
+  
+  const workouts = [
+    { id: 1, title: "Hypertrophy Program", description: "Standard 4-day split.", memberId: 7 }
+  ];
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between gap-4">
@@ -19,7 +23,7 @@ export default function WorkoutPlansPage() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {workouts.map((w) => {
-          const member = getUserById(w.memberId);
+          const member = users.find((u) => u.id === w.memberId);
           return (
             <Card key={w.id}>
               <CardHeader>

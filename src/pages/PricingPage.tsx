@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Dumbbell, CheckCircle2 } from "lucide-react";
-import { getGymBySlug } from "@/data/dummy";
+import { useGyms } from "@/hooks/useApi";
 
 const plans = [
   {
@@ -33,7 +33,10 @@ const plans = [
 export default function PricingPage() {
   const { gymName } = useParams();
   const navigate = useNavigate();
-  const gym = gymName ? getGymBySlug(gymName) : null;
+  const { data: gyms = [] } = useGyms();
+  
+  const generateSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-');
+  const gym = gymName ? gyms.find((g) => generateSlug(g.name) === gymName) : null;
 
   return (
     <div className="min-h-screen bg-background">

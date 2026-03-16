@@ -3,11 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { getGymById } from "@/data/dummy";
-
-const gym = getGymById(1)!;
+import { useGyms } from "@/hooks/useApi";
 
 export default function SettingsPage() {
+  const gymId = 1;
+  const { data: gyms = [] } = useGyms();
+  const gym = gyms.find((g) => g.id === gymId) || { name: "Loading...", address: "" };
+
   return (
     <div className="space-y-6 max-w-2xl">
       <div>

@@ -1,37 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { users, attendanceRecords, subscriptions, payments, membershipPlans, getMembersByGym } from "@/data/dummy";
 import { Users, CalendarCheck, CreditCard, TrendingUp, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
+import { useDashboardStats, useSubscriptions } from "@/hooks/useApi";
 
-const gymId = 1;
-const members = getMembersByGym(gymId);
-const today = new Date().toISOString().split("T")[0];
-const todayAttendance = attendanceRecords.filter(a => a.date === today && members.some(m => m.id === a.userId));
-
-const activeSubscriptions = subscriptions.filter(s => s.status === "Active" && members.some(m => m.id === s.userId));
-const expiringSubscriptions = subscriptions.filter(s => {
-  if (s.status !== "Active") return false;
-  const end = new Date(s.endDate);
-  const now = new Date();
-  const diff = (end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-  return diff <= 30 && diff > 0;
-});
-
-const totalRevenue = payments
-  .filter(p => p.status === "Paid" && members.some(m => m.id === p.userId))
-  .reduce((sum, p) => sum + p.amount, 0);
-
-// Weekly attendance chart data
-const weekData = Array.from({ length: 7 }, (_, i) => {
-  const d = new Date();
-  d.setDate(d.getDate() - (6 - i));
-  const dateStr = d.toISOString().split("T")[0];
-  const count = attendanceRecords.filter(a => a.date === dateStr && members.some(m => m.id === a.userId)).length;
-  return { day: d.toLocaleDateString("en", { weekday: "short" }), count };
-});
-
-// Revenue by month
+// Static mock data for charts since backend aggregation isn't implemented
+const weekData = [
+  { day: "Mon", count: 45 }, { day: "Tue", count: 52 }, { day: "Wed", count: 38 },
+  { day: "Thu", count: 65 }, { day: "Fri", count: 48 }, { day: "Sat", count: 25 }, { day: "Sun", count: 18 }
+];
 const monthlyRevenue = [
   { month: "Jan", revenue: 1049.95 },
   { month: "Feb", revenue: 689.96 },
@@ -39,21 +16,33 @@ const monthlyRevenue = [
 ];
 
 const statusColors = { Active: "hsl(142, 71%, 45%)", Expired: "hsl(0, 84%, 60%)", Frozen: "hsl(38, 92%, 50%)" };
-const subStatusData = [
-  { name: "Active", value: subscriptions.filter(s => s.status === "Active").length },
-  { name: "Expired", value: subscriptions.filter(s => s.status === "Expired").length },
-  { name: "Frozen", value: subscriptions.filter(s => s.status === "Frozen").length },
-];
-
-const kpiCards = [
-  { title: "Total Members", value: members.length, icon: Users, color: "text-primary" },
-  { title: "Today's Attendance", value: todayAttendance.length, icon: CalendarCheck, color: "text-success" },
-  { title: "Active Memberships", value: activeSubscriptions.length, icon: TrendingUp, color: "text-primary" },
-  { title: "Expiring Soon", value: expiringSubscriptions.length, icon: AlertTriangle, color: "text-warning" },
-  { title: "Total Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: CreditCard, color: "text-success" },
-];
 
 export default function AdminDashboard() {
+  const gymId = 1;
+  const { data: stats } = useDashboardStats(gymId);
+  const { data: subscriptions = [] } = useSubscriptions(gymId);
+
+  const activeSubs = subscriptions.filter(s => s.status === "Active");
+  const expiringSubs = subscriptions.filter(s => {
+    if (s.status !== "Active") return false;
+    const diff = (new Date(s.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
+    return diff <= 30 && diff > 0;
+  });
+
+  const subStatusData = [
+    { name: "Active", value: activeSubs.length },
+    { name: "Expired", value: subscriptions.filter(s => s.status === "Expired").length },
+    { name: "Frozen", value: subscriptions.filter(s => s.status === "Frozen").length },
+  ];
+
+  const kpiCards = [
+    { title: "Total Members", value: stats?.total_members ?? 0, icon: Users, color: "text-primary" },
+    { title: "Today's Attendance", value: stats?.todays_attendance ?? 0, icon: CalendarCheck, color: "text-success" },
+    { title: "Active Memberships", value: stats?.active_memberships ?? 0, icon: TrendingUp, color: "text-primary" },
+    { title: "Expiring Soon", value: expiringSubs.length, icon: AlertTriangle, color: "text-warning" },
+    { title: "Total Revenue", value: `$${stats?.total_revenue?.toFixed(2) ?? "0"}`, icon: CreditCard, color: "text-success" },
+  ];
+
   return (
     <div className="space-y-6">
       <div>

@@ -1,9 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getAttendanceByUser } from "@/data/dummy";
 
-const attendance = getAttendanceByUser(7).reverse();
+const attendance = [
+  { id: 1, date: new Date().toISOString().split("T")[0], timeIn: new Date().toISOString(), timeOut: new Date().toISOString(), source: "Biometric" }
+].reverse();
 
 export default function MemberAttendanceHistory() {
   return (

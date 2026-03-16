@@ -4,19 +4,28 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { users, getGymById, getSubscriptionByUser, getPlanById } from "@/data/dummy";
 import { useState } from "react";
 import { Search, Crown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useUsers, useGyms, useSubscriptions, usePlans } from "@/hooks/useApi";
 
 export default function SuperAdminUsers() {
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [premiumOnly, setPremiumOnly] = useState(false);
 
+  const { data: users = [] } = useUsers();
+  const { data: gyms = [] } = useGyms();
+  const { data: subscriptions = [] } = useSubscriptions();
+  const { data: plans = [] } = usePlans();
+
+  const getGymById = (gymId: number) => gyms.find((g) => g.id === gymId);
+  const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
+  const getPlanById = (planId: number) => plans.find((p) => p.id === planId);
+
   const filtered = users.filter((u) => {
-    const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = u.name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase());
     const matchesRole = filterRole === "all" || u.role === filterRole;
     if (!matchesSearch || !matchesRole) return false;
     if (premiumOnly && filterRole === "Member") {
@@ -79,7 +88,7 @@ export default function SuperAdminUsers() {
                       <div className="flex items-center gap-3">
                         <div className="relative">
                           <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-primary/10 text-primary text-xs">{u.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                            <AvatarFallback className="bg-primary/10 text-primary text-xs">{u.name?.split(" ").map(n => n[0]).join("")}</AvatarFallback>
                           </Avatar>
                           {u.role === "Member" && (() => {
                             const sub = getSubscriptionByUser(u.id);

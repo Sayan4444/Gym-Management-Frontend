@@ -15,7 +15,7 @@ import {
   LayoutDashboard, Users, CalendarCheck, CreditCard, ClipboardList, Dumbbell,
   BarChart3, Settings, Building2, UserCog, LogOut, Crown, User as UserIcon,
 } from "lucide-react";
-import { users, getSubscriptionByUser, getPlanById } from "@/data/dummy";
+import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
 
 interface NavItem {
   title: string;
@@ -128,11 +128,19 @@ export default function DashboardLayout({ role }: { role: string }) {
   const prefix = gymName ? `/${gymName}` : "";
   const [profileOpen, setProfileOpen] = useState(false);
 
+  // Use API hooks
+  const { data: usersData = [] } = useUsers();
+  const { data: subscriptions = [] } = useSubscriptions();
+  const { data: plans = [] } = usePlans();
+
+  const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
+  const getPlanById = (planId: number) => plans.find((p) => p.id === planId);
+
   // Determine the current user based on role
-  const currentUser = role === "member" ? users.find(u => u.id === 7)
-    : role === "admin" ? users.find(u => u.id === 2)
-    : role === "trainer" ? users.find(u => u.id === 4)
-    : users.find(u => u.id === 1);
+  const currentUser = role === "member" ? usersData.find(u => u.id === 7)
+    : role === "admin" ? usersData.find(u => u.id === 2)
+    : role === "trainer" ? usersData.find(u => u.id === 4)
+    : usersData.find(u => u.id === 1);
 
   return (
     <SidebarProvider>
@@ -158,7 +166,7 @@ export default function DashboardLayout({ role }: { role: string }) {
                         </AvatarFallback>
                       </Avatar>
                       {role === "member" && (() => {
-                        const member = users.find(u => u.id === 7);
+                        const member = usersData.find(u => u.id === 7);
                         if (!member) return null;
                         const sub = getSubscriptionByUser(member.id);
                         const plan = sub ? getPlanById(sub.planId) : null;

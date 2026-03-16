@@ -2,18 +2,25 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getSubscriptionByUser, getPlanById, getPaymentsByUser, getPlansByGym, getAddonsByGym } from "@/data/dummy";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PackagePlus, RotateCcw } from "lucide-react";
-
-const sub = getSubscriptionByUser(7);
-const plan = sub ? getPlanById(sub.planId) : null;
-const memberPayments = getPaymentsByUser(7);
-const gymPlans = getPlansByGym(1).filter(p => p.isActive);
-const gymAddons = getAddonsByGym(1).filter(a => a.isActive);
+import { useSubscriptions, usePlans, useAddons } from "@/hooks/useApi";
 
 export default function MemberSubscription() {
+  const gymId = 1;
+  const { data: subscriptions = [] } = useSubscriptions(gymId);
+  const { data: plans = [] } = usePlans(gymId);
+  const { data: addons = [] } = useAddons(gymId);
+
+  const sub = subscriptions.find((s) => s.userId === 7 && s.status === "Active");
+  const plan = sub ? plans.find((p) => p.id === sub.planId) : null;
+  const memberPayments = [
+    { id: 1, amount: 49.99, paymentDate: "2023-11-01", status: "Paid" }
+  ];
+  
+  const gymPlans = plans.filter((p) => p.isActive);
+  const gymAddons = addons.filter((a) => a.isActive);
   const [showRenewDialog, setShowRenewDialog] = useState(false);
   const [showAddonDialog, setShowAddonDialog] = useState(false);
 
