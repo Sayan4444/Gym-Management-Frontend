@@ -181,7 +181,13 @@ export default function DashboardLayout({ role }: { role: string }) {
                     <UserIcon className="mr-2 h-4 w-4" /> Profile
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")}>
+                  <DropdownMenuItem onClick={async () => {
+                    try {
+                      await fetch("http://localhost:8080/api/auth/logout", { method: "POST", credentials: "include" });
+                    } catch (_) {}
+                    localStorage.removeItem("user");
+                    navigate(gymName ? `/${gymName}/login` : "/");
+                  }}>
                     <LogOut className="mr-2 h-4 w-4" /> Sign out
                   </DropdownMenuItem>
                 </DropdownMenuContent>

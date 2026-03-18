@@ -16,6 +16,7 @@ export default function LoginPage() {
       setLoading(true);
       const res = await fetch("http://localhost:8080/api/auth/google", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -27,7 +28,8 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
-      localStorage.setItem("token", data.token);
+      // Token is now set as an HTTP-only cookie by the backend.
+      // We only store user metadata for UI purposes.
       localStorage.setItem("user", JSON.stringify(data.user));
 
       toast.success("Successfully logged in!");

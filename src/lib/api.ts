@@ -1,19 +1,12 @@
 export const API_BASE_URL = "http://localhost:8080/api";
 
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("token") || localStorage.getItem("auth_token");
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-};
-
 export async function fetchApi(endpoint: string, options?: RequestInit) {
   const url = `${API_BASE_URL}${endpoint}`;
   const response = await fetch(url, {
     ...options,
+    credentials: "include",
     headers: {
-      ...getAuthHeaders(),
+      "Content-Type": "application/json",
       ...options?.headers,
     },
   });
@@ -39,6 +32,10 @@ export const api = {
     preferredTime: string;
     notes: string;
   }) => fetchApi("/demo-request", { method: "POST", body: JSON.stringify(data) }),
+
+  // Auth
+  logout: () => fetchApi("/auth/logout", { method: "POST" }),
+  getMe: () => fetchApi("/auth/me"),
   
   // Protected
   getDashboardStats: (gymId?: number) => {

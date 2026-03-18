@@ -5,11 +5,10 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-  const token = localStorage.getItem("token");
   const userStr = localStorage.getItem("user");
 
-  if (!token || !userStr) {
-    // Not authenticated
+  if (!userStr) {
+    // Not authenticated — no user data stored
     return <Navigate to="/" replace />;
   }
 
@@ -21,7 +20,6 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     }
   } catch (error) {
     // Invalid user data
-    localStorage.removeItem("token");
     localStorage.removeItem("user");
     return <Navigate to="/" replace />;
   }
