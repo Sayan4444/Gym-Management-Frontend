@@ -81,7 +81,7 @@ export default function DemoPage() {
           </div>
         ) : (
           <div className="bg-card border border-border/30 rounded-2xl p-6 md:p-10 shadow-lg">
-            <div className="h-1 w-full bg-gradient-to-r from-brand to-brand/50 rounded-full -mt-6 md:-mt-10 mb-8 mx-auto" style={{ marginTop: '-1px', borderRadius: '1rem 1rem 0 0', position: 'relative', top: '-1.5rem', left: '-1.5rem', width: 'calc(100% + 3rem)' }} />
+
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>

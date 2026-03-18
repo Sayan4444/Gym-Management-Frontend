@@ -4,20 +4,62 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Dumbbell } from "lucide-react";
+import { useGoogleLogin } from '@react-oauth/google';
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const handleGoogleSignIn = () => {
-    setLoading(true);
-    // Placeholder: will be replaced with actual Google Auth via Lovable Cloud
-    setTimeout(() => {
+  const handleGoogleSuccess = async (tokenResponse: any) => {
+    try {
+      setLoading(true);
+      const res = await fetch("http://localhost:8080/api/auth/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ credential: tokenResponse.access_token }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Authentication failed");
+      }
+
+      const data = await res.json();
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      toast.success("Successfully logged in!");
+
+      // Route based on role
+      const role = data.user.role;
+      const gymName = "iron-forge-fitness"; // Assuming a default gym for now, ideally this would be dynamic or handled by backend
+
+      if (role === 'SuperAdmin') {
+        navigate('/super-admin');
+      } else if (role === 'GymAdmin') {
+        navigate(`/${gymName}/admin`);
+      } else if (role === 'Trainer') {
+        navigate(`/${gymName}/trainer`);
+      } else {
+        navigate(`/${gymName}/member`);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Failed to login with Google");
+    } finally {
       setLoading(false);
-      // Default to member dashboard for demo — in real app, role determines redirect
-      navigate("/iron-forge-fitness/member");
-    }, 1000);
+    }
   };
+
+  const login = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => {
+      console.error("Google Login Failed");
+      toast.error("Failed to login with Google");
+    },
+  });
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -35,7 +77,7 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Button
-            onClick={handleGoogleSignIn}
+            onClick={() => login()}
             disabled={loading}
             className="w-full h-12 text-base gap-3 bg-background text-foreground border border-border hover:bg-muted"
             variant="outline"
