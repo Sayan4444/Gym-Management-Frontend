@@ -15,6 +15,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
 import UnauthorizedPage from "./pages/Unauthorized";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import ValidGymRoute from "./components/ValidGymRoute";
 
 // Admin pages
 import AdminPanel from "./pages/admin/AdminPanel";
@@ -47,7 +48,7 @@ const App = () => (
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<LandingPage />} />
-              <Route path="/:gymName/login" element={<LoginPage />} />
+              <Route path="/bookslot" element={<DemoPage />} />
 
               {/* Super Admin routes (no gymName prefix) */}
               <Route element={<ProtectedRoute allowedRoles={['SuperAdmin']} />}>
@@ -57,28 +58,30 @@ const App = () => (
               </Route>
 
               {/* Gym-specific routes */}
-              <Route path="/:gymName" element={<GymHomePage />} />
-              <Route path="/bookslot" element={<DemoPage />} />
-              <Route path="/:gymName/pricing" element={<PricingPage />} />
+              <Route path="/:gymName" element={<ValidGymRoute />}>
+                <Route index element={<GymHomePage />} />
+                <Route path="login" element={<LoginPage />} />
+                <Route path="pricing" element={<PricingPage />} />
 
-              {/* Gym Admin routes */}
-              <Route element={<ProtectedRoute allowedRoles={['GymAdmin']} />}>
-                <Route path="/:gymName/admin" element={<DashboardLayout role="admin" />}>
-                  <Route index element={<AdminPanel />} />
+                {/* Gym Admin routes */}
+                <Route element={<ProtectedRoute allowedRoles={['GymAdmin']} />}>
+                  <Route path="admin" element={<DashboardLayout role="admin" />}>
+                    <Route index element={<AdminPanel />} />
+                  </Route>
                 </Route>
-              </Route>
 
-              {/* Trainer routes */}
-              <Route element={<ProtectedRoute allowedRoles={['Trainer']} />}>
-                <Route path="/:gymName/trainer" element={<DashboardLayout role="trainer" />}>
-                  <Route index element={<TrainerDashboard />} />
+                {/* Trainer routes */}
+                <Route element={<ProtectedRoute allowedRoles={['Trainer']} />}>
+                  <Route path="trainer" element={<DashboardLayout role="trainer" />}>
+                    <Route index element={<TrainerDashboard />} />
+                  </Route>
                 </Route>
-              </Route>
 
-              {/* Member routes */}
-              <Route element={<ProtectedRoute allowedRoles={['Member']} />}>
-                <Route path="/:gymName/member" element={<DashboardLayout role="member" />}>
-                  <Route index element={<MemberDashboard />} />
+                {/* Member routes */}
+                <Route element={<ProtectedRoute allowedRoles={['Member']} />}>
+                  <Route path="member" element={<DashboardLayout role="member" />}>
+                    <Route index element={<MemberDashboard />} />
+                  </Route>
                 </Route>
               </Route>
 

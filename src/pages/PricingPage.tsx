@@ -35,8 +35,13 @@ export default function PricingPage() {
   const navigate = useNavigate();
   const { data: gyms = [] } = useGyms();
   
-  const generateSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-');
-  const gym = gymName ? gyms.find((g) => generateSlug(g.name) === gymName) : null;
+  const gym = gymName
+    ? gyms.find(
+        (g) =>
+          g.slug?.toLowerCase() === gymName.toLowerCase() ||
+          g.name.toLowerCase().replace(/\s+/g, '-') === gymName.toLowerCase()
+      )
+    : null;
 
   return (
     <div className="min-h-screen bg-background">

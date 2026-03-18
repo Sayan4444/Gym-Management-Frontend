@@ -8,12 +8,16 @@ import { PackagePlus, RotateCcw } from "lucide-react";
 import { useSubscriptions, usePlans, useAddons } from "@/hooks/useApi";
 
 export default function MemberSubscription() {
-  const gymId = 1;
+  const storedUser = localStorage.getItem("user");
+  const authUser = storedUser ? JSON.parse(storedUser) : null;
+  const gymId = authUser?.gymId || 1;
+  const userId = authUser?.id || 7;
+
   const { data: subscriptions = [] } = useSubscriptions(gymId);
   const { data: plans = [] } = usePlans(gymId);
   const { data: addons = [] } = useAddons(gymId);
 
-  const sub = subscriptions.find((s) => s.userId === 7 && s.status === "Active");
+  const sub = subscriptions.find((s) => s.userId === userId && s.status === "Active");
   const plan = sub ? plans.find((p) => p.id === sub.planId) : null;
   const memberPayments = [
     { id: 1, amount: 49.99, paymentDate: "2023-11-01", status: "Paid" }
@@ -62,7 +66,54 @@ export default function MemberSubscription() {
               </div>
             </div>
           ) : (
-            <p className="text-muted-foreground">No active subscription.</p>
+            <div className="space-y-6">
+              <p className="text-muted-foreground">You don't have an active subscription. Choose a plan or add-on below to get started.</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <div>
+                  <h3 className="font-semibold mb-3">Available Plans</h3>
+                  <div className="space-y-3">
+                    {gymPlans.length > 0 ? (
+                      gymPlans.map((p) => (
+                        <div key={p.id} className="flex items-center justify-between rounded-lg border p-4">
+                          <div>
+                            <p className="font-medium">{p.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {p.durationMonths} month{p.durationMonths > 1 ? "s" : ""}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg font-semibold">${p.price.toFixed(2)}</span>
+                            <Button size="sm">Subscribe</Button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No plans available.</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-3">Available Addons</h3>
+                  <div className="space-y-3">
+                    {gymAddons.length > 0 ? (
+                      gymAddons.map((a) => (
+                        <div key={a.id} className="flex items-center justify-between rounded-lg border p-4">
+                          <p className="font-medium">{a.name}</p>
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg font-semibold">${a.price.toFixed(2)}</span>
+                            <Button size="sm">Buy Addon</Button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No addons available.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>

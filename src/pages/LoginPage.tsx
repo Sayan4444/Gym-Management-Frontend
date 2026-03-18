@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { gymName = "iron-forge-fitness" } = useParams<{ gymName: string }>();
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSuccess = async (tokenResponse: any) => {
@@ -36,7 +37,7 @@ export default function LoginPage() {
 
       // Route based on role
       const role = data.user.role;
-      const gymName = "iron-forge-fitness"; // Assuming a default gym for now, ideally this would be dynamic or handled by backend
+      // gymName is now taken from useParams
 
       if (role === 'SuperAdmin') {
         navigate('/super-admin');
