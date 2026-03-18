@@ -1,7 +1,7 @@
 export const API_BASE_URL = "http://localhost:8080/api";
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem("auth_token");
+  const token = localStorage.getItem("token") || localStorage.getItem("auth_token");
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -57,6 +57,9 @@ export const api = {
 
   updateMember: (id: number, data: any) => 
     fetchApi(`/members/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+
+  updateProfile: (data: any) =>
+    fetchApi(`/profile`, { method: "PUT", body: JSON.stringify(data) }),
 
   deleteMember: (id: number) => 
     fetchApi(`/members/${id}`, { method: "DELETE" }),

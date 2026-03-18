@@ -41,6 +41,17 @@ export function useUpdateMember() {
   });
 }
 
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<User>) => api.updateProfile(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+    },
+  });
+}
+
 export function useDeleteMember() {
   const queryClient = useQueryClient();
   return useMutation({

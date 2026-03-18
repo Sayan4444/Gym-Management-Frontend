@@ -10,12 +10,15 @@ export default function MemberDashboard() {
   const [searchParams] = useSearchParams();
   const currentTab = searchParams.get("tab") || "dashboard";
 
-  const gymId = 1;
+  const storedUser = localStorage.getItem("user");
+  const authUser = storedUser ? JSON.parse(storedUser) : null;
+  const gymId = authUser?.gymId || 1;
+
   const { data: users = [] } = useUsers(gymId);
   const { data: subscriptions = [] } = useSubscriptions(gymId);
   const { data: plans = [] } = usePlans(gymId);
 
-  const member = users.find(u => u.id === 7);
+  const member = users.find(u => u.id === authUser?.id) || authUser;
   const sub = member ? subscriptions.find(s => s.userId === member.id && s.status === "Active") : null;
   const plan = sub ? plans.find(p => p.id === sub.planId) : null;
   

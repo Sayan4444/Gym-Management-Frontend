@@ -136,11 +136,10 @@ export default function DashboardLayout({ role }: { role: string }) {
   const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
   const getPlanById = (planId: number) => plans.find((p) => p.id === planId);
 
-  // Determine the current user based on role
-  const currentUser = role === "member" ? usersData.find(u => u.id === 7)
-    : role === "admin" ? usersData.find(u => u.id === 2)
-    : role === "trainer" ? usersData.find(u => u.id === 4)
-    : usersData.find(u => u.id === 1);
+  // Determine the current user based on localStorage
+  const storedUser = localStorage.getItem("user");
+  const authUser = storedUser ? JSON.parse(storedUser) : null;
+  const currentUser = usersData.find(u => u.id === authUser?.id) || authUser;
 
   return (
     <SidebarProvider>
@@ -162,11 +161,11 @@ export default function DashboardLayout({ role }: { role: string }) {
                     <div className="relative">
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                          {role === "admin" ? "SC" : role === "trainer" ? "MJ" : role === "member" ? "JW" : "AR"}
+                          {currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : "U"}
                         </AvatarFallback>
                       </Avatar>
                       {role === "member" && (() => {
-                        const member = usersData.find(u => u.id === 7);
+                        const member = currentUser;
                         if (!member) return null;
                         const sub = getSubscriptionByUser(member.id);
                         const plan = sub ? getPlanById(sub.planId) : null;

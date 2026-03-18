@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@/data/types";
+import { useUpdateProfile } from "@/hooks/useApi";
 import {
   User as UserIcon, Mail, Phone, Calendar, Heart,
   Ruler, Weight, Droplets, MapPin, ShieldAlert, Activity,
@@ -66,30 +67,60 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const updateProfileMutation = useUpdateProfile();
+
   const handleSave = () => {
-    toast({
-      title: "Profile updated",
-      description: "Your profile has been saved successfully.",
-    });
-    onOpenChange(false);
+    updateProfileMutation.mutate(
+      {
+        name: form.name,
+        phone: form.phone,
+        dob: form.dob,
+        gender: form.gender,
+        address: form.address,
+        emergencyContactName: form.emergencyContactName,
+        emergencyContactPhone: form.emergencyContactPhone,
+        bloodGroup: form.bloodGroup,
+        height: form.height ? parseFloat(form.height) : undefined,
+        weight: form.weight ? parseFloat(form.weight) : undefined,
+        medicalConditions: form.medicalConditions,
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Profile updated",
+            description: "Your profile has been saved successfully.",
+          });
+          onOpenChange(false);
+        },
+        onError: (err: any) => {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: err.message || "Could not update profile",
+          });
+        },
+      }
+    );
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <div className="flex items-center justify-center h-9 w-9 rounded-full bg-primary/10">
-              <UserIcon className="h-5 w-5 text-primary" />
-            </div>
-            My Profile
-          </DialogTitle>
-          <DialogDescription>
-            View and update your personal information
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="w-[95vw] sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px] max-h-[85vh] p-0 flex flex-col overflow-hidden gap-0 border-border shadow-2xl">
+        <div className="p-6 pb-4 border-b relative">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <div className="flex items-center justify-center h-9 w-9 rounded-full bg-primary/10">
+                <UserIcon className="h-5 w-5 text-primary" />
+              </div>
+              My Profile
+            </DialogTitle>
+            <DialogDescription>
+              View and update your personal information
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-6 py-2">
+        <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar bg-accent/5">
           {/* ── Personal Information ── */}
           <fieldset className="space-y-4">
             <legend className="flex items-center gap-2 text-sm font-semibold text-foreground border-b pb-2 mb-1 w-full">
@@ -278,14 +309,16 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
           </fieldset>
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>
-            Save Changes
-          </Button>
-        </DialogFooter>
+        <div className="p-6 pt-4 border-t bg-card">
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
