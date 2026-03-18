@@ -15,7 +15,7 @@ import {
   LayoutDashboard, Users, CalendarCheck, CreditCard, ClipboardList, Dumbbell,
   BarChart3, Settings, Building2, UserCog, LogOut, Crown, User as UserIcon,
 } from "lucide-react";
-import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
+import { useUsers, useSubscriptions, usePlans, useMe } from "@/hooks/useApi";
 
 interface NavItem {
   title: string;
@@ -136,10 +136,12 @@ export default function DashboardLayout({ role }: { role: string }) {
   const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
   const getPlanById = (planId: number) => plans.find((p) => p.id === planId);
 
-  // Determine the current user based on localStorage
+  const { data: me } = useMe();
+
+  // Determine the current user based on localStorage and API
   const storedUser = localStorage.getItem("user");
   const authUser = storedUser ? JSON.parse(storedUser) : null;
-  const currentUser = usersData.find(u => u.id === authUser?.id) || authUser;
+  const currentUser = usersData.find(u => u.id === authUser?.id) || me || authUser;
 
   return (
     <SidebarProvider>

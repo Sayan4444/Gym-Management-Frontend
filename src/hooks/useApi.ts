@@ -31,6 +31,13 @@ export function useUsers(gymId?: number, isPremium?: boolean, role?: string) {
   });
 }
 
+export function useMe() {
+  return useQuery<User>({
+    queryKey: ["me"],
+    queryFn: api.getMe,
+  });
+}
+
 export function useUpdateMember() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -48,6 +55,7 @@ export function useUpdateProfile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["me"] });
     },
   });
 }
