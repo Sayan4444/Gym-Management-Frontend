@@ -10,7 +10,6 @@ import LandingPage from "./pages/LandingPage";
 import GymHomePage from "./pages/GymHomePage";
 import LoginPage from "./pages/LoginPage";
 import PricingPage from "./pages/PricingPage";
-import DemoPage from "./pages/DemoPage";
 import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
 import UnauthorizedPage from "./pages/Unauthorized";
@@ -22,17 +21,13 @@ import AdminPanel from "./pages/admin/AdminPanel";
 
 // Trainer pages
 import TrainerDashboard from "./pages/trainer/TrainerDashboard";
-import WorkoutPlansPage from "./pages/trainer/WorkoutPlansPage";
 
 // Member pages
 import MemberDashboard from "./pages/member/MemberDashboard";
-import MemberAttendanceHistory from "./pages/member/MemberAttendanceHistory";
-import MemberSubscription from "./pages/member/MemberSubscription";
 
 // Super Admin pages
 import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
-import GymManagement from "./pages/super-admin/GymManagement";
-import SuperAdminUsers from "./pages/super-admin/SuperAdminUsers";
+import BookDemoPage from "./pages/BookDemoPage";
 
 const queryClient = new QueryClient();
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
@@ -48,7 +43,7 @@ const App = () => (
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<LandingPage />} />
-              <Route path="/bookslot" element={<DemoPage />} />
+              <Route path="/bookslot" element={<BookDemoPage />} />
 
               {/* Super Admin routes (no gymName prefix) */}
               <Route element={<ProtectedRoute allowedRoles={['SuperAdmin']} />}>

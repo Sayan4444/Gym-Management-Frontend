@@ -9,7 +9,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 
-export default function DemoPage() {
+export default function BookDemoPage() {
   const navigate = useNavigate();
   const { gymName } = useParams();
   const { toast } = useToast();

@@ -6,7 +6,7 @@ export default function ValidGymRoute() {
   const { gymName } = useParams<{ gymName: string }>();
   const navigate = useNavigate();
   const { data: gyms = [], isLoading } = useGyms();
-
+  
   const gym = gyms.find(
     (g) =>
       g.slug?.toLowerCase() === gymName?.toLowerCase() ||
