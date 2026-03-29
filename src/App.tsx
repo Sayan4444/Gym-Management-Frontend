@@ -29,7 +29,15 @@ import MemberDashboard from "./pages/member/MemberDashboard";
 import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
 import BookDemoPage from "./pages/BookDemoPage";
 
-const queryClient = new QueryClient();
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+    },
+  },
+});
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
 
 const App = () => (
@@ -86,6 +94,7 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ThemeProvider>
   </GoogleOAuthProvider>

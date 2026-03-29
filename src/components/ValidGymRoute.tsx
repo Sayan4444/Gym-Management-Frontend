@@ -1,17 +1,11 @@
 import { useParams, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useGyms } from "@/hooks/useApi";
+import { useGym } from "../hooks/useApi";
 
 export default function ValidGymRoute() {
   const { gymName } = useParams<{ gymName: string }>();
   const navigate = useNavigate();
-  const { data: gyms = [], isLoading } = useGyms();
-  
-  const gym = gyms.find(
-    (g) =>
-      g.slug?.toLowerCase() === gymName?.toLowerCase() ||
-      g.name.toLowerCase().replace(/\s+/g, '-') === gymName?.toLowerCase()
-  );
+  const { data: gym, isLoading } = useGym(gymName);
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
