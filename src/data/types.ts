@@ -7,19 +7,19 @@ export interface User {
   phone: string;
   dob: string;
   gender: string;
-  photo_url: string;
-  biometric_id: string;
+  photoUrl: string;
+  biometricId: string;
   role: string;
-  gym_id: number | null;
-  subscription_id: number | null;
-  trainer_id: number | null;
+  gymId: number | null;
+  subscriptionId: number | null;
+  trainerId: number | null;
   address: string;
-  emergency_contact_name: string;
-  emergency_contact_phone: string;
-  blood_group: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  bloodGroup: string;
   height: number | null;
   weight: number | null;
-  medical_conditions: string;
+  medicalConditions: string;
 }
 
 export interface Gym {
@@ -30,48 +30,48 @@ export interface Gym {
   slug: string;
   address: string;
   whatsapp: string;
-  Users?: User[];
+  users?: User[];
 }
 
 export interface MembershipPlan {
   id: number;
   createdAt: string;
   updatedAt: string;
-  gym_id: number;
+  gymId: number;
   name: string;
   price: number;
-  duration_months: number;
-  is_active: boolean;
+  durationMonths: number;
+  isActive: boolean;
 }
 
 export interface Addon {
   id: number;
   createdAt: string;
   updatedAt: string;
-  gym_id: number;
+  gymId: number;
   name: string;
   price: number;
-  is_active: boolean;
+  isActive: boolean;
 }
 
 export interface UserAddon {
   id: number;
   createdAt: string;
   updatedAt: string;
-  user_id: number;
-  addon_id: number;
-  payment_id: number;
-  purchased_at: string;
+  userId: number;
+  addonId: number;
+  paymentId: number;
+  purchasedAt: string;
 }
 
 export interface Subscription {
   id: number;
   createdAt: string;
   updatedAt: string;
-  user_id: number;
-  plan_id: number;
-  start_date: string;
-  end_date: string;
+  userId: number;
+  planId: number;
+  startDate: string;
+  endDate: string;
   status: string;
 }
 
@@ -79,26 +79,26 @@ export interface Payment {
   id: number;
   createdAt: string;
   updatedAt: string;
-  user_id: number;
+  userId: number;
   amount: number;
-  payment_date: string;
+  paymentDate: string;
   status: string;
-  payment_for: string;
-  plan_id: number | null;
-  addon_id: number | null;
-  razorpay_order_id: string;
-  razorpay_payment_id: string;
-  razorpay_signature: string;
+  paymentFor: string;
+  planId: number | null;
+  addonId: number | null;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
 }
 
 export interface Attendance {
   id: number;
   createdAt: string;
   updatedAt: string;
-  user_id: number;
+  userId: number;
   date: string;
-  time_in: string;
-  time_out: string | null;
+  timeIn: string;
+  timeOut: string | null;
   source: string;
 }
 
@@ -106,18 +106,18 @@ export interface GymQRToken {
   id: number;
   createdAt: string;
   updatedAt: string;
-  gym_id: number;
+  gymId: number;
   token: string;
-  expires_at: string;
+  expiresAt: string;
 }
 
 export interface WorkoutPlan {
   id: number;
   createdAt: string;
   updatedAt: string;
-  gym_id: number;
-  trainer_id: number;
-  member_id: number;
+  gymId: number;
+  trainerId: number;
+  memberId: number;
   title: string;
   description: string;
 }
