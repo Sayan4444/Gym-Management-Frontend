@@ -31,19 +31,5 @@ export const api = {
     preferredTime: string;
     notes: string;
   }) => fetchApi("/demo-request", { method: "POST", body: JSON.stringify(data) }),
-  getDashboardStats: (gymId?: number | string) => {
-    const search = gymId ? `?gym_id=${gymId}` : "";
-    return fetchApi(`/dashboard/stats${search}`);
-  },
   logAttendance: (data: any) => fetchApi("/attendance", { method: "POST", body: JSON.stringify(data) }),
-  getPlans: (gymId?: number | string) => {
-    const params = new URLSearchParams();
-    if (gymId) params.append("gym_id", gymId.toString());
-    const search = params.toString() ? `?${params.toString()}` : "";
-    return fetchApi(`/plans${search}`);
-  },
-  createPlan: (data: any) => fetchApi("/plans", { method: "POST", body: JSON.stringify(data) }),
-  updateMember: (id: number, data: any) => fetchApi(`/members/${id}`, { method: "PUT", body: JSON.stringify(data) }),
-  deleteMember: (id: number) => fetchApi(`/members/${id}`, { method: "DELETE" }),
-  buyAddon: (data: { user_id: number; addon_id: number }) => fetchApi(`/addons/buy`, { method: "POST", body: JSON.stringify(data) }),
 };

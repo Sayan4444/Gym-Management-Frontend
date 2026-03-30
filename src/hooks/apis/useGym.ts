@@ -5,7 +5,7 @@ import { Gym } from "@/data/types";
 export function useAddGym() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.addGym(data),
+    mutationFn: (data: Gym) => api.addGym(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gyms"] });
     },
@@ -19,7 +19,7 @@ export function useGyms() {
   });
 }
 
-export function useGym(identifier?: string) {
+export function useGym(identifier?: number|string) {
   return useQuery<Gym>({
     queryKey: ["gym", identifier],
     queryFn: () => identifier ? api.getGym(identifier) : Promise.reject("No identifier"),
@@ -30,7 +30,7 @@ export function useGym(identifier?: string) {
 export function useUpdateGym() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ identifier, data }: { identifier: string; data: any }) => api.updateGym(identifier, data),
+    mutationFn: ({ identifier, data }: { identifier: number | string; data: Gym }) => api.updateGym(identifier, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["gyms"] });
       queryClient.invalidateQueries({ queryKey: ["gym", variables.identifier] });
@@ -41,16 +41,9 @@ export function useUpdateGym() {
 export function useDeleteGym() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (identifier: string) => api.deleteGym(identifier),
+    mutationFn: (identifier: number | string) => api.deleteGym(identifier),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gyms"] });
     },
-  });
-}
-
-export function useDashboardStats(gymId?: number | string) {
-  return useQuery({
-    queryKey: ["dashboard-stats", gymId],
-    queryFn: () => api.getDashboardStats(gymId),
   });
 }

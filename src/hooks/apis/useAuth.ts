@@ -5,7 +5,7 @@ import { User } from "@/data/types";
 export function useGoogleLogin() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.googleLogin(data),
+    mutationFn: (accessToken: string) => api.googleLogin(accessToken),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },

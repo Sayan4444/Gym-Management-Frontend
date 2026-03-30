@@ -5,15 +5,14 @@ import { Subscription } from "@/data/types";
 export function useAssignSubscription() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.assignSubscription(data),
+    mutationFn: (data: Subscription) => api.assignSubscription(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
     },
   });
 }
 
-export function useSubscriptions(gymId?: number | string, userId?: number | string) {
+export function useSubscriptions(gymId?: number, userId?: number) {
   return useQuery<Subscription[]>({
     queryKey: ["subscriptions", gymId, userId],
     queryFn: () => api.getSubscriptions(gymId, userId),
@@ -23,7 +22,7 @@ export function useSubscriptions(gymId?: number | string, userId?: number | stri
 export function useUpdateSubscription() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number | string; data: any }) => api.updateSubscription(id, data),
+    mutationFn: ({ id, data }: { id: number ; data: any }) => api.updateSubscription(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
     },
@@ -33,7 +32,7 @@ export function useUpdateSubscription() {
 export function useDeleteSubscription() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: number | string) => api.deleteSubscription(id),
+    mutationFn: (id: number) => api.deleteSubscription(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
     },

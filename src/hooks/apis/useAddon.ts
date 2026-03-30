@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Addon } from "@/data/types";
 
-export function useAddons(gymId?: number | string) {
+export function useAddons(gymId?: number) {
   return useQuery<Addon[]>({
     queryKey: ["addons", gymId],
     queryFn: () => api.getAddons(gymId),
@@ -12,7 +12,7 @@ export function useAddons(gymId?: number | string) {
 export function useCreateAddon() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.createAddon(data),
+    mutationFn: ({ gymId, data }: { gymId: number ; data: Addon }) => api.createAddon(gymId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["addons"] });
     },
@@ -22,7 +22,7 @@ export function useCreateAddon() {
 export function useUpdateAddon() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number | string; data: any }) => api.updateAddon(id, data),
+    mutationFn: ({ gymId, addonId, data }: { gymId: number ; addonId: number ; data: Addon }) => api.updateAddon(gymId, addonId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["addons"] });
     },
@@ -32,17 +32,7 @@ export function useUpdateAddon() {
 export function useDeleteAddon() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: number | string) => api.deleteAddon(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["addons"] });
-    },
-  });
-}
-
-export function useBuyAddon() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: { user_id: number; addon_id: number }) => api.buyAddon(data),
+    mutationFn: ({ gymId, addonId }: { gymId: number ; addonId: number }) => api.deleteAddon(gymId, addonId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["addons"] });
     },
