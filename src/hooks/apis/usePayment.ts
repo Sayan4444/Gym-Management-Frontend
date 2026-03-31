@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { Payment } from "../../data/types";
 
 export function useCreateOrder() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.createOrder(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
-      queryClient.invalidateQueries({ queryKey: ["addons"] });
+    mutationFn: (data: Payment) => api.createOrder(data),
+    onSuccess: (responseData: Payment) => {
+      if (responseData.paymentFor === "Membership Plan") queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+      if (responseData.paymentFor === "Add-On") queryClient.invalidateQueries({ queryKey: ["addons"] });
     },
   });
 }
@@ -16,11 +16,10 @@ export function useCreateOrder() {
 export function useVerifyPayment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.verifyPayment(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
-      queryClient.invalidateQueries({ queryKey: ["addons"] });
+    mutationFn: (data: Payment) => api.verifyPayment(data),
+    onSuccess: (responseData: Payment) => {
+      if (responseData.paymentFor === "Membership Plan") queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+      if (responseData.paymentFor === "Add-On") queryClient.invalidateQueries({ queryKey: ["addons"] });
     },
   });
 }

@@ -33,5 +33,4 @@ export const api = {
     preferredTime: string;
     notes: string;
   }) => fetchApi("/demo-request", { method: "POST", body: JSON.stringify(data) }),
-  logAttendance: (data: any) => fetchApi("/attendance", { method: "POST", body: JSON.stringify(data) }),
 };

@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { WorkoutPlan } from "@/data/types";
 
 export function useCreateWorkoutPlan() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.createWorkoutPlan(data),
+    mutationFn: (data: WorkoutPlan) => api.createWorkoutPlan(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workout-plans"] });
     },
@@ -21,7 +22,7 @@ export function useWorkoutPlans() {
 export function useUpdateWorkoutPlan() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number | string; data: any }) => api.updateWorkoutPlan(id, data),
+    mutationFn: ({ id, data }: { id: number ; data: WorkoutPlan }) => api.updateWorkoutPlan(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workout-plans"] });
     },
@@ -31,7 +32,7 @@ export function useUpdateWorkoutPlan() {
 export function useDeleteWorkoutPlan() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: number | string) => api.deleteWorkoutPlan(id),
+    mutationFn: (id: number ) => api.deleteWorkoutPlan(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workout-plans"] });
     },

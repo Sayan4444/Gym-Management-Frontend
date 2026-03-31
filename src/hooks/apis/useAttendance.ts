@@ -11,7 +11,7 @@ export function useQRToken() {
 export function useScanQRAttendance() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => api.scanQRAttendance(data),
+    mutationFn: (data: { scannedToken: string }) => api.scanQRAttendance(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
     },
@@ -21,17 +21,7 @@ export function useScanQRAttendance() {
 export function useMarkManualAttendance() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, data }: { userId: number | string; data: any }) => api.markManualAttendance(userId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
-    },
-  });
-}
-
-export function useLogAttendance() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: any) => api.logAttendance(data),
+    mutationFn: ({ userId }: { userId: number }) => api.markManualAttendance(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
     },

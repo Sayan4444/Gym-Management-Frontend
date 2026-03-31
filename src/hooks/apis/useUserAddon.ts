@@ -22,7 +22,7 @@ export function useUserAddons(gymId?: number, userId?: number) {
 export function useUpdateUserAddon() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, data }: { id: number; data: any }) => api.updateUserAddon(id, data),
+        mutationFn: ({ id, data }: { id: number; data: UserAddon }) => api.updateUserAddon(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["user-addons"] });
         },
