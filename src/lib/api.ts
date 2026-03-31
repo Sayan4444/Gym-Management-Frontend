@@ -6,6 +6,7 @@ import { userApi } from './api/user';
 import { subscriptionApi } from './api/subscription';
 import { paymentApi } from './api/payment';
 import { addonApi } from './api/addon';
+import { userAddonApi } from './api/userAddon';
 import { workoutPlanApi } from './api/workoutplan';
 import { attendanceApi } from './api/attendance';
 
@@ -19,6 +20,7 @@ export const api = {
   ...subscriptionApi,
   ...paymentApi,
   ...addonApi,
+  ...userAddonApi,
   ...workoutPlanApi,
   ...attendanceApi,
 
