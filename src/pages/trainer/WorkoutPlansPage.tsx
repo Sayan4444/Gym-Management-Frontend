@@ -6,7 +6,7 @@ import { useUsers } from "@/hooks/useApi";
 
 export default function WorkoutPlansPage() {
   const gymId = 1;
-  const { data: users = [] } = useUsers(gymId);
+  const users = useUsers(gymId).data?.users || [];
   
   const workouts = [
     { id: 1, title: "Hypertrophy Program", description: "Standard 4-day split.", memberId: 7 }

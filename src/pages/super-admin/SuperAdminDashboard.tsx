@@ -11,8 +11,8 @@ export default function SuperAdminDashboard() {
   const [searchParams] = useSearchParams();
   const currentTab = searchParams.get("tab") || "overview";
 
-  const { data: gyms = [] } = useGyms();
-  const { data: users = [] } = useUsers();
+  const gyms = useGyms().data?.gyms || [];
+  const users = useUsers().data?.users || [];
   const { data: stats } = useSuperAdminDashboardStats();
 
   const totalMembers = stats?.total_members ?? 0;

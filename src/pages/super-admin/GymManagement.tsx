@@ -6,7 +6,7 @@ import { Gym } from "../../data/types";
 
 function GymCard({ gym }: { gym: Gym }) {
   const { data: stats } = useSuperAdminDashboardStats();
-  const { data: users = [] } = useUsers(gym.id);
+  const users = useUsers(gym.id).data?.users || [];
   
   const trainers = users.filter((u) => u.role === "Trainer").length;
 
@@ -50,7 +50,8 @@ function GymCard({ gym }: { gym: Gym }) {
 }
 
 export default function GymManagement() {
-  const { data: gyms, isLoading } = useGyms();
+  const { data, isLoading } = useGyms();
+  const gyms = data?.gyms || [];
 
   return (
     <div className="space-y-6">

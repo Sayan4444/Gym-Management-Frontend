@@ -13,9 +13,9 @@ export default function MemberSubscription() {
   const gymId = authUser?.gymId || 1;
   const userId = authUser?.id || 7;
 
-  const { data: subscriptions = [] } = useSubscriptions(gymId);
-  const { data: plans = [] } = useMembershipPlans(gymId);
-  const { data: addons = [] } = useAddons(gymId);
+  const subscriptions = useSubscriptions(gymId).data?.subscriptions || [];
+  const plans = useMembershipPlans(gymId).data?.memberships || [];
+  const addons = useAddons(gymId).data?.addons || [];
 
   const sub = subscriptions.find((s) => s.userId === userId && s.status === "Active");
   const plan = sub ? plans.find((p) => p.id === sub.planId) : null;

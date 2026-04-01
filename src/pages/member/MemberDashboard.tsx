@@ -14,9 +14,9 @@ export default function MemberDashboard() {
   const authUser = storedUser ? JSON.parse(storedUser) : null;
   const gymId = authUser?.gymId || 1;
 
-  const { data: users = [] } = useUsers(gymId);
-  const { data: subscriptions = [] } = useSubscriptions(gymId);
-  const { data: plans = [] } = useMembershipPlans(gymId);
+  const users = useUsers(gymId).data?.users || [];
+  const subscriptions = useSubscriptions().data?.subscriptions || [];
+  const plans = useMembershipPlans(gymId).data?.memberships || [];
 
   const member = users.find(u => u.id === authUser?.id) || authUser;
   const sub = member ? subscriptions.find(s => s.userId === member.id && s.status === "Active") : null;

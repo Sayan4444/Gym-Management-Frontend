@@ -10,8 +10,7 @@ export default function TrainerDashboard() {
   const [searchParams] = useSearchParams();
   const currentTab = searchParams.get("tab") || "dashboard";
 
-  const gymId = 1;
-  const { data: users = [] } = useUsers(gymId);
+  const users = useUsers().data?.users || [];
   const trainer = users.find((u) => u.id === 4) || { id: 4, name: "Loading...", email: "" };
   const assignedMembers = users.filter((u) => u.trainerId === trainer.id);
 

@@ -18,9 +18,9 @@ export default function DashboardLayout({ role }: { role: string }) {
   const [profileOpen, setProfileOpen] = useState(false);
 
   // Use API hooks
-  const { data: usersData = [] } = useUsers();
-  const { data: subscriptions = [] } = useSubscriptions();
-  const { data: plans = [] } = useMembershipPlans();
+  const usersData = useUsers().data?.users || [];
+  const subscriptions = useSubscriptions().data?.subscriptions || [];
+  const plans = useMembershipPlans().data?.memberships || [];
 
   const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
   const getPlanById = (planId: number) => plans.find((p) => p.id === planId);

@@ -15,10 +15,10 @@ export default function SuperAdminUsers() {
   const [filterRole, setFilterRole] = useState("all");
   const [premiumOnly, setPremiumOnly] = useState(false);
 
-  const { data: users = [] } = useUsers();
-  const { data: gyms = [] } = useGyms();
-  const { data: subscriptions = [] } = useSubscriptions();
-  const { data: plans = [] } = useMembershipPlans();
+  const users = useUsers().data?.users || [];
+  const gyms = useGyms().data?.gyms || [];
+  const subscriptions = useSubscriptions().data?.subscriptions || [];
+  const plans = useMembershipPlans().data?.memberships || [];
 
   const getGymById = (gymId: number) => gyms.find((g) => g.id === gymId);
   const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
