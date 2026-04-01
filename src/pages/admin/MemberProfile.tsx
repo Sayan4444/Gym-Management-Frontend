@@ -6,16 +6,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Fingerprint, Snowflake, RefreshCw, Ban } from "lucide-react";
-import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
+import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
 
 export default function MemberProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const gymId = 1;
 
-  const { data: users = [] } = useUsers(gymId);
-  const { data: subscriptions = [] } = useSubscriptions(gymId);
-  const { data: plans = [] } = usePlans(gymId);
+  const users = useUsers().data?.users || [];
+  const subscriptions = useSubscriptions().data?.subscriptions || [];
+  const plans = useMembershipPlans().data?.memberships || [];
 
   const member = users.find((u) => u.id === Number(id));
 

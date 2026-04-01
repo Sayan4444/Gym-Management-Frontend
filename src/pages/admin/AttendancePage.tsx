@@ -5,19 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CalendarCheck, Plus, Crown } from "lucide-react";
-import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
+import { Plus, Crown } from "lucide-react";
+import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
 
-// Local static data for attendance records
 const attendanceRecords = [
   { id: 1, userId: 7, date: new Date().toISOString().split("T")[0], timeIn: new Date().toISOString(), timeOut: null, source: "Biometric" }
 ];
 
 export default function AttendancePage() {
   const gymId = 1;
-  const { data: users = [] } = useUsers(gymId);
-  const { data: subscriptions = [] } = useSubscriptions(gymId);
-  const { data: plans = [] } = usePlans(gymId);
+  const users = useUsers(gymId).data?.users || [];
+  const subscriptions = useSubscriptions(gymId).data?.subscriptions || [];
+  const plans = useMembershipPlans(gymId).data?.memberships || [];
 
   const gymMembers = users.filter(u => u.role === "Member");
   const memberIds = new Set(gymMembers.map((m) => m.id));

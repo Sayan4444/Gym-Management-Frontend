@@ -3,7 +3,7 @@ import { api } from "@/lib/api";
 import { Addon } from "@/data/types";
 
 export function useAddons(gymId?: number) {
-  return useQuery<Addon[]>({
+  return useQuery<{ count: number; addons: Addon[] }>({
     queryKey: ["addons", gymId],
     queryFn: () => api.getAddons(gymId),
   });

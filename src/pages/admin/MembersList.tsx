@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Plus, Eye, Crown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
+import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
 
 const statusBadge = (status?: string) => {
   if (!status) return <Badge variant="outline">No Plan</Badge>;
@@ -24,10 +24,9 @@ const statusBadge = (status?: string) => {
 
 export default function MembersList() {
   const navigate = useNavigate();
-  const gymId = 1;
-  const { data: members = [] } = useUsers(gymId, false, "Member");
-  const { data: subscriptions = [] } = useSubscriptions(gymId);
-  const { data: plans = [] } = usePlans(gymId);
+  const members = useUsers().data?.users || [];
+  const subscriptions = useSubscriptions().data?.subscriptions || [];
+  const plans = useMembershipPlans().data?.memberships || [];
 
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");

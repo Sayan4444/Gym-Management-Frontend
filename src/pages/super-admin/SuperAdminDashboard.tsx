@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGyms, useUsers, useDashboardStats } from "@/hooks/useApi";
+import { useGyms, useUsers, useSuperAdminDashboardStats } from "@/hooks/useApi";
 import { Building2, Users, CreditCard, TrendingUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useSearchParams } from "react-router-dom";
@@ -13,7 +13,7 @@ export default function SuperAdminDashboard() {
 
   const { data: gyms = [] } = useGyms();
   const { data: users = [] } = useUsers();
-  const { data: stats } = useDashboardStats();
+  const { data: stats } = useSuperAdminDashboardStats();
 
   const totalMembers = stats?.total_members ?? 0;
   const totalTrainers = users.filter((u) => u.role === "Trainer").length;

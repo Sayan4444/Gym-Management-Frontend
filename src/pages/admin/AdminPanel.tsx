@@ -14,9 +14,6 @@ export default function AdminPanel() {
   const [searchParams] = useSearchParams();
   const tab = searchParams.get("tab") || "dashboard";
 
-  // Support member profile deep-link via ?tab=member&id=123
-  const memberId = searchParams.get("id");
-
   switch (tab) {
     case "members":
       return <MembersList />;

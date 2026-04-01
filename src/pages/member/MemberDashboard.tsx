@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { CalendarCheck, CreditCard, Clock, Crown } from "lucide-react";
 import MemberAttendanceHistory from "./MemberAttendanceHistory";
 import MemberSubscription from "./MemberSubscription";
-import { useUsers, useSubscriptions, usePlans } from "@/hooks/useApi";
+import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
 
 export default function MemberDashboard() {
   const [searchParams] = useSearchParams();
@@ -16,7 +16,7 @@ export default function MemberDashboard() {
 
   const { data: users = [] } = useUsers(gymId);
   const { data: subscriptions = [] } = useSubscriptions(gymId);
-  const { data: plans = [] } = usePlans(gymId);
+  const { data: plans = [] } = useMembershipPlans(gymId);
 
   const member = users.find(u => u.id === authUser?.id) || authUser;
   const sub = member ? subscriptions.find(s => s.userId === member.id && s.status === "Active") : null;

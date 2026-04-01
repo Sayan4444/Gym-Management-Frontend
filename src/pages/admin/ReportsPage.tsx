@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
-import { useUsers, useDashboardStats } from "@/hooks/useApi";
+import { useAdminDashboardStats, useUsers } from "@/hooks/useApi";
 
 // Local static data for charts since backend has no aggregation routes
 const attendanceData = Array.from({ length: 30 }, (_, i) => {
@@ -23,9 +23,8 @@ const tooltipStyle = {
 };
 
 export default function ReportsPage() {
-  const gymId = 1;
-  const { data: users = [] } = useUsers(gymId);
-  const { data: stats } = useDashboardStats(gymId);
+  const users = useUsers().data?.users || [];
+  const { data: stats } = useAdminDashboardStats();
 
   const gymMembers = users.filter((u) => u.role === "Member");
   const totalRevenue = stats?.total_revenue ?? 0;

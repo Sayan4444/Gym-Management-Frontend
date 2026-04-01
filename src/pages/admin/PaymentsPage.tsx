@@ -8,8 +8,7 @@ import { Search } from "lucide-react";
 import { useUsers } from "@/hooks/useApi";
 
 export default function PaymentsPage() {
-  const gymId = 1;
-  const { data: users = [] } = useUsers(gymId);
+  const users = useUsers().data?.users || [];
   const gymMembers = users.filter((u) => u.role === "Member");
 
   // Local static mock for payments

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PackagePlus, RotateCcw } from "lucide-react";
-import { useSubscriptions, usePlans, useAddons } from "@/hooks/useApi";
+import { useSubscriptions, useMembershipPlans, useAddons } from "@/hooks/useApi";
 
 export default function MemberSubscription() {
   const storedUser = localStorage.getItem("user");
@@ -14,7 +14,7 @@ export default function MemberSubscription() {
   const userId = authUser?.id || 7;
 
   const { data: subscriptions = [] } = useSubscriptions(gymId);
-  const { data: plans = [] } = usePlans(gymId);
+  const { data: plans = [] } = useMembershipPlans(gymId);
   const { data: addons = [] } = useAddons(gymId);
 
   const sub = subscriptions.find((s) => s.userId === userId && s.status === "Active");

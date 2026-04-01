@@ -13,7 +13,7 @@ export function useAssignUserAddon() {
 }
 
 export function useUserAddons(gymId?: number, userId?: number) {
-    return useQuery<UserAddon[]>({
+    return useQuery<{ count: number, user_addons: UserAddon[]}>({
         queryKey: ["user-addons", gymId, userId],
         queryFn: () => api.getUserAddons(gymId, userId),
     });

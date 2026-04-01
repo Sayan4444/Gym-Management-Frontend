@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Users, CalendarCheck, CreditCard, TrendingUp, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
-import { useDashboardStats, useSubscriptions } from "@/hooks/useApi";
+import { useAdminDashboardStats, useSubscriptions } from "@/hooks/useApi";
 
 // Static mock data for charts since backend aggregation isn't implemented
 const weekData = [
@@ -18,9 +17,8 @@ const monthlyRevenue = [
 const statusColors = { Active: "hsl(142, 71%, 45%)", Expired: "hsl(0, 84%, 60%)", Frozen: "hsl(38, 92%, 50%)" };
 
 export default function AdminDashboard() {
-  const gymId = 1;
-  const { data: stats } = useDashboardStats(gymId);
-  const { data: subscriptions = [] } = useSubscriptions(gymId);
+  const { data: stats } = useAdminDashboardStats();
+  const subscriptions = useSubscriptions().data?.subscriptions || [];
 
   const activeSubs = subscriptions.filter(s => s.status === "Active");
   const expiringSubs = subscriptions.filter(s => {

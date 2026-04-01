@@ -9,6 +9,7 @@ import { addonApi } from './api/addon';
 import { userAddonApi } from './api/userAddon';
 import { workoutPlanApi } from './api/workoutplan';
 import { attendanceApi } from './api/attendance';
+import { dashboardStatsApi } from './api/DashboardStats';
 
 export { fetchApi, API_BASE_URL };
 
@@ -23,6 +24,7 @@ export const api = {
   ...userAddonApi,
   ...workoutPlanApi,
   ...attendanceApi,
+  ...dashboardStatsApi,
 
   // ----- Legacy/Other Routes (kept to prevent breaking existing code) -----
   submitDemoRequest: (data: {

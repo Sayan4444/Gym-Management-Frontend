@@ -8,7 +8,7 @@ import { useState } from "react";
 import { Search, Crown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useUsers, useGyms, useSubscriptions, usePlans } from "@/hooks/useApi";
+import { useUsers, useGyms, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
 
 export default function SuperAdminUsers() {
   const [search, setSearch] = useState("");
@@ -18,7 +18,7 @@ export default function SuperAdminUsers() {
   const { data: users = [] } = useUsers();
   const { data: gyms = [] } = useGyms();
   const { data: subscriptions = [] } = useSubscriptions();
-  const { data: plans = [] } = usePlans();
+  const { data: plans = [] } = useMembershipPlans();
 
   const getGymById = (gymId: number) => gyms.find((g) => g.id === gymId);
   const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");

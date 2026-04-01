@@ -3,7 +3,7 @@ import { api } from "@/lib/api";
 import { User } from "@/data/types";
 
 export function useUsers(gymId?: number, isPremium?: boolean, role?: string) {
-  return useQuery<User[]>({
+  return useQuery<{ count: number, users: User[] }>({
     queryKey: ["users", gymId, isPremium, role],
     queryFn: () => api.getUsers(gymId, isPremium, role),
   });

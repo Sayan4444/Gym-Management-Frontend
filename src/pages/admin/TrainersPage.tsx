@@ -4,11 +4,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useUsers } from "@/hooks/useApi";
 
 export default function TrainersPage() {
-  const gymId = 1;
-  const { data: users = [] } = useUsers(gymId);
+  const users = useUsers().data?.users || [];
   const trainers = users.filter(u => u.role === "Trainer");
   const members = users.filter(u => u.role === "Member");
-  
+
   // Local fake data for workout plans
   const workoutPlans = [
     { id: 1, trainerId: trainers[0]?.id || 0, title: "Hypertrophy Phase 1" },

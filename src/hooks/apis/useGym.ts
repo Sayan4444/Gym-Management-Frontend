@@ -13,13 +13,13 @@ export function useAddGym() {
 }
 
 export function useGyms() {
-  return useQuery<Gym[]>({
+  return useQuery<{ count: number, gyms: Gym[] }>({
     queryKey: ["gyms"],
     queryFn: api.getGyms,
   });
 }
 
-export function useGym(identifier?: number|string) {
+export function useGym(identifier?: number | string) {
   return useQuery<Gym>({
     queryKey: ["gym", identifier],
     queryFn: () => identifier ? api.getGym(identifier) : Promise.reject("No identifier"),

@@ -8,7 +8,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Crown, User as UserIcon } from "lucide-react";
-import { useUsers, useSubscriptions, usePlans, useMe, useLogout } from "@/hooks/useApi";
+import { useUsers, useSubscriptions, useMembershipPlans, useMe, useLogout } from "@/hooks/useApi";
 import { SidebarNav, roleLabels } from "./SidebarNav";
 
 export default function DashboardLayout({ role }: { role: string }) {
@@ -20,7 +20,7 @@ export default function DashboardLayout({ role }: { role: string }) {
   // Use API hooks
   const { data: usersData = [] } = useUsers();
   const { data: subscriptions = [] } = useSubscriptions();
-  const { data: plans = [] } = usePlans();
+  const { data: plans = [] } = useMembershipPlans();
 
   const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
   const getPlanById = (planId: number) => plans.find((p) => p.id === planId);

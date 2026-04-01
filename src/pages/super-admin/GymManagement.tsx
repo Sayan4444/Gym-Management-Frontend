@@ -1,10 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Building2 } from "lucide-react";
-import { useGyms, useDashboardStats, useUsers } from "@/hooks/useApi";
+import { useGyms, useSuperAdminDashboardStats, useUsers } from "@/hooks/useApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Gym } from "../../data/types";
 
-function GymCard({ gym }: { gym: any }) {
-  const { data: stats } = useDashboardStats(gym.id);
+function GymCard({ gym }: { gym: Gym }) {
+  const { data: stats } = useSuperAdminDashboardStats();
   const { data: users = [] } = useUsers(gym.id);
   
   const trainers = users.filter((u) => u.role === "Trainer").length;

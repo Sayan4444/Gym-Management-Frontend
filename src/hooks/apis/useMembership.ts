@@ -3,7 +3,7 @@ import { api } from "@/lib/api";
 import { MembershipPlan } from "@/data/types";
 
 export function useMembershipPlansByGym(gymId?: number) {
-  return useQuery<MembershipPlan[]>({
+  return useQuery<{count:number,memberships:MembershipPlan[]}>({
     queryKey: ["membership-plans", gymId],
     queryFn: () => gymId ? api.getMembershipPlansByGym(gymId) : Promise.reject("No gymId"),
     enabled: !!gymId,
@@ -11,7 +11,7 @@ export function useMembershipPlansByGym(gymId?: number) {
 }
 
 export function useMembershipPlans(gymId?: number) {
-  return useQuery<MembershipPlan[]>({
+  return useQuery<{count:number,memberships:MembershipPlan[]}>({
     queryKey: ["membership-plans", gymId],
     queryFn: () => api.getMembershipPlans(gymId),
   });

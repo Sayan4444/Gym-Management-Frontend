@@ -13,7 +13,7 @@ export function useAssignSubscription() {
 }
 
 export function useSubscriptions(gymId?: number, userId?: number) {
-  return useQuery<Subscription[]>({
+  return useQuery<{ count: number; subscriptions: Subscription[] }>({
     queryKey: ["subscriptions", gymId, userId],
     queryFn: () => api.getSubscriptions(gymId, userId),
   });
@@ -22,7 +22,7 @@ export function useSubscriptions(gymId?: number, userId?: number) {
 export function useUpdateSubscription() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number ; data: any }) => api.updateSubscription(id, data),
+    mutationFn: ({ id, data }: { id: number; data: Subscription }) => api.updateSubscription(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
     },

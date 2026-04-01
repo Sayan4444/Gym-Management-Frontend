@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://localhost:8080/api";
+export const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080"}/api`;
 
 function toCamelCase(obj: any): any {
   if (Array.isArray(obj)) {

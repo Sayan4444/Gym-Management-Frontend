@@ -7,7 +7,7 @@ import { useGyms } from "@/hooks/useApi";
 
 export default function SettingsPage() {
   const gymId = 1;
-  const { data: gyms = [] } = useGyms();
+  const gyms = useGyms().data?.gyms || [];
   const gym = gyms.find((g) => g.id === gymId) || { name: "Loading...", address: "" };
 
   return (
