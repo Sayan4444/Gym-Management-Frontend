@@ -8,22 +8,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Crown } from "lucide-react";
 import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
 
-const attendanceRecords = [
-  { id: 1, userId: 7, date: new Date().toISOString().split("T")[0], timeIn: new Date().toISOString(), timeOut: null, source: "Biometric" }
-];
+import { useAttendance } from "@/hooks/useApi";
 
 export default function AttendancePage() {
-  const gymId = 1;
-  const users = useUsers(gymId).data?.users || [];
-  const subscriptions = useSubscriptions(gymId).data?.subscriptions || [];
-  const plans = useMembershipPlans(gymId).data?.memberships || [];
+  const users = useUsers(undefined, undefined, "Member").data?.users || [];
+  const subscriptions = useSubscriptions().data?.subscriptions || [];
+  const plans = useMembershipPlans().data?.memberships || [];
 
-  const gymMembers = users.filter(u => u.role === "Member");
-  const memberIds = new Set(gymMembers.map((m) => m.id));
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
-  const dayRecords = attendanceRecords
-    .filter(a => a.date === selectedDate && memberIds.has(a.userId))
-    .sort((a, b) => new Date(a.timeIn).getTime() - new Date(b.timeIn).getTime());
+  
+  const { data: attendanceData } = useAttendance({ date: selectedDate });
+  const dayRecords = attendanceData?.attendance || [];
 
   return (
     <div className="space-y-6">
@@ -66,14 +61,14 @@ export default function AttendancePage() {
                         <div className="relative">
                           <Avatar className="h-8 w-8">
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                              {user?.name.split(" ").map(n => n[0]).join("") || "?"}
+                              {a.user_name?.split(" ").map((n: string) => n[0]).join("") || "?"}
                             </AvatarFallback>
                           </Avatar>
                           {isPremium && (
                             <Crown className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 text-yellow-500 fill-yellow-400 drop-shadow" />
                           )}
                         </div>
-                        <span className="font-medium">{user?.name || "Unknown"}</span>
+                        <span className="font-medium">{a.user_name || "Unknown"}</span>
                       </div>
                     </TableCell>
                     <TableCell>{timeIn.toLocaleTimeString()}</TableCell>

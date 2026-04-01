@@ -8,6 +8,13 @@ export function useQRToken() {
   });
 }
 
+export function useAttendance(params?: { date?: string; user_id?: number; gym_id?: number; search?: string }) {
+  return useQuery<{ count: number; attendance: any[] }>({
+    queryKey: ["attendance", params],
+    queryFn: () => api.getAttendance(params),
+  });
+}
+
 export function useScanQRAttendance() {
   const queryClient = useQueryClient();
   return useMutation({

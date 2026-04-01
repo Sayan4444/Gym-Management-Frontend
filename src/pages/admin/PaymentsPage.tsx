@@ -5,27 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search } from "lucide-react";
-import { useUsers } from "@/hooks/useApi";
+import { usePayments } from "@/hooks/useApi";
 
 export default function PaymentsPage() {
-  const users = useUsers().data?.users || [];
-  const gymMembers = users.filter((u) => u.role === "Member");
-
-  // Local static mock for payments
-  const gymPayments = [
-    { id: 1, userId: gymMembers[0]?.id || 0, amount: 49.99, paymentDate: "2023-11-01", status: "Paid", paymentFor: "Membership Plan" }
-  ];
-
   const [filterStatus, setFilterStatus] = useState("all");
   const [search, setSearch] = useState("");
 
-  const filtered = gymPayments.filter((p) => {
-    const user = users.find((u) => u.id === p.userId);
-    const matchesSearch = !search || user?.name?.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filterStatus === "all" || p.status === filterStatus;
-    return matchesSearch && matchesFilter;
+  const { data } = usePayments({
+    status: filterStatus === "all" ? undefined : filterStatus,
+    search: search || undefined,
   });
 
+  const filtered = data?.payments || [];
   const totalPaid = filtered.filter(p => p.status === "Paid").reduce((s, p) => s + p.amount, 0);
 
   const statusBadge = (status: string) => {
@@ -75,11 +66,10 @@ export default function PaymentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((p) => {
-                const user = users.find((u) => u.id === p.userId);
+              {filtered.map((p: any) => {
                 return (
                   <TableRow key={p.id}>
-                    <TableCell className="font-medium">{user?.name || "Unknown"}</TableCell>
+                    <TableCell className="font-medium">{p.user_name || "Unknown"}</TableCell>
                     <TableCell>${p.amount.toFixed(2)}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={p.paymentFor === "Membership Plan" ? "bg-primary/10 text-primary border-primary/20" : "bg-purple-500/10 text-purple-600 border-purple-500/20"}>

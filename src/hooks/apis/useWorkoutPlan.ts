@@ -12,10 +12,10 @@ export function useCreateWorkoutPlan() {
   });
 }
 
-export function useWorkoutPlans() {
-  return useQuery({
-    queryKey: ["workout-plans"],
-    queryFn: api.getWorkoutPlans,
+export function useWorkoutPlans(params?: { member_id?: number; trainer_id?: number }) {
+  return useQuery<{ count: number; plans: WorkoutPlan[] }>({
+    queryKey: ["workout-plans", params],
+    queryFn: () => api.getWorkoutPlans(params),
   });
 }
 

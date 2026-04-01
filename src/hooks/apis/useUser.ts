@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { User } from "@/data/types";
 
-export function useUsers(gymId?: number, isPremium?: boolean, role?: string) {
+export function useUsers(gymId?: number, isPremium?: boolean, role?: string, search?: string, subscriptionStatus?: string) {
   return useQuery<{ count: number, users: User[] }>({
-    queryKey: ["users", gymId, isPremium, role],
-    queryFn: () => api.getUsers(gymId, isPremium, role),
+    queryKey: ["users", gymId, isPremium, role, search, subscriptionStatus],
+    queryFn: () => api.getUsers(gymId, isPremium, role, search, subscriptionStatus),
   });
 }
 

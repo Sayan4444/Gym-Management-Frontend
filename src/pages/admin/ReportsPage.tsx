@@ -2,19 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
 import { useAdminDashboardStats, useUsers } from "@/hooks/useApi";
 
-// Local static data for charts since backend has no aggregation routes
-const attendanceData = Array.from({ length: 30 }, (_, i) => {
-  const d = new Date();
-  d.setDate(d.getDate() - (29 - i));
-  return { date: d.toLocaleDateString("en", { month: "short", day: "numeric" }), count: Math.floor(Math.random() * 20) + 30 };
-});
-
-const revenueData = [
-  { month: "Jan '24", revenue: 1049.95, count: 5 },
-  { month: "Feb '24", revenue: 689.96, count: 4 },
-  { month: "Mar '25", revenue: 149.97, count: 3 },
-];
-
 const tooltipStyle = {
   background: "hsl(var(--card))",
   border: "1px solid hsl(var(--border))",
@@ -23,12 +10,17 @@ const tooltipStyle = {
 };
 
 export default function ReportsPage() {
-  const users = useUsers().data?.users || [];
+  const users = useUsers(undefined, undefined, "Member").data?.users || [];
   const { data: stats } = useAdminDashboardStats();
 
-  const gymMembers = users.filter((u) => u.role === "Member");
   const totalRevenue = stats?.total_revenue ?? 0;
-  const avgDaily = (45.2).toFixed(1); // placeholder for local testing
+  
+  const attendanceData = stats?.weekly_attendance || [];
+  const revenueData = stats?.monthly_revenue || [];
+  
+  const avgDaily = attendanceData.length > 0 
+    ? (attendanceData.reduce((acc, curr) => acc + curr.count, 0) / attendanceData.length).toFixed(1) 
+    : "0.0";
 
   return (
     <div className="space-y-6">
@@ -52,19 +44,19 @@ export default function ReportsPage() {
         </Card>
         <Card>
           <CardContent className="pt-6 text-center">
-            <p className="text-3xl font-bold font-display">{gymMembers.length}</p>
+            <p className="text-3xl font-bold font-display">{users.length}</p>
             <p className="text-sm text-muted-foreground">Total Members</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
-        <CardHeader><CardTitle>Attendance Trend (30 Days)</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Attendance Trend (7 Days)</CardTitle></CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={attendanceData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis dataKey="date" tick={{ fontSize: 11 }} interval={4} />
+              <XAxis dataKey="day" tick={{ fontSize: 11 }} interval={0} />
               <YAxis tick={{ fontSize: 12 }} />
               <Tooltip contentStyle={tooltipStyle} />
               <Area type="monotone" dataKey="count" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.1} strokeWidth={2} />

@@ -1,18 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useUsers } from "@/hooks/useApi";
+import { useUsers, useWorkoutPlans } from "@/hooks/useApi";
 
 export default function TrainersPage() {
-  const users = useUsers().data?.users || [];
-  const trainers = users.filter(u => u.role === "Trainer");
-  const members = users.filter(u => u.role === "Member");
-
-  // Local fake data for workout plans
-  const workoutPlans = [
-    { id: 1, trainerId: trainers[0]?.id || 0, title: "Hypertrophy Phase 1" },
-    { id: 2, trainerId: trainers[0]?.id || 0, title: "Cardio Focus" }
-  ];
+  const trainers = useUsers(undefined, undefined, "Trainer").data?.users || [];
+  const members = useUsers(undefined, undefined, "Member").data?.users || [];
+  const workoutPlans = useWorkoutPlans().data?.plans || [];
 
   return (
     <div className="space-y-6">

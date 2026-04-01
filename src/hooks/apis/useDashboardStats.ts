@@ -7,6 +7,8 @@ export interface DashboardStatsResponse {
     active_memberships: number;
     expiring_soon: number;
     total_revenue: number;
+    weekly_attendance: { day: string, count: number }[];
+    monthly_revenue: { month: string, revenue: number }[];
 }
 
 export function useSuperAdminDashboardStats() {

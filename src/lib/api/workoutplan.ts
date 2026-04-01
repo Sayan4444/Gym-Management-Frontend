@@ -4,7 +4,13 @@ import { WorkoutPlan } from '@/data/types';
 export const workoutPlanApi = {
   // ----- Workout Plan Routes -----
   createWorkoutPlan: (data: WorkoutPlan) => fetchApi("/workout-plan", { method: "POST", body: JSON.stringify(data) }),
-  getWorkoutPlans: () => fetchApi("/workout-plan"),
+  getWorkoutPlans: (params?: { member_id?: number; trainer_id?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.member_id) qs.append("member_id", params.member_id.toString());
+    if (params?.trainer_id) qs.append("trainer_id", params.trainer_id.toString());
+    const query = qs.toString() ? `?${qs.toString()}` : "";
+    return fetchApi(`/workout-plan${query}`);
+  },
   updateWorkoutPlan: (id: number, data: WorkoutPlan) => fetchApi(`/workout-plan/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteWorkoutPlan: (id: number ) => fetchApi(`/workout-plan/${id}`, { method: "DELETE" }),
 };

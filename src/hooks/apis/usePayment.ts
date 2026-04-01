@@ -1,6 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Payment } from "../../data/types";
+
+export function usePayments(params?: { gym_id?: number; user_id?: number; status?: string; search?: string }) {
+  return useQuery<{ count: number; payments: (Payment & { user_name?: string })[] }>({
+    queryKey: ["payments", params],
+    queryFn: () => api.getPayments(params),
+  });
+}
 
 export function useCreateOrder() {
   const queryClient = useQueryClient();
