@@ -27,10 +27,17 @@ export function useCreateMembershipPlan() {
   });
 }
 
+export interface UpdateMembershipPayload {
+  name?: string;
+  price?: number;
+  durationMonths?: number;
+  isActive?: boolean;
+}
+
 export function useUpdateMembershipPlan() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ gymId, membershipId, data }: { gymId: number ; membershipId: number ; data: MembershipPlan }) => api.updateMembershipPlan(gymId, membershipId, data),
+    mutationFn: ({ gymId, membershipId, data }: { gymId: number; membershipId: number; data: UpdateMembershipPayload }) => api.updateMembershipPlan(gymId, membershipId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["membership-plans"] });
     },
