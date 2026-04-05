@@ -66,10 +66,10 @@ export default function PaymentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((p: any) => {
+              {filtered.map((p) => {
                 return (
                   <TableRow key={p.id}>
-                    <TableCell className="font-medium">{p.user_name || "Unknown"}</TableCell>
+                    <TableCell className="font-medium">{p.userName || "Unknown"}</TableCell>
                     <TableCell>${p.amount.toFixed(2)}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={p.paymentFor === "Membership Plan" ? "bg-primary/10 text-primary border-primary/20" : "bg-purple-500/10 text-purple-600 border-purple-500/20"}>

@@ -1,4 +1,5 @@
 import { Gym } from '../../data/types';
+import { UpdateGymPayload } from '../../hooks/apis/useGym';
 import { fetchApi } from './core';
 
 export const gymApi = {
@@ -6,6 +7,6 @@ export const gymApi = {
   addGym: (data: Gym) => fetchApi("/gym", { method: "POST", body: JSON.stringify(data) }),
   getGyms: () => fetchApi("/gyms"),
   getGym: (identifier: number | string) => fetchApi(`/gym/${identifier}`),
-  updateGym: (identifier: number | string, data: Gym) => fetchApi(`/gym/${identifier}`, { method: "PUT", body: JSON.stringify(data) }),
+  updateGym: (identifier: number | string, data: UpdateGymPayload) => fetchApi(`/gym/${identifier}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteGym: (identifier: number | string) => fetchApi(`/gym/${identifier}`, { method: "DELETE" }),
 };

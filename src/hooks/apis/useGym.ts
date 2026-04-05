@@ -27,10 +27,19 @@ export function useGym(identifier?: number | string) {
   });
 }
 
+export interface UpdateGymPayload {
+    name: string;
+    slug: string;
+    address: string;
+    whatsapp: string;
+    phone: string;
+    email: string;
+}
+
 export function useUpdateGym() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ identifier, data }: { identifier: number | string; data: Gym }) => api.updateGym(identifier, data),
+    mutationFn: ({ identifier, data }: { identifier: number | string; data: UpdateGymPayload }) => api.updateGym(identifier, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["gyms"] });
       queryClient.invalidateQueries({ queryKey: ["gym", variables.identifier] });
