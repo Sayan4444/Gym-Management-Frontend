@@ -11,21 +11,20 @@ import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
 import { useAttendance } from "@/hooks/useApi";
 
 export default function AttendancePage() {
-  const users = useUsers(undefined, undefined, "Member").data?.users || [];
+  const users = useUsers().data?.users || [];
   const subscriptions = useSubscriptions().data?.subscriptions || [];
   const plans = useMembershipPlans().data?.memberships || [];
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   
-  const { data: attendanceData } = useAttendance({ date: selectedDate });
-  const dayRecords = attendanceData?.attendance || [];
-
+  const dayRecords = useAttendance({ date: selectedDate }).data?.attendance || [];
+  console.log(dayRecords)
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold font-display">Attendance</h1>
-          <p className="text-muted-foreground">{dayRecords.length} check-ins on {selectedDate}</p>
+          <p className="text-muted-foreground">{dayRecords?.length} check-ins on {selectedDate}</p>
         </div>
         <div className="flex gap-3">
           <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="w-44" />
@@ -47,7 +46,6 @@ export default function AttendancePage() {
             </TableHeader>
             <TableBody>
               {dayRecords.map((a) => {
-                const user = users.find((u) => u.id === a.userId);
                 const sub = subscriptions.find((s) => s.userId === a.userId && s.status === "Active");
                 const plan = sub ? plans.find((p) => p.id === sub.planId) : null;
                 const isPremium = plan?.name.toLowerCase().includes("premium");
@@ -61,7 +59,7 @@ export default function AttendancePage() {
                         <div className="relative">
                           <Avatar className="h-8 w-8">
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                              {a.user_name?.split(" ").map((n: string) => n[0]).join("") || "?"}
+                              {a.user.name?.split(" ").map((n: string) => n[0]).join("") || "?"}
                             </AvatarFallback>
                           </Avatar>
                           {isPremium && (

@@ -2,13 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
 export interface DashboardStatsResponse {
-    total_members: number;
-    todays_attendance: number;
-    active_memberships: number;
-    expiring_soon: number;
-    total_revenue: number;
-    weekly_attendance: { day: string, count: number }[];
-    monthly_revenue: { month: string, revenue: number }[];
+  totalMembers: number;
+  todaysAttendance: number;
+  activeMemberships: number;
+  expiringSoon: number;
+  totalRevenue: number;
+  weeklyAttendance: { day: string, count: number }[];
+  monthlyRevenue: { month: string, revenue: number }[];
 }
 
 export function useSuperAdminDashboardStats() {

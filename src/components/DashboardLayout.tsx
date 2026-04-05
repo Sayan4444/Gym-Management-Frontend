@@ -9,7 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Crown, User as UserIcon } from "lucide-react";
 import { useUsers, useSubscriptions, useMembershipPlans, useMe, useLogout } from "@/hooks/useApi";
-import { SidebarNav, roleLabels } from "./SidebarNav";
+import { SidebarNav } from "./SidebarNav";
+import { roleLabels } from "@/lib/constants";
 
 export default function DashboardLayout({ role }: { role: string }) {
   const navigate = useNavigate();
@@ -18,20 +19,16 @@ export default function DashboardLayout({ role }: { role: string }) {
   const [profileOpen, setProfileOpen] = useState(false);
 
   // Use API hooks
-  const usersData = useUsers().data?.users || [];
   const subscriptions = useSubscriptions().data?.subscriptions || [];
-  const plans = useMembershipPlans().data?.memberships || [];
 
   const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
-  const getPlanById = (planId: number) => plans.find((p) => p.id === planId);
 
-  const { data: me } = useMe();
+  const { data: currentUser } = useMe();
   const { mutateAsync: logout } = useLogout();
 
-  // Determine the current user based on localStorage and API
-  const storedUser = localStorage.getItem("user");
-  const authUser = storedUser ? JSON.parse(storedUser) : null;
-  const currentUser = usersData.find(u => u.id === authUser?.id) || me || authUser;
+  const membershipPlans = useMembershipPlans().data?.memberships || [];
+
+  const getPlanById = (planId: number) => membershipPlans.find((plan) => plan.id === planId);
 
   return (
     <SidebarProvider>
@@ -76,7 +73,9 @@ export default function DashboardLayout({ role }: { role: string }) {
                   <DropdownMenuItem onClick={async () => {
                     try {
                       await logout();
-                    } catch (_) {}
+                    } catch (error) {
+                      console.error("Logout failed:", error);
+                    }
                     localStorage.removeItem("user");
                     navigate(gymName ? `/${gymName}/login` : "/");
                   }}>

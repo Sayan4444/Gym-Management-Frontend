@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { Attendance } from "../../data/types";
 
 export function useQRToken() {
   return useQuery({
@@ -9,7 +10,7 @@ export function useQRToken() {
 }
 
 export function useAttendance(params?: { date?: string; user_id?: number; gym_id?: number; search?: string }) {
-  return useQuery<{ count: number; attendance: any[] }>({
+  return useQuery<{ count: number; attendance: Attendance[] }>({
     queryKey: ["attendance", params],
     queryFn: () => api.getAttendance(params),
   });

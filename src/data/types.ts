@@ -31,6 +31,8 @@ export interface Gym {
   address: string;
   whatsapp: string;
   users?: User[];
+  phone: string;
+  email: string;
 }
 
 export interface MembershipPlan {

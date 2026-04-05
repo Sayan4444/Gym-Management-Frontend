@@ -72,17 +72,20 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
   const handleSave = () => {
     updateProfileMutation.mutate(
       {
-        name: form.name,
-        phone: form.phone,
-        dob: form.dob,
-        gender: form.gender,
-        address: form.address,
-        emergencyContactName: form.emergencyContactName,
-        emergencyContactPhone: form.emergencyContactPhone,
-        bloodGroup: form.bloodGroup,
-        height: form.height ? parseFloat(form.height) : undefined,
-        weight: form.weight ? parseFloat(form.weight) : undefined,
-        medicalConditions: form.medicalConditions,
+        id: user.id,
+        data: {
+          name: form.name,
+          phone: form.phone,
+          dob: form.dob,
+          gender: form.gender,
+          address: form.address,
+          emergencyContactName: form.emergencyContactName,
+          emergencyContactPhone: form.emergencyContactPhone,
+          bloodGroup: form.bloodGroup,
+          height: form.height ? parseFloat(form.height) : undefined,
+          weight: form.weight ? parseFloat(form.weight) : undefined,
+          medicalConditions: form.medicalConditions,
+        }
       },
       {
         onSuccess: () => {
@@ -92,11 +95,12 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
           });
           onOpenChange(false);
         },
-        onError: (err: any) => {
+        onError: (err: unknown) => {
+          const message = err instanceof Error ? err.message : "Could not update profile";
           toast({
             variant: "destructive",
             title: "Error",
-            description: err.message || "Could not update profile",
+            description: message,
           });
         },
       }

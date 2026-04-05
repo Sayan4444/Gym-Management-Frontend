@@ -11,6 +11,7 @@ import { Search, Plus, Eye, Crown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
+import { log } from "node:console";
 
 const statusBadge = (status?: string) => {
   if (!status) return <Badge variant="outline">No Plan</Badge>;
@@ -27,6 +28,7 @@ export default function MembersList() {
   const members = useUsers().data?.users || [];
   const subscriptions = useSubscriptions().data?.subscriptions || [];
   const plans = useMembershipPlans().data?.memberships || [];
+
 
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");

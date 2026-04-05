@@ -15,6 +15,8 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
+import { roleLabels } from "@/lib/constants";
+
 function getNavItems(role: string, prefix: string): NavItem[] {
   const items: Record<string, NavItem[]> = {
     admin: [
@@ -44,13 +46,6 @@ function getNavItems(role: string, prefix: string): NavItem[] {
   };
   return items[role] || [];
 }
-
-export const roleLabels: Record<string, string> = {
-  admin: "Gym Admin",
-  trainer: "Trainer",
-  member: "Member",
-  "super-admin": "Super Admin",
-};
 
 export function SidebarNav({ role, prefix }: { role: string; prefix: string }) {
   const { state } = useSidebar();

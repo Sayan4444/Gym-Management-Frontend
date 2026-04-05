@@ -1,22 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, CalendarCheck, CreditCard, TrendingUp, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
-import { useAdminDashboardStats, useSubscriptions } from "@/hooks/useApi";
+import { useAdminDashboardStats, useMe, useSubscriptions } from "@/hooks/useApi";
 
-// Static mock data for charts since backend aggregation isn't implemented
-const weekData = [
-  { day: "Mon", count: 45 }, { day: "Tue", count: 52 }, { day: "Wed", count: 38 },
-  { day: "Thu", count: 65 }, { day: "Fri", count: 48 }, { day: "Sat", count: 25 }, { day: "Sun", count: 18 }
-];
-const monthlyRevenue = [
-  { month: "Jan", revenue: 1049.95 },
-  { month: "Feb", revenue: 689.96 },
-  { month: "Mar", revenue: 149.97 },
-];
 
 const statusColors = { Active: "hsl(142, 71%, 45%)", Expired: "hsl(0, 84%, 60%)", Frozen: "hsl(38, 92%, 50%)" };
 
 export default function AdminDashboard() {
+  const { data: currentUser } = useMe();
   const { data: stats } = useAdminDashboardStats();
   const subscriptions = useSubscriptions().data?.subscriptions || [];
 
@@ -31,21 +22,21 @@ export default function AdminDashboard() {
     { name: "Active", value: activeSubs.length },
     { name: "Expired", value: subscriptions.filter(s => s.status === "Expired").length },
     { name: "Frozen", value: subscriptions.filter(s => s.status === "Frozen").length },
-  ];
+  ].filter(item => item.value > 0);
 
   const kpiCards = [
-    { title: "Total Members", value: stats?.total_members ?? 0, icon: Users, color: "text-primary" },
-    { title: "Today's Attendance", value: stats?.todays_attendance ?? 0, icon: CalendarCheck, color: "text-success" },
-    { title: "Active Memberships", value: stats?.active_memberships ?? 0, icon: TrendingUp, color: "text-primary" },
+    { title: "Total Members", value: stats?.totalMembers ?? 0, icon: Users, color: "text-primary" },
+    { title: "Today's Attendance", value: stats?.todaysAttendance ?? 0, icon: CalendarCheck, color: "text-success" },
+    { title: "Active Memberships", value: stats?.activeMemberships ?? 0, icon: TrendingUp, color: "text-primary" },
     { title: "Expiring Soon", value: expiringSubs.length, icon: AlertTriangle, color: "text-warning" },
-    { title: "Total Revenue", value: `$${stats?.total_revenue?.toFixed(2) ?? "0"}`, icon: CreditCard, color: "text-success" },
+    { title: "Total Revenue", value: `$${stats?.totalRevenue?.toFixed(2) ?? "0"}`, icon: CreditCard, color: "text-success" },
   ];
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold font-display">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back, Sarah. Here's your gym overview.</p>
+        <p className="text-muted-foreground">Welcome back, {currentUser?.name}. Here's your gym overview.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -71,7 +62,8 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={weekData}>
+              <BarChart data={stats?.weeklyAttendance}>
+                {/* <BarChart data={weekData}> */}
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="day" className="text-muted-foreground" tick={{ fontSize: 12 }} />
                 <YAxis className="text-muted-foreground" tick={{ fontSize: 12 }} />
@@ -88,7 +80,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={monthlyRevenue}>
+              <LineChart data={stats?.monthlyRevenue}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="month" className="text-muted-foreground" tick={{ fontSize: 12 }} />
                 <YAxis className="text-muted-foreground" tick={{ fontSize: 12 }} />

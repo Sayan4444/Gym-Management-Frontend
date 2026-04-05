@@ -9,10 +9,24 @@ export function useUsers(gymId?: number, isPremium?: boolean, role?: string, sea
   });
 }
 
+export interface UpdateProfilePayload {
+  name?: string;
+  phone?: string;
+  dob?: string;
+  gender?: string;
+  address?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  bloodGroup?: string;
+  height?: number;
+  weight?: number;
+  medicalConditions?: string;
+}
+
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number ; data: User }) => api.updateProfile(id, data),
+    mutationFn: ({ id, data }: { id: number; data: UpdateProfilePayload }) => api.updateProfile(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["me"] });
