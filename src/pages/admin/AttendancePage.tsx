@@ -1,48 +1,35 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, QrCode } from "lucide-react";
 
-import { useAttendance, useMarkManualAttendance } from "@/hooks/apis/useAttendance";
+import { useAttendance } from "@/hooks/apis/useAttendance";
 import { useUsers } from "@/hooks/apis/useUser";
 import { User } from "@/data/types";
 import { UserDetailsDialog } from "@/components/UserDetailsDialog";
 import { PaginationFooter } from "@/components/PaginationFooter";
+import { QRCodeModal } from "@/components/QRCodeModal";
+import { ManualCheckInModal } from "@/components/ManualCheckInModal";
 
 export default function AttendancePage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const dayRecords = useAttendance({ date: selectedDate }).data?.attendance || [];
   const { data: usersData } = useUsers();
   const users = usersData?.users || [];
-  const markAttendanceMutation = useMarkManualAttendance();
 
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const totalPages = Math.ceil(dayRecords.length / itemsPerPage) || 1;
   const paginatedRecords = dayRecords.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
-  const handleManualCheckIn = () => {
-    if (!selectedUserId) return;
-    markAttendanceMutation.mutate(
-      { userId: Number(selectedUserId) },
-      {
-        onSuccess: () => {
-          setIsManualModalOpen(false);
-          setSelectedUserId("");
-        }
-      }
-    );
-  };
 
   return (
     <div className="space-y-6">
@@ -51,44 +38,18 @@ export default function AttendancePage() {
           <h1 className="text-3xl font-bold font-display">Attendance</h1>
           <p className="text-muted-foreground">{dayRecords?.length} check-ins on {selectedDate}</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <Input type="date" value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); setPage(1); }} className="w-44" />
-          <Dialog open={isManualModalOpen} onOpenChange={setIsManualModalOpen}>
-            <DialogTrigger asChild>
-              <Button><Plus className="mr-2 h-4 w-4" /> Manual Check-in</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Manual Check-in</DialogTitle>
-                <DialogDescription>
-                  Select a member or trainer to manually log their attendance for today.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a user" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id.toString()}>
-                          {user.name} ({user.email})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsManualModalOpen(false)}>Cancel</Button>
-                <Button onClick={handleManualCheckIn} disabled={!selectedUserId || markAttendanceMutation.isPending}>
-                  {markAttendanceMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Check In
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+
+          {/* Get QR Button + Modal */}
+          <Button variant="outline" onClick={() => setIsQRModalOpen(true)}>
+            <QrCode className="mr-2 h-4 w-4" /> Get QR
+          </Button>
+          <QRCodeModal open={isQRModalOpen} onOpenChange={setIsQRModalOpen} />
+          <Button onClick={() => setIsManualModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> Manual Check-in
+          </Button>
+          <ManualCheckInModal open={isManualModalOpen} onOpenChange={setIsManualModalOpen} />
         </div>
       </div>
 

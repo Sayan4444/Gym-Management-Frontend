@@ -3,7 +3,7 @@ import { api } from "@/lib/api";
 import { Attendance } from "../../data/types";
 
 export function useQRToken() {
-  return useQuery({
+  return useQuery<{ token: string,expiresAt: string }>({
     queryKey: ["qr-token"],
     queryFn: api.getQRToken,
   });
