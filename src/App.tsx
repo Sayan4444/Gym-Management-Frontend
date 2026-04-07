@@ -19,9 +19,6 @@ import ValidGymRoute from "./components/ValidGymRoute";
 // Admin pages
 import AdminPanel from "./pages/admin/AdminPanel";
 
-// Trainer pages
-import TrainerDashboard from "./pages/trainer/TrainerDashboard";
-
 // Member pages
 import MemberDashboard from "./pages/member/MemberDashboard";
 
@@ -30,6 +27,7 @@ import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
 import BookDemoPage from "./pages/BookDemoPage";
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import TrainerPanel from "./pages/trainer/TrainerPanel";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,7 +74,7 @@ const App = () => (
                 {/* Trainer routes */}
                 <Route element={<ProtectedRoute allowedRoles={['Trainer']} />}>
                   <Route path="trainer" element={<DashboardLayout role="trainer" />}>
-                    <Route index element={<TrainerDashboard />} />
+                    <Route index element={<TrainerPanel />} />
                   </Route>
                 </Route>
 

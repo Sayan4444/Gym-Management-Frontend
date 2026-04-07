@@ -24,7 +24,7 @@ export interface User {
   gym?: Gym;
   subscription?: Subscription;
   trainer?: User;
-  workoutPlan?: WorkoutPlan[];
+  workoutPlans?: WorkoutPlan[];
 }
 
 export interface Gym {

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -5,12 +6,16 @@ import { Plus } from "lucide-react";
 import { useUsers } from "@/hooks/useApi";
 
 export default function WorkoutPlansPage() {
-  const gymId = 1;
-  const users = useUsers(gymId).data?.users || [];
-  
-  const workouts = [
-    { id: 1, title: "Hypertrophy Program", description: "Standard 4-day split.", memberId: 7 }
-  ];
+  const users = useUsers({ include: "workout_plans" }).data?.users || [];
+
+  // O(1) lookup by user id instead of O(n) find() inside the render loop
+  const userMap = useMemo(() => new Map(users.map((u) => [u.id, u])), [users]);
+
+  // Flatten all workout plans from every user into a single array
+  const workouts = useMemo(
+    () => users.flatMap((user) => user.workoutPlans ?? []),
+    [users]
+  );
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between gap-4">
@@ -23,7 +28,7 @@ export default function WorkoutPlansPage() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {workouts.map((w) => {
-          const member = users.find((u) => u.id === w.memberId);
+          const member = userMap.get(w.memberId);
           return (
             <Card key={w.id}>
               <CardHeader>

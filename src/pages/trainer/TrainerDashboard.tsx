@@ -2,30 +2,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useSearchParams } from "react-router-dom";
-import WorkoutPlansPage from "./WorkoutPlansPage";
-import { useUsers } from "@/hooks/useApi";
+import { useMe, useUsers, useAttendance } from "@/hooks/useApi";
 
 export default function TrainerDashboard() {
-  const [searchParams] = useSearchParams();
-  const currentTab = searchParams.get("tab") || "dashboard";
+  const me = useMe().data;
+  const gymId = me?.gymId ?? undefined;
 
-  const users = useUsers().data?.users || [];
-  const trainer = users.find((u) => u.id === 4) || { id: 4, name: "Loading...", email: "" };
-  const assignedMembers = users.filter((u) => u.trainerId === trainer.id);
+  const assignedMembers = useUsers({ include: "workout_plans" }).data?.users || [];
 
-  // Local static mock for trainer pages
-  const workouts = [{ id: 1, title: "Leg Day", description: "Legs", memberId: assignedMembers[0]?.id || 0 }];
-  const todayAttendance = [{ id: 1, userId: assignedMembers[0]?.id || 0 }];
-
-  if (currentTab === "workouts") {
-    return <WorkoutPlansPage />;
-  }
+  const workouts = assignedMembers.map((m) => m.workoutPlans || []);
+  const todayAttendance = useAttendance().data?.attendance || [];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold font-display">Welcome, {trainer.name.split(" ")[0]}</h1>
+        <h1 className="text-3xl font-bold font-display">Welcome, {me?.name?.split(" ")[0]}</h1>
         <p className="text-muted-foreground">Your trainer dashboard</p>
       </div>
 

@@ -12,7 +12,7 @@ import { User } from "@/data/types";
 function TrainerCard({ trainer }: { trainer: User }) {
   const members = useUsers({ role: "Member", trainerId: trainer.id }).data?.users || [];
   
-  const plans = members.map((member) => member.workoutPlan)
+  const plans = members.map((member) => member.workoutPlans)
 
   return (
     <Card>
