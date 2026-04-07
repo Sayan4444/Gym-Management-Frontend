@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { User } from "@/data/types";
 
-export function useUsers(gymId?: number, isPremium?: boolean, role?: string, search?: string, subscriptionStatus?: string) {
+export function useUsers({ gymId, trainerId, isPremium, role, search, subscriptionStatus, include }: { gymId?: number, trainerId?: number, isPremium?: boolean, role?: string, search?: string, subscriptionStatus?: string, include?: string } = {}) {
   return useQuery<{ count: number, users: User[] }>({
-    queryKey: ["users", gymId, isPremium, role, search, subscriptionStatus],
-    queryFn: () => api.getUsers(gymId, isPremium, role, search, subscriptionStatus),
+    queryKey: ["users", gymId, trainerId, isPremium, role, search, subscriptionStatus, include],
+    queryFn: () => api.getUsers(gymId, trainerId, isPremium, role, search, subscriptionStatus, include),
   });
 }
 
@@ -21,6 +21,11 @@ export interface UpdateProfilePayload {
   height?: number;
   weight?: number;
   medicalConditions?: string;
+  gymId?: number | null;
+  subscriptionId?: number | null;
+  trainerId?: number | null;
+  workoutPlanId?: number | null;
+  role?: string;
 }
 
 export function useUpdateProfile() {

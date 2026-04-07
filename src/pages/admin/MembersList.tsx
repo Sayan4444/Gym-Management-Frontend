@@ -1,51 +1,41 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Plus, Eye, Crown } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
-import { log } from "node:console";
-
-const statusBadge = (status?: string) => {
-  if (!status) return <Badge variant="outline">No Plan</Badge>;
-  const variants: Record<string, string> = {
-    Active: "bg-success/10 text-success border-success/20",
-    Expired: "bg-destructive/10 text-destructive border-destructive/20",
-    Frozen: "bg-warning/10 text-warning border-warning/20",
-  };
-  return <Badge variant="outline" className={variants[status] || ""}>{status}</Badge>;
-};
+import { Search, Crown, Eye } from "lucide-react";
+import { useUsers } from "@/hooks/useApi";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { User, MembershipPlan, Subscription } from "@/data/types";
+import { UserDetailsDialog } from "@/components/UserDetailsDialog";
+import { PaginationFooter } from "@/components/PaginationFooter";
 
 export default function MembersList() {
   const navigate = useNavigate();
-  const members = useUsers().data?.users || [];
-  const subscriptions = useSubscriptions().data?.subscriptions || [];
-  const plans = useMembershipPlans().data?.memberships || [];
-
-
+  const members = useUsers({ include: "subscription,workoutPlan" }).data?.users || [];
+  
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [premiumOnly, setPremiumOnly] = useState(false);
+  const [page, setPage] = useState(1);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<{ plan: MembershipPlan; subscription: Subscription } | null>(null);
 
-  const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
-  const getPlanById = (planId: number) => plans.find((p) => p.id === planId);
+  const itemsPerPage = 10;
 
-  const filtered = members.filter((m) => {
-    const sub = getSubscriptionByUser(m.id);
-    const plan = sub ? getPlanById(sub.planId) : null;
+  const filtered = members.filter((m: any) => {
+    const sub = m.subscription;
     const matchesSearch = m.name?.toLowerCase().includes(search.toLowerCase()) || m.email?.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filterStatus === "all" || sub?.status === filterStatus || (!sub && filterStatus === "none");
     if (!matchesSearch || !matchesFilter) return false;
-    if (premiumOnly && !plan?.name.toLowerCase().includes("premium")) return false;
     return true;
   });
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+  const paginatedMembers = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   return (
     <div className="space-y-6">
@@ -54,7 +44,6 @@ export default function MembersList() {
           <h1 className="text-3xl font-bold font-display">Members</h1>
           <p className="text-muted-foreground">{members.length} total members</p>
         </div>
-        <Button><Plus className="mr-2 h-4 w-4" /> Add Member</Button>
       </div>
 
       <Card>
@@ -62,9 +51,9 @@ export default function MembersList() {
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search members..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+              <Input placeholder="Search members..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-9" />
             </div>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <Select value={filterStatus} onValueChange={(val) => { setFilterStatus(val); setPage(1); }}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
@@ -76,64 +65,94 @@ export default function MembersList() {
                 <SelectItem value="none">No Plan</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex items-center gap-2">
-              <Checkbox id="premium-filter-admin" checked={premiumOnly} onCheckedChange={(checked) => setPremiumOnly(checked === true)} />
-              <Label htmlFor="premium-filter-admin" className="text-sm font-medium flex items-center gap-1 cursor-pointer">
-                <Crown className="h-3.5 w-3.5 text-yellow-500 fill-yellow-400" /> Premium only
-              </Label>
-            </div>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Member</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Biometric</TableHead>
-                <TableHead></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((m) => {
-                const sub = getSubscriptionByUser(m.id);
-                const plan = sub ? getPlanById(sub.planId) : null;
-                return (
-                  <TableRow key={m.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-primary/10 text-primary text-xs">{m.name?.split(" ").map(n => n[0]).join("")}</AvatarFallback>
-                          </Avatar>
-                          {plan?.name.toLowerCase().includes("premium") && (
-                            <Crown className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 text-yellow-500 fill-yellow-400 drop-shadow" />
-                          )}
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedMembers.map((m: any) => {
+                  const sub = m.subscription;
+                  const plan = sub?.plan;
+                  return (
+                    <TableRow key={m.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="bg-primary/10 text-primary text-xs">{m.name?.split(" ").map((n: string) => n[0]).join("").substring(0, 2)}</AvatarFallback>
+                            </Avatar>
+                            {plan?.name?.toLowerCase().includes("premium") && m.role !== "trainer" && (
+                              <Crown className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 text-yellow-500 fill-yellow-400 drop-shadow" />
+                            )}
+                          </div>
+                          <span className="font-medium cursor-pointer hover:underline text-primary" onClick={() => setSelectedUser(m as User)}>{m.name}</span>
                         </div>
-                        <span className="font-medium">{m.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{m.email}</TableCell>
-                    <TableCell className="text-muted-foreground">{m.phone}</TableCell>
-                    <TableCell>{plan?.name || "—"}</TableCell>
-                    <TableCell>{statusBadge(sub?.status)}</TableCell>
-                    <TableCell>
-                      {m.biometricId ? <Badge variant="secondary" className="text-xs">Enrolled</Badge> : <Badge variant="outline" className="text-xs">Not Set</Badge>}
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/members/${m.id}`)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{m.phone}</TableCell>
+                      <TableCell>
+                        {m.role === "trainer" ? "—" : (sub?.status === "Expired" ? <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 cursor-pointer hover:bg-destructive/20" onClick={() => { if (sub && plan) setSelectedPlan({plan, subscription: sub as Subscription}) }}>Expired</Badge> : (plan?.name ? <span className="cursor-pointer hover:underline text-primary" onClick={() => { if (sub && plan) setSelectedPlan({plan, subscription: sub as Subscription}) }}>{plan.name}</span> : "—"))}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">{m.role || "member"}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => setSelectedUser(m as User)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+
+          <PaginationFooter
+            page={page}
+            totalPages={totalPages}
+            setPage={setPage}
+            itemsPerPage={itemsPerPage}
+            totalItems={filtered.length}
+            itemName="users"
+          />
         </CardContent>
       </Card>
+
+      <UserDetailsDialog 
+        user={selectedUser} 
+        open={!!selectedUser} 
+        onOpenChange={(open) => !open && setSelectedUser(null)} 
+      />
+
+      <Dialog open={!!selectedPlan} onOpenChange={(open) => !open && setSelectedPlan(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Plan & Subscription Details</DialogTitle>
+          </DialogHeader>
+          {selectedPlan?.plan && selectedPlan?.subscription && (
+            <div className="space-y-3 pt-4 text-sm">
+              <div className="font-medium text-base mb-2">Plan Details</div>
+              <div className="grid grid-cols-3 border-b pb-2"><span className="text-muted-foreground text-right mr-4">Name:</span> <span className="col-span-2 font-medium">{selectedPlan.plan.name}</span></div>
+              <div className="grid grid-cols-3 border-b pb-2"><span className="text-muted-foreground text-right mr-4">Price:</span> <span className="col-span-2">₹{selectedPlan.plan.price}</span></div>
+              <div className="grid grid-cols-3 pb-2"><span className="text-muted-foreground text-right mr-4">Duration:</span> <span className="col-span-2">{selectedPlan.plan.durationMonths} months</span></div>
+              
+              <div className="font-medium text-base mt-6 mb-2 border-t pt-4">Subscription Details</div>
+              <div className="grid grid-cols-3 border-b pb-2"><span className="text-muted-foreground text-right mr-4">Status:</span> <span className="col-span-2"><Badge variant="outline">{selectedPlan.subscription.status}</Badge></span></div>
+              <div className="grid grid-cols-3 border-b pb-2"><span className="text-muted-foreground text-right mr-4">Started On:</span> <span className="col-span-2">{new Date(selectedPlan.subscription.startDate).toLocaleDateString()}</span></div>
+              <div className="grid grid-cols-3 pb-2"><span className="text-muted-foreground text-right mr-4">Ends On:</span> <span className="col-span-2">{new Date(selectedPlan.subscription.endDate).toLocaleDateString()}</span></div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

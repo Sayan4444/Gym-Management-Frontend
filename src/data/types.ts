@@ -20,6 +20,11 @@ export interface User {
   height: number | null;
   weight: number | null;
   medicalConditions: string;
+  workoutPlanId: number | null;
+  gym?: Gym;
+  subscription?: Subscription;
+  trainer?: User;
+  workoutPlan?: WorkoutPlan[];
 }
 
 export interface Gym {
@@ -75,6 +80,7 @@ export interface Subscription {
   startDate: string;
   endDate: string;
   status: string;
+  plan?: MembershipPlan;
 }
 
 export interface Payment {

@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search } from "lucide-react";
 import { usePayments } from "@/hooks/useApi";
+import { PaginationFooter } from "@/components/PaginationFooter";
 
 export default function PaymentsPage() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
 
   const { data } = usePayments({
     status: filterStatus === "all" ? undefined : filterStatus,
@@ -17,7 +21,10 @@ export default function PaymentsPage() {
   });
 
   const filtered = data?.payments || [];
-  const totalPaid = filtered.filter(p => p.status === "Paid").reduce((s, p) => s + p.amount, 0);
+  const totalPaid = filtered.filter((p: any) => p.status === "Paid").reduce((s: any, p: any) => s + p.amount, 0);
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+  const paginatedPayments = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   const statusBadge = (status: string) => {
     const cls: Record<string, string> = {
@@ -40,9 +47,9 @@ export default function PaymentsPage() {
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search by member..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+              <Input placeholder="Search by member..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-9" />
             </div>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <Select value={filterStatus} onValueChange={(val) => { setFilterStatus(val); setPage(1); }}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
@@ -66,7 +73,7 @@ export default function PaymentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((p) => {
+              {paginatedPayments.map((p: any) => {
                 return (
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{p.userName || "Unknown"}</TableCell>
@@ -83,6 +90,15 @@ export default function PaymentsPage() {
               })}
             </TableBody>
           </Table>
+
+          <PaginationFooter
+            page={page}
+            totalPages={totalPages}
+            setPage={setPage}
+            itemsPerPage={itemsPerPage}
+            totalItems={filtered.length}
+            itemName="payments"
+          />
         </CardContent>
       </Card>
     </div>

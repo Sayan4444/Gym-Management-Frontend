@@ -10,7 +10,7 @@ export function useQRToken() {
 }
 
 export function useAttendance(params?: { date?: string; user_id?: number; gym_id?: number; search?: string }) {
-  return useQuery<{ count: number; attendance: Attendance[] }>({
+  return useQuery<{ count: number; attendance: (Attendance & { userName: string })[] }>({
     queryKey: ["attendance", params],
     queryFn: () => api.getAttendance(params),
   });
@@ -32,6 +32,7 @@ export function useMarkManualAttendance() {
     mutationFn: ({ userId }: { userId: number }) => api.markManualAttendance(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["attendance"] });
     },
   });
 }

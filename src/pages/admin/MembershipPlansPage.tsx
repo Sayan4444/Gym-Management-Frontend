@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PaginationFooter } from "@/components/PaginationFooter";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Pencil, Trash2 } from "lucide-react";
@@ -17,9 +18,15 @@ export default function MembershipPlansPage() {
   const gymId = user?.gymId as number;
 
   const plans = [...(useMembershipPlans().data?.memberships || [])].sort((a, b) => a.id - b.id);
-  // console.log(plans);
+  const [plansPage, setPlansPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPlansPages = Math.ceil(plans.length / itemsPerPage) || 1;
+  const paginatedPlans = plans.slice((plansPage - 1) * itemsPerPage, plansPage * itemsPerPage);
 
   const addons = [...(useAddons().data?.addons || [])].sort((a, b) => a.id - b.id);
+  const [addonsPage, setAddonsPage] = useState(1);
+  const totalAddonsPages = Math.ceil(addons.length / itemsPerPage) || 1;
+  const paginatedAddons = addons.slice((addonsPage - 1) * itemsPerPage, addonsPage * itemsPerPage);
   const { toast } = useToast();
 
   const createPlan = useCreateMembershipPlan();
@@ -185,7 +192,7 @@ export default function MembershipPlansPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {plans.map((p) => (
+              {paginatedPlans.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell>₹{p.price.toFixed(2)}</TableCell>
@@ -214,6 +221,15 @@ export default function MembershipPlansPage() {
               ))}
             </TableBody>
           </Table>
+
+          <PaginationFooter
+            page={plansPage}
+            totalPages={totalPlansPages}
+            setPage={setPlansPage}
+            itemsPerPage={itemsPerPage}
+            totalItems={plans.length}
+            itemName="plans"
+          />
         </CardContent>
       </Card>
 
@@ -239,7 +255,7 @@ export default function MembershipPlansPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {addons.map((a) => (
+              {paginatedAddons.map((a) => (
                 <TableRow key={a.id}>
                   <TableCell className="font-medium">{a.name}</TableCell>
                   <TableCell>₹{a.price.toFixed(2)}</TableCell>
@@ -265,6 +281,15 @@ export default function MembershipPlansPage() {
               ))}
             </TableBody>
           </Table>
+
+          <PaginationFooter
+            page={addonsPage}
+            totalPages={totalAddonsPages}
+            setPage={setAddonsPage}
+            itemsPerPage={itemsPerPage}
+            totalItems={addons.length}
+            itemName="add-ons"
+          />
         </CardContent>
       </Card>
 
