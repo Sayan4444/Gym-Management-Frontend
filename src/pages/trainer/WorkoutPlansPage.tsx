@@ -6,7 +6,8 @@ import { Plus } from "lucide-react";
 import { useUsers } from "@/hooks/useApi";
 
 export default function WorkoutPlansPage() {
-  const users = useUsers({ include: "workout_plans" }).data?.users || [];
+  const users = useUsers({ include: "workout_plan" }).data?.users || [];
+  console.log(users);
 
   // O(1) lookup by user id instead of O(n) find() inside the render loop
   const userMap = useMemo(() => new Map(users.map((u) => [u.id, u])), [users]);

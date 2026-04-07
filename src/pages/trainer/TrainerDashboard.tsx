@@ -6,7 +6,6 @@ import { useMe, useUsers, useAttendance } from "@/hooks/useApi";
 
 export default function TrainerDashboard() {
   const me = useMe().data;
-  const gymId = me?.gymId ?? undefined;
 
   const assignedMembers = useUsers({ include: "workout_plans" }).data?.users || [];
 
