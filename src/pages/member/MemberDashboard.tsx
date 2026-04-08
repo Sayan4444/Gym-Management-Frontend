@@ -1,22 +1,29 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router-dom";
-import { CalendarCheck, CreditCard, Clock, Crown } from "lucide-react";
+import { CalendarCheck, CreditCard, Clock, Crown, Loader2 } from "lucide-react";
 import MemberAttendanceHistory from "./MemberAttendanceHistory";
 import MemberSubscription from "./MemberSubscription";
-import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
+import { useUsers, useSubscriptions, useMembershipPlans, useMe } from "@/hooks/useApi";
 
 export default function MemberDashboard() {
   const [searchParams] = useSearchParams();
   const currentTab = searchParams.get("tab") || "dashboard";
 
-  const storedUser = localStorage.getItem("user");
-  const authUser = storedUser ? JSON.parse(storedUser) : null;
+  const { data: authUser, isLoading: isAuthLoading } = useMe();
   const gymId = authUser?.gymId || 1;
 
-  const users = useUsers(gymId).data?.users || [];
+  const users = useUsers({ gymId }).data?.users || [];
   const subscriptions = useSubscriptions().data?.subscriptions || [];
   const plans = useMembershipPlans(gymId).data?.memberships || [];
+
+  if (isAuthLoading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   const member = users.find(u => u.id === authUser?.id) || authUser;
   const sub = member ? subscriptions.find(s => s.userId === member.id && s.status === "Active") : null;

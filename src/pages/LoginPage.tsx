@@ -16,10 +16,8 @@ export default function LoginPage() {
   const handleGoogleSuccess = async (tokenResponse: any) => {
     try {
       const data = await googleLoginMutation.mutateAsync({ access_token: tokenResponse.access_token });
-
       // Token is now set as an HTTP-only cookie by the backend.
-      // We only store user metadata for UI purposes.
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // We rely on the `useMe` hook to fetch user metadata, no localStorage needed.
 
       toast.success("Successfully logged in!");
 

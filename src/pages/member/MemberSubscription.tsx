@@ -4,18 +4,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { PackagePlus, RotateCcw } from "lucide-react";
-import { useSubscriptions, useMembershipPlans, useAddons } from "@/hooks/useApi";
+import { PackagePlus, RotateCcw, Loader2 } from "lucide-react";
+import { useSubscriptions, useMembershipPlans, useAddons, useMe } from "@/hooks/useApi";
 
 export default function MemberSubscription() {
-  const storedUser = localStorage.getItem("user");
-  const authUser = storedUser ? JSON.parse(storedUser) : null;
+  const { data: authUser, isLoading: isAuthLoading } = useMe();
   const gymId = authUser?.gymId || 1;
   const userId = authUser?.id || 7;
 
   const subscriptions = useSubscriptions(gymId).data?.subscriptions || [];
   const plans = useMembershipPlans(gymId).data?.memberships || [];
   const addons = useAddons(gymId).data?.addons || [];
+
+  if (isAuthLoading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   const sub = subscriptions.find((s) => s.userId === userId && s.status === "Active");
   const plan = sub ? plans.find((p) => p.id === sub.planId) : null;

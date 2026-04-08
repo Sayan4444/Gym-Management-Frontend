@@ -76,7 +76,6 @@ export default function DashboardLayout({ role }: { role: string }) {
                     } catch (error) {
                       console.error("Logout failed:", error);
                     }
-                    localStorage.removeItem("user");
                     navigate(gymName ? `/${gymName}/login` : "/");
                   }}>
                     <LogOut className="mr-2 h-4 w-4" /> Sign out
