@@ -10,21 +10,23 @@ export interface User {
   photoUrl: string;
   biometricId: string;
   role: string;
-  gymId: number | null;
-  subscriptionId: number | null;
-  trainerId: number | null;
-  address: string;
-  emergencyContactName: string;
-  emergencyContactPhone: string;
-  bloodGroup: string;
-  height: number | null;
-  weight: number | null;
-  medicalConditions: string;
-  workoutPlanId: number | null;
+  gymId?: number;
+  subscriptionId?: number;
+  userAddonId?: number;
+  trainerId?: number;
+  address?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  bloodGroup?: string;
+  height?: number;
+  weight?: number;
+  medicalConditions?: string;
   gym?: Gym;
   subscription?: Subscription;
+  userAddon?: UserAddon[];
   trainer?: User;
   workoutPlans?: WorkoutPlan[];
+  payments?: Payment[];
 }
 
 export interface Gym {
@@ -67,8 +69,8 @@ export interface UserAddon {
   updatedAt: string;
   userId: number;
   addonId: number;
-  paymentId: number;
   purchasedAt: string;
+  addon?: Addon;
 }
 
 export interface Subscription {
@@ -108,6 +110,7 @@ export interface Attendance {
   timeIn: string;
   timeOut: string | null;
   source: string;
+  user?: User;
 }
 
 export interface GymQRToken {

@@ -1,5 +1,6 @@
 import { User } from "@/data/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { formatDate } from "@/lib/utils";
 
 interface UserDetailsDialogProps {
   user: User | null;
@@ -31,7 +32,7 @@ export function UserDetailsDialog({ user, open, onOpenChange }: UserDetailsDialo
             {user.dob && (
               <div className="grid grid-cols-3 border-b pb-2">
                 <span className="text-muted-foreground text-right mr-4">DOB:</span> 
-                <span className="col-span-2">{new Date(user.dob).toLocaleDateString()}</span>
+                <span className="col-span-2">{formatDate(user.dob)}</span>
               </div>
             )}
             {user.gender && (

@@ -20,7 +20,7 @@ import ValidGymRoute from "./components/ValidGymRoute";
 import AdminPanel from "./pages/admin/AdminPanel";
 
 // Member pages
-import MemberDashboard from "./pages/member/MemberDashboard";
+import MemberPanel from "./pages/member/MemberPanel";
 
 // Super Admin pages
 import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
@@ -81,7 +81,7 @@ const App = () => (
                 {/* Member routes */}
                 <Route element={<ProtectedRoute allowedRoles={['Member']} />}>
                   <Route path="member" element={<DashboardLayout role="member" />}>
-                    <Route index element={<MemberDashboard />} />
+                    <Route index element={<MemberPanel />} />
                   </Route>
                 </Route>
               </Route>

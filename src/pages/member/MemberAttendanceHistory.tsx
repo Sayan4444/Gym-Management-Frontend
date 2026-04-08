@@ -1,12 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-const attendance = [
-  { id: 1, date: new Date().toISOString().split("T")[0], timeIn: new Date().toISOString(), timeOut: new Date().toISOString(), source: "Biometric" }
-].reverse();
+import { useAttendance } from "@/hooks/useApi";
+import { formatDate, formatTime } from "@/lib/utils";
 
 export default function MemberAttendanceHistory() {
+  const { data: attendanceData } = useAttendance();
+  const attendance = attendanceData?.attendance || [];
+
   return (
     <div className="space-y-6">
       <div>
@@ -33,9 +34,9 @@ export default function MemberAttendanceHistory() {
                 const duration = timeOut ? `${Math.round((timeOut.getTime() - timeIn.getTime()) / 60000)} min` : "—";
                 return (
                   <TableRow key={a.id}>
-                    <TableCell>{a.date}</TableCell>
-                    <TableCell>{timeIn.toLocaleTimeString()}</TableCell>
-                    <TableCell>{timeOut ? timeOut.toLocaleTimeString() : "—"}</TableCell>
+                    <TableCell>{formatDate(a.date)}</TableCell>
+                    <TableCell>{formatTime(timeIn)}</TableCell>
+                    <TableCell>{timeOut ? formatTime(timeOut) : "—"}</TableCell>
                     <TableCell className="text-muted-foreground">{duration}</TableCell>
                     <TableCell><Badge variant={a.source === "Biometric" ? "default" : "secondary"}>{a.source}</Badge></TableCell>
                   </TableRow>

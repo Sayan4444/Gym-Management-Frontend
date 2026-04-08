@@ -22,9 +22,9 @@ export function useLogout() {
   });
 }
 
-export function useMe() {
+export function useMe(include?:string) {
   return useQuery<User>({
-    queryKey: ["me"],
-    queryFn: api.getMe,
+    queryKey: ["me", include],
+    queryFn: () => api.getMe(include),
   });
 }

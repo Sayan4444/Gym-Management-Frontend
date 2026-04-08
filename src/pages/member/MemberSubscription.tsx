@@ -5,16 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PackagePlus, RotateCcw, Loader2 } from "lucide-react";
-import { useSubscriptions, useMembershipPlans, useAddons, useMe } from "@/hooks/useApi";
+import { useMe } from "@/hooks/useApi";
+import { formatDate } from "@/lib/utils";
 
 export default function MemberSubscription() {
-  const { data: authUser, isLoading: isAuthLoading } = useMe();
-  const gymId = authUser?.gymId || 1;
-  const userId = authUser?.id || 7;
+  const { data: me, isLoading: isAuthLoading } = useMe("include=subscription,workout_plan");
 
-  const subscriptions = useSubscriptions(gymId).data?.subscriptions || [];
-  const plans = useMembershipPlans(gymId).data?.memberships || [];
-  const addons = useAddons(gymId).data?.addons || [];
+  const subscription = me?.subscription;
+  const plan = me?.subscription?.plan  ;
+  const addons = me?.userAddon ;
+  const memberPayments = me?.payments ;
 
   if (isAuthLoading) {
     return (
@@ -24,14 +24,6 @@ export default function MemberSubscription() {
     );
   }
 
-  const sub = subscriptions.find((s) => s.userId === userId && s.status === "Active");
-  const plan = sub ? plans.find((p) => p.id === sub.planId) : null;
-  const memberPayments = [
-    { id: 1, amount: 49.99, paymentDate: "2023-11-01", status: "Paid" }
-  ];
-  
-  const gymPlans = plans.filter((p) => p.isActive);
-  const gymAddons = addons.filter((a) => a.isActive);
   const [showRenewDialog, setShowRenewDialog] = useState(false);
   const [showAddonDialog, setShowAddonDialog] = useState(false);
 
@@ -54,7 +46,7 @@ export default function MemberSubscription() {
             <div className="grid grid-cols-2 gap-4">
               {[
                 ["Plan", plan.name], ["Price", `$${plan.price}/mo`], ["Status", null],
-                ["Start Date", sub.startDate], ["End Date", sub.endDate], ["Duration", `${plan.durationMonths} month(s)`],
+                ["Start Date", formatDate(sub.startDate)], ["End Date", formatDate(sub.endDate)], ["Duration", `${plan.durationMonths} month(s)`],
               ].map(([label, value]) => (
                 <div key={label as string}>
                   <p className="text-sm text-muted-foreground">{label}</p>
@@ -139,7 +131,7 @@ export default function MemberSubscription() {
             <TableBody>
               {memberPayments.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell>{p.paymentDate}</TableCell>
+                  <TableCell>{formatDate(p.paymentDate)}</TableCell>
                   <TableCell>${p.amount.toFixed(2)}</TableCell>
                   <TableCell>{statusBadge(p.status)}</TableCell>
                 </TableRow>

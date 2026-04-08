@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { User, MembershipPlan, Subscription } from "@/data/types";
 import { UserDetailsDialog } from "@/components/UserDetailsDialog";
 import { PaginationFooter } from "@/components/PaginationFooter";
+import { formatDate } from "@/lib/utils";
 
 export default function MembersList() {
   const navigate = useNavigate();
@@ -147,8 +148,8 @@ export default function MembersList() {
               
               <div className="font-medium text-base mt-6 mb-2 border-t pt-4">Subscription Details</div>
               <div className="grid grid-cols-3 border-b pb-2"><span className="text-muted-foreground text-right mr-4">Status:</span> <span className="col-span-2"><Badge variant="outline">{selectedPlan.subscription.status}</Badge></span></div>
-              <div className="grid grid-cols-3 border-b pb-2"><span className="text-muted-foreground text-right mr-4">Started On:</span> <span className="col-span-2">{new Date(selectedPlan.subscription.startDate).toLocaleDateString()}</span></div>
-              <div className="grid grid-cols-3 pb-2"><span className="text-muted-foreground text-right mr-4">Ends On:</span> <span className="col-span-2">{new Date(selectedPlan.subscription.endDate).toLocaleDateString()}</span></div>
+              <div className="grid grid-cols-3 border-b pb-2"><span className="text-muted-foreground text-right mr-4">Started On:</span> <span className="col-span-2">{formatDate(selectedPlan.subscription.startDate)}</span></div>
+              <div className="grid grid-cols-3 pb-2"><span className="text-muted-foreground text-right mr-4">Ends On:</span> <span className="col-span-2">{formatDate(selectedPlan.subscription.endDate)}</span></div>
             </div>
           )}
         </DialogContent>

@@ -14,6 +14,7 @@ import { UserDetailsDialog } from "@/components/UserDetailsDialog";
 import { PaginationFooter } from "@/components/PaginationFooter";
 import { QRCodeModal } from "@/components/QRCodeModal";
 import { ManualCheckInModal } from "@/components/ManualCheckInModal";
+import { formatDate, formatTime } from "@/lib/utils";
 
 export default function AttendancePage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
@@ -36,7 +37,7 @@ export default function AttendancePage() {
       <div className="flex flex-col sm:flex-row justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold font-display">Attendance</h1>
-          <p className="text-muted-foreground">{dayRecords?.length} check-ins on {selectedDate}</p>
+          <p className="text-muted-foreground">{dayRecords?.length} check-ins on {formatDate(selectedDate)}</p>
         </div>
         <div className="flex gap-3 items-center">
           <Input type="date" value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); setPage(1); }} className="w-44" />
@@ -92,8 +93,8 @@ export default function AttendancePage() {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>{timeIn.toLocaleTimeString()}</TableCell>
-                    <TableCell>{timeOut ? timeOut.toLocaleTimeString() : <Badge variant="outline" className="bg-success/10 text-success">Active</Badge>}</TableCell>
+                    <TableCell>{formatTime(timeIn)}</TableCell>
+                    <TableCell>{timeOut ? formatTime(timeOut) : <Badge variant="outline" className="bg-success/10 text-success">Active</Badge>}</TableCell>
                     <TableCell className="text-muted-foreground">{duration}</TableCell>
                     <TableCell>
                       <Badge variant={a.source === "Biometric" ? "default" : "secondary"}>{a.source}</Badge>

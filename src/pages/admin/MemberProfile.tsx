@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Fingerprint, Snowflake, RefreshCw, Ban } from "lucide-react";
 import { useUsers, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
+import { formatDate, formatTime } from "@/lib/utils";
 
 export default function MemberProfile() {
   const { id } = useParams();
@@ -102,9 +103,9 @@ export default function MemberProfile() {
                 <TableBody>
                   {attendance.slice(-20).reverse().map((a) => (
                     <TableRow key={a.id}>
-                      <TableCell>{a.date}</TableCell>
-                      <TableCell>{new Date(a.timeIn).toLocaleTimeString()}</TableCell>
-                      <TableCell>{a.timeOut ? new Date(a.timeOut).toLocaleTimeString() : "—"}</TableCell>
+                      <TableCell>{formatDate(a.date)}</TableCell>
+                      <TableCell>{formatTime(a.timeIn)}</TableCell>
+                      <TableCell>{a.timeOut ? formatTime(a.timeOut) : "—"}</TableCell>
                       <TableCell><Badge variant={a.source === "Biometric" ? "default" : "secondary"}>{a.source}</Badge></TableCell>
                     </TableRow>
                   ))}
@@ -121,7 +122,7 @@ export default function MemberProfile() {
                 <div className="grid grid-cols-2 gap-4">
                   {[
                     ["Plan", plan.name], ["Price", `$${plan.price}`], ["Duration", `${plan.durationMonths} month(s)`],
-                    ["Start Date", sub.startDate], ["End Date", sub.endDate], ["Status", sub.status],
+                    ["Start Date", formatDate(sub.startDate)], ["End Date", formatDate(sub.endDate)], ["Status", sub.status],
                   ].map(([label, value]) => (
                     <div key={label}>
                       <p className="text-sm text-muted-foreground">{label}</p>
@@ -150,7 +151,7 @@ export default function MemberProfile() {
                 <TableBody>
                   {memberPayments.map((p) => (
                     <TableRow key={p.id}>
-                      <TableCell>{p.paymentDate}</TableCell>
+                      <TableCell>{formatDate(p.paymentDate)}</TableCell>
                       <TableCell>${p.amount.toFixed(2)}</TableCell>
                       <TableCell>{statusBadge(p.status)}</TableCell>
                     </TableRow>
