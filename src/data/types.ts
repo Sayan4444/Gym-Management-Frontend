@@ -119,6 +119,14 @@ export interface GymQRToken {
   expiresAt: string;
 }
 
+export interface WorkoutExercise {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  workoutPlanId: number;
+  name: string;
+}
+
 export interface WorkoutPlan {
   id: number;
   createdAt: string;
@@ -127,5 +135,5 @@ export interface WorkoutPlan {
   trainerId: number;
   memberId: number;
   title: string;
-  description: string;
+  exercises: WorkoutExercise[];
 }
