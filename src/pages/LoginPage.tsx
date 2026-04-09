@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -10,6 +10,7 @@ import { useGoogleLogin as useGoogleLoginMutation } from "@/hooks/apis/useAuth";
 export default function LoginPage() {
   const navigate = useNavigate();
   const { gymName} = useParams<{ gymName: string }>();
+  const [searchParams] = useSearchParams();
   
   const googleLoginMutation = useGoogleLoginMutation();
 
@@ -23,7 +24,12 @@ export default function LoginPage() {
 
       // Route based on role
       const role = data.user.role;
-      // gymName is now taken from useParams
+
+      const pendingToken = searchParams.get("token")
+      if (pendingToken) {
+        navigate(`/${gymName}/mark-attendance?token=${pendingToken}`);
+        return;
+      }
 
       if (role === 'SuperAdmin') {
         navigate('/super-admin');

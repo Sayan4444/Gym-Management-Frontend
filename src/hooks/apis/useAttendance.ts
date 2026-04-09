@@ -16,10 +16,16 @@ export function useAttendance(params?: { date?: string; user_id?: number; gym_id
   });
 }
 
+export interface ScanQRAttendancePayload { scannedToken: string }
+export interface ScanQRAttendanceResponse {
+  attendance:Attendance,
+  message:string
+}
+
 export function useScanQRAttendance() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: { scannedToken: string }) => api.scanQRAttendance(data),
+  return useMutation<ScanQRAttendanceResponse, Error, ScanQRAttendancePayload >({
+    mutationFn: (data: ScanQRAttendancePayload) => api.scanQRAttendance(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
     },

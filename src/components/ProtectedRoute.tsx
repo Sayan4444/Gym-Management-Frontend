@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useParams, useSearchParams } from "react-router-dom";
 import { useMe } from "@/hooks/useApi";
 import { Loader2 } from "lucide-react";
 
@@ -8,7 +8,10 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   const { data: user, isLoading, isError } = useMe();
-
+  // get the gym name from the params
+  const { gymName } = useParams();
+  const [searchParams] = useSearchParams();
+    
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -18,7 +21,8 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   }
 
   if (isError || !user) {
-    return <Navigate to="/" replace />;
+    const token = searchParams.get("token");
+    return <Navigate to={`/${gymName ? gymName + "/" : ""}login${token ? `?token=${token}` : ""}`} replace />;
   }
 
   if (!allowedRoles.includes(user.role)) {

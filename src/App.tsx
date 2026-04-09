@@ -22,6 +22,9 @@ import AdminPanel from "./pages/admin/AdminPanel";
 // Member pages
 import MemberPanel from "./pages/member/MemberPanel";
 
+// Mark Attendance Route
+import MarkAttendancePage from "./pages/MarkAttendancePage";
+
 // Super Admin pages
 import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
 import BookDemoPage from "./pages/BookDemoPage";
@@ -63,6 +66,10 @@ const App = () => (
                 <Route index element={<GymHomePage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="pricing" element={<PricingPage />} />
+
+                <Route element={<ProtectedRoute allowedRoles={['GymAdmin', 'Trainer', 'Member']} />}>
+                  <Route path="mark-attendance" element={<MarkAttendancePage />} />
+                </Route>
 
                 {/* Gym Admin routes */}
                 <Route element={<ProtectedRoute allowedRoles={['GymAdmin']} />}>

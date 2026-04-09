@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QrCode, Clock, Loader2 } from "lucide-react";
@@ -10,6 +11,7 @@ interface QRCodeModalProps {
 }
 
 export function QRCodeModal({ open, onOpenChange }: QRCodeModalProps) {
+  const { gymName } = useParams<{ gymName: string }>();
   const [countdown, setCountdown] = useState<number>(0);
   const { data: qrData, isLoading: isQRLoading, refetch: refetchQR } = useQRToken();
 
@@ -51,7 +53,7 @@ export function QRCodeModal({ open, onOpenChange }: QRCodeModalProps) {
             <>
               <div className="rounded-xl overflow-hidden border border-border shadow-md p-2 bg-white">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrData.token)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`${window.location.origin}/mark-attendance?token=${qrData.token}`)}`}
                   alt="Attendance QR Code"
                   width={220}
                   height={220}
