@@ -2,31 +2,15 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCreateOrder, useVerifyPayment } from "@/hooks/apis/usePayment";
+import { IOrderPayload, IVerifyPaymentPayload, useCreateOrder, useVerifyPayment } from "@/hooks/apis/usePayment";
 import { MembershipPlan, Addon } from "@/data/types";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type PaymentType = "Membership Plan" | "Add-On";
-
-interface RazorpayHandlerResponse {
-  razorpay_order_id: string;
-  razorpay_payment_id: string;
-  razorpay_signature: string;
-}
-
 interface RazorpayButtonProps {
-  /** The plan or add-on to purchase. */
   item: MembershipPlan | Addon;
-  /** Whether this is a membership plan or an add-on. */
-  type: PaymentType;
-  /** Prefill values for the Razorpay checkout form. */
+  type: string;
   prefill?: { name?: string; email?: string; contact?: string };
-  /** Called after the payment has been fully verified (or modal dismissed). */
   onSuccess?: () => void;
-  /** Called if the payment flow throws an error. */
   onError?: (err: unknown) => void;
-  /** Additional class names for the button. */
   className?: string;
 }
 
@@ -82,21 +66,19 @@ export function RazorpayButton({
   const createOrder = useCreateOrder();
   const verifyPayment = useVerifyPayment();
 
+  
   async function handleClick() {
     setIsPaying(true);
     try {
       // ── Step 1: Create order on backend ─────────────────────────────────────
-      const orderPayload: Record<string, unknown> = {
+      const orderPayload: IOrderPayload = {
         amount: item.price,
         paymentFor: type,
-        ...(type === "Membership Plan" ? { planId: item.id } : { addonId: item.id }),
+        planId: type === "Membership Plan" ? item.id : undefined,
+        addonId: type === "Add-On" ? item.id : undefined,
       };
 
-      const orderRes = (await createOrder.mutateAsync(orderPayload as never)) as {
-        orderId: string;
-        amount: number;
-        currency: string;
-      };
+      const orderRes = await createOrder.mutateAsync(orderPayload);
 
       const { orderId: razorpayOrderId, amount, currency } = orderRes;
 
@@ -129,13 +111,9 @@ export function RazorpayButton({
             contact: prefill.contact ?? "",
           },
           // ── Step 3: Verify on backend after successful payment ──────────────
-          handler: async (response: RazorpayHandlerResponse) => {
+          handler: async (payload: IVerifyPaymentPayload) => {
             try {
-              await verifyPayment.mutateAsync({
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpaySignature: response.razorpay_signature,
-              } as never);
+              await verifyPayment.mutateAsync(payload);
 
               // ── Step 4: Refresh member data ─────────────────────────────────
               queryClient.invalidateQueries({ queryKey: ["me"] });
