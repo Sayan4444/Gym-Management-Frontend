@@ -13,7 +13,8 @@ export function formatDate(dateInput: string | Date | undefined | null): string 
   const day = String(date.getDate()).padStart(2, '0');
   const month = date.toLocaleString('en-US', { month: 'long' });
   const year = date.getFullYear();
-
+  console.log(`${day} ${month} , ${year}`); 
+  
   return `${day} ${month} , ${year}`;
 }
 

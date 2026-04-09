@@ -1,12 +1,18 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarCheck, CreditCard, Clock, Crown, Loader2 } from "lucide-react";
 import { useMe, useAttendance } from "@/hooks/useApi";
 import { formatDate, formatTime } from "@/lib/utils";
+import { PaginationFooter } from "@/components/PaginationFooter";
+
+const ITEMS_PER_PAGE = 5;
 
 export default function MemberDashboard() {
   const { data: me, isLoading: isAuthLoading } = useMe("subscription");
   const { data: attendanceData } = useAttendance();
+
+  const [page, setPage] = useState(1);
 
   const sub = me?.subscription;
   const plan = sub?.plan;
@@ -21,7 +27,8 @@ export default function MemberDashboard() {
   }
 
   const attendance = attendanceData?.attendance || [];
-  const recentAttendance = attendance.slice(0, 5);
+  const totalPages = Math.ceil(attendance.length / ITEMS_PER_PAGE);
+  const pagedAttendance = attendance.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   const daysLeft = sub ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
@@ -82,7 +89,7 @@ export default function MemberDashboard() {
         <CardHeader><CardTitle>Recent Attendance</CardTitle></CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {recentAttendance.map((a) => (
+            {pagedAttendance.map((a) => (
               <div key={a.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                 <div>
                   <p className="font-medium">{formatDate(a.date)}</p>
@@ -94,6 +101,14 @@ export default function MemberDashboard() {
               </div>
             ))}
           </div>
+          <PaginationFooter
+            page={page}
+            totalPages={totalPages}
+            setPage={setPage}
+            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={attendance.length}
+            itemName="check-ins"
+          />
         </CardContent>
       </Card>
     </div>

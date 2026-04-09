@@ -1,12 +1,20 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAttendance } from "@/hooks/useApi";
 import { formatDate, formatTime } from "@/lib/utils";
+import { PaginationFooter } from "@/components/PaginationFooter";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function MemberAttendanceHistory() {
   const { data: attendanceData } = useAttendance();
   const attendance = attendanceData?.attendance || [];
+
+  const [page, setPage] = useState(1);
+  const totalPages = Math.ceil(attendance.length / ITEMS_PER_PAGE);
+  const pagedAttendance = attendance.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-6">
@@ -28,7 +36,7 @@ export default function MemberAttendanceHistory() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {attendance.map((a) => {
+              {pagedAttendance.map((a) => {
                 const timeIn = new Date(a.timeIn);
                 const timeOut = a.timeOut ? new Date(a.timeOut) : null;
                 const duration = timeOut ? `${Math.round((timeOut.getTime() - timeIn.getTime()) / 60000)} min` : "—";
@@ -44,6 +52,14 @@ export default function MemberAttendanceHistory() {
               })}
             </TableBody>
           </Table>
+          <PaginationFooter
+            page={page}
+            totalPages={totalPages}
+            setPage={setPage}
+            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={attendance.length}
+            itemName="records"
+          />
         </CardContent>
       </Card>
     </div>

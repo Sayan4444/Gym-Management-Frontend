@@ -91,7 +91,6 @@ export interface Payment {
   updatedAt: string;
   userId: number;
   amount: number;
-  paymentDate: string;
   status: string;
   paymentFor: string;
   planId: number | null;
