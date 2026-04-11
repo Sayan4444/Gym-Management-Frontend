@@ -10,6 +10,7 @@ import { userAddonApi } from './api/userAddon';
 import { workoutPlanApi } from './api/workoutplan';
 import { attendanceApi } from './api/attendance';
 import { dashboardStatsApi } from './api/DashboardStats';
+import { bookDemoApi } from './api/bookDemo';
 
 export { fetchApi, API_BASE_URL };
 
@@ -25,14 +26,5 @@ export const api = {
   ...workoutPlanApi,
   ...attendanceApi,
   ...dashboardStatsApi,
-
-  // ----- Legacy/Other Routes (kept to prevent breaking existing code) -----
-  submitDemoRequest: (data: {
-    fullName: string;
-    mobile: string;
-    email: string;
-    preferredDate: string;
-    preferredTime: string;
-    notes: string;
-  }) => fetchApi("/demo-request", { method: "POST", body: JSON.stringify(data) }),
+  ...bookDemoApi
 };

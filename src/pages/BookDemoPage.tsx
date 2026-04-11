@@ -8,6 +8,7 @@ import { Dumbbell, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
+import { useBookDemo } from "../hooks/apis/useBookDemo";
 
 export default function BookDemoPage() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function BookDemoPage() {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const bookDemo =useBookDemo();
   const [form, setForm] = useState({
     fullName: "",
     mobile: "",
@@ -32,10 +34,11 @@ export default function BookDemoPage() {
     }
     setLoading(true);
     try {
-      await api.submitDemoRequest(form);
+      bookDemo.mutateAsync(form)
       setSubmitted(true);
-    } catch (err: any) {
-      toast({ title: err.message || "Something went wrong", variant: "destructive" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      toast({ title: message, variant: "destructive" });
     } finally {
       setLoading(false);
     }

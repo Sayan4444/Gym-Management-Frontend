@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Dumbbell } from "lucide-react";
-import { useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin, TokenResponse } from '@react-oauth/google';
 import { toast } from "sonner";
 import { useGoogleLogin as useGoogleLoginMutation } from "@/hooks/apis/useAuth";
 
@@ -14,7 +14,7 @@ export default function LoginPage() {
   
   const googleLoginMutation = useGoogleLoginMutation();
 
-  const handleGoogleSuccess = async (tokenResponse: any) => {
+  const handleGoogleSuccess = async (tokenResponse: TokenResponse) => {
     try {
       const data = await googleLoginMutation.mutateAsync({ access_token: tokenResponse.access_token });
       // Token is now set as an HTTP-only cookie by the backend.
