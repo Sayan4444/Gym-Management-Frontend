@@ -21,8 +21,17 @@ WORKDIR /app
 # Copy built assets from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy the entrypoint script
+COPY entrypoint.sh .
+
+# Make the script executable
+RUN chmod +x entrypoint.sh
+
 # Expose port 3000
 EXPOSE 3000
+
+# Set the script as the entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Start a static file server to serve the built assets on port 3000
 CMD ["bunx", "serve", "-s", "dist", "-l", "3000"]

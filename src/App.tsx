@@ -39,7 +39,8 @@ const queryClient = new QueryClient({
     },
   },
 });
-const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+
+const clientId = window.env?.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_GOOGLE_CLIENT_ID
 
 const App = () => (
   <GoogleOAuthProvider clientId={clientId}>

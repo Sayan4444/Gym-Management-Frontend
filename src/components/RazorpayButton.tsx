@@ -100,7 +100,7 @@ export function RazorpayButton({
                 : `Add-On: ${(item as Addon).name}`;
 
             const options = {
-              key: import.meta.env.VITE_RAZORPAY_KEY_ID as string,
+              key: (window.env?.VITE_RAZORPAY_KEY_ID || import.meta.env.VITE_RAZORPAY_KEY_ID ) as string,
               amount: amount * 100, // backend returns INR, Razorpay expects paise
               currency,
               name: "Gym Management",
