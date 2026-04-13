@@ -14,36 +14,38 @@ export default function LoginPage() {
   
   const googleLoginMutation = useGoogleLoginMutation();
 
-  const handleGoogleSuccess = async (tokenResponse: TokenResponse) => {
-    try {
-      const data = await googleLoginMutation.mutateAsync({ access_token: tokenResponse.access_token });
-      // Token is now set as an HTTP-only cookie by the backend.
-      // We rely on the `useMe` hook to fetch user metadata, no localStorage needed.
+  const handleGoogleSuccess = (tokenResponse: TokenResponse) => {
+    googleLoginMutation.mutate({ access_token: tokenResponse.access_token }, {
+      onSuccess: (data) => {
+        // Token is now set as an HTTP-only cookie by the backend.
+        // We rely on the `useMe` hook to fetch user metadata, no localStorage needed.
 
-      toast.success("Successfully logged in!");
+        toast.success("Successfully logged in!");
 
-      // Route based on role
-      const role = data.user.role;
+        // Route based on role
+        const role = data.user.role;
 
-      const pendingToken = searchParams.get("token")
-      if (pendingToken) {
-        navigate(`/${gymName}/mark-attendance?token=${pendingToken}`);
-        return;
+        const pendingToken = searchParams.get("token")
+        if (pendingToken) {
+          navigate(`/${gymName}/mark-attendance?token=${pendingToken}`);
+          return;
+        }
+
+        if (role === 'SuperAdmin') {
+          navigate('/super-admin');
+        } else if (role === 'GymAdmin') {
+          navigate(`/${gymName}/admin`);
+        } else if (role === 'Trainer') {
+          navigate(`/${gymName}/trainer`);
+        } else {
+          navigate(`/${gymName}/member`);
+        }
+      },
+      onError: (error) => {
+        console.error("Login error:", error);
+        toast.error("Failed to login with Google");
       }
-
-      if (role === 'SuperAdmin') {
-        navigate('/super-admin');
-      } else if (role === 'GymAdmin') {
-        navigate(`/${gymName}/admin`);
-      } else if (role === 'Trainer') {
-        navigate(`/${gymName}/trainer`);
-      } else {
-        navigate(`/${gymName}/member`);
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Failed to login with Google");
-    }
+    });
   };
 
   const login = useGoogleLogin({

@@ -24,7 +24,7 @@ export default function DashboardLayout({ role }: { role: string }) {
   const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
 
   const { data: currentUser } = useMe();
-  const { mutateAsync: logout } = useLogout();
+  const { mutate: logout } = useLogout();
 
   const membershipPlans = useMembershipPlans().data?.memberships || [];
 
@@ -70,13 +70,14 @@ export default function DashboardLayout({ role }: { role: string }) {
                     <UserIcon className="mr-2 h-4 w-4" /> Profile
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={async () => {
-                    try {
-                      await logout();
-                    } catch (error) {
-                      console.error("Logout failed:", error);
-                    }
-                    navigate(gymName ? `/${gymName}/login` : "/");
+                  <DropdownMenuItem onClick={() => {
+                    logout(undefined, {
+                      onSuccess: () => navigate(gymName ? `/${gymName}/login` : "/"),
+                      onError: (error) => {
+                        console.error("Logout failed:", error);
+                        navigate(gymName ? `/${gymName}/login` : "/");
+                      }
+                    });
                   }}>
                     <LogOut className="mr-2 h-4 w-4" /> Sign out
                   </DropdownMenuItem>

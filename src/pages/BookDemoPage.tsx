@@ -26,22 +26,24 @@ export default function BookDemoPage() {
     notes: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.fullName || !form.mobile) {
       toast({ title: "Please fill in all required fields", variant: "destructive" });
       return;
     }
     setLoading(true);
-    try {
-      bookDemo.mutateAsync(form)
-      setSubmitted(true);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Something went wrong";
-      toast({ title: message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
+    bookDemo.mutate(form, {
+      onSuccess: () => {
+        setSubmitted(true);
+        setLoading(false);
+      },
+      onError: (err: unknown) => {
+        const message = err instanceof Error ? err.message : "Something went wrong";
+        toast({ title: message, variant: "destructive" });
+        setLoading(false);
+      }
+    });
   };
 
   return (

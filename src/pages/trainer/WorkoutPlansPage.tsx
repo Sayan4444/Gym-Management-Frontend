@@ -115,10 +115,11 @@ export default function WorkoutPlansPage() {
   // ---------- Delete confirmation state ----------
   const [deletingPlan, setDeletingPlan] = useState<WorkoutPlan | null>(null);
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = () => {
     if (!deletingPlan) return;
-    await deleteMutation.mutateAsync(deletingPlan.id);
-    setDeletingPlan(null);
+    deleteMutation.mutate(deletingPlan.id, {
+      onSuccess: () => setDeletingPlan(null),
+    });
   };
 
   // O(1) lookup by user id
@@ -159,25 +160,28 @@ export default function WorkoutPlansPage() {
     setEditingPlan(null);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const exercises = form.exercises.filter((ex) => ex.name.trim() !== "");
 
     if (editingPlan) {
-      await updateMutation.mutateAsync({
+      updateMutation.mutate({
         id: editingPlan.id,
         data: {
           title: form.title,
           exercises,
         },
+      }, {
+        onSuccess: () => handleClose()
       });
     } else {
-      await createMutation.mutateAsync({
+      createMutation.mutate({
         member_id: Number(form.memberId),
         title: form.title,
         exercises,
+      }, {
+        onSuccess: () => handleClose()
       });
     }
-    handleClose();
   };
 
   const isBusy = createMutation.isPending || updateMutation.isPending;

@@ -67,78 +67,87 @@ export function RazorpayButton({
   const verifyPayment = useVerifyPayment();
 
   
-  async function handleClick() {
+  function handleClick() {
     setIsPaying(true);
-    try {
-      // ── Step 1: Create order on backend ─────────────────────────────────────
-      const orderPayload: IOrderPayload = {
-        amount: item.price,
-        paymentFor: type,
-        planId: type === "Membership Plan" ? item.id : undefined,
-        addonId: type === "Add-On" ? item.id : undefined,
-      };
 
-      const orderRes = await createOrder.mutateAsync(orderPayload);
+    // ── Step 1: Create order on backend ─────────────────────────────────────
+    const orderPayload: IOrderPayload = {
+      amount: item.price,
+      paymentFor: type,
+      planId: type === "Membership Plan" ? item.id : undefined,
+      addonId: type === "Add-On" ? item.id : undefined,
+    };
 
-      const { orderId: razorpayOrderId, amount, currency } = orderRes;
+    createOrder.mutate(orderPayload, {
+      onSuccess: async (orderRes) => {
+        try {
+          const { orderId: razorpayOrderId, amount, currency } = orderRes;
 
-      // ── Step 2: Load SDK & open checkout ────────────────────────────────────
-      await loadRazorpayScript();
+          // ── Step 2: Load SDK & open checkout ────────────────────────────────────
+          await loadRazorpayScript();
 
-      await new Promise<void>((resolve, reject) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const Razorpay = (window as any).Razorpay;
-        if (!Razorpay) {
-          reject(new Error("Razorpay SDK not available"));
-          return;
-        }
-
-        const description =
-          type === "Membership Plan"
-            ? `Plan: ${(item as MembershipPlan).name}`
-            : `Add-On: ${(item as Addon).name}`;
-
-        const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID as string,
-          amount: amount * 100, // backend returns INR, Razorpay expects paise
-          currency,
-          name: "Gym Management",
-          description,
-          order_id: razorpayOrderId,
-          prefill: {
-            name: prefill.name ?? "",
-            email: prefill.email ?? "",
-            contact: prefill.contact ?? "",
-          },
-          // ── Step 3: Verify on backend after successful payment ──────────────
-          handler: async (payload: IVerifyPaymentPayload) => {
-            try {
-              await verifyPayment.mutateAsync(payload);
-
-              // ── Step 4: Refresh member data ─────────────────────────────────
-              queryClient.invalidateQueries({ queryKey: ["me"] });
-              onSuccess?.();
-              resolve();
-            } catch (err) {
-              reject(err);
+          await new Promise<void>((resolve, reject) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const Razorpay = (window as any).Razorpay;
+            if (!Razorpay) {
+              reject(new Error("Razorpay SDK not available"));
+              return;
             }
-          },
-          modal: {
-            // Dismissing the modal is not an error — just resolve quietly
-            ondismiss: () => resolve(),
-          },
-        };
 
-        const rzp = new Razorpay(options);
-        rzp.on("payment.failed", () => reject(new Error("Payment failed")));
-        rzp.open();
-      });
-    } catch (err) {
-      console.error("[RazorpayButton] Payment error:", err);
-      onError?.(err);
-    } finally {
-      setIsPaying(false);
-    }
+            const description =
+              type === "Membership Plan"
+                ? `Plan: ${(item as MembershipPlan).name}`
+                : `Add-On: ${(item as Addon).name}`;
+
+            const options = {
+              key: import.meta.env.VITE_RAZORPAY_KEY_ID as string,
+              amount: amount * 100, // backend returns INR, Razorpay expects paise
+              currency,
+              name: "Gym Management",
+              description,
+              order_id: razorpayOrderId,
+              prefill: {
+                name: prefill.name ?? "",
+                email: prefill.email ?? "",
+                contact: prefill.contact ?? "",
+              },
+              // ── Step 3: Verify on backend after successful payment ──────────────
+              handler: (payload: IVerifyPaymentPayload) => {
+                verifyPayment.mutate(payload, {
+                  onSuccess: () => {
+                    // ── Step 4: Refresh member data ─────────────────────────────────
+                    queryClient.invalidateQueries({ queryKey: ["me"] });
+                    onSuccess?.();
+                    resolve();
+                  },
+                  onError: (err) => {
+                    reject(err);
+                  }
+                });
+              },
+              modal: {
+                // Dismissing the modal is not an error — just resolve quietly
+                ondismiss: () => resolve(),
+              },
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on("payment.failed", () => reject(new Error("Payment failed")));
+            rzp.open();
+          });
+        } catch (err) {
+          console.error("[RazorpayButton] Payment error:", err);
+          onError?.(err);
+        } finally {
+          setIsPaying(false);
+        }
+      },
+      onError: (err) => {
+        console.error("[RazorpayButton] Payment error:", err);
+        onError?.(err);
+        setIsPaying(false);
+      }
+    });
   }
 
   return (

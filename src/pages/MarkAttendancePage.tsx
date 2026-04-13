@@ -21,13 +21,12 @@ export default function MarkAttendancePage() {
   useEffect(() => {
     if (!token) return;
 
-    (async () => {
-      try {
-        console.log(token);
-
-        await markAttendanceMutation.mutateAsync({ scannedToken: token });
+    console.log(token);
+    markAttendanceMutation.mutate({ scannedToken: token }, {
+      onSuccess: () => {
         toast.success("Attendance recorded successfully!");
-      } catch (error) {
+      },
+      onError: (error) => {
         const err = error as { response?: { status: number; data?: { error: string } }; message?: string };
         console.log(err.message);
         
@@ -38,8 +37,8 @@ export default function MarkAttendancePage() {
           toast.error(err?.response?.data?.error || "Failed to record attendance.");
         }
       }
-    })();
-  }, [token, me, navigate, markAttendanceMutation.mutateAsync]);
+    });
+  }, [token, me, navigate, markAttendanceMutation.mutate]);
 
   if (!token) {
     return (
