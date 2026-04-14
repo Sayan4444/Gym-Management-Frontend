@@ -19,10 +19,11 @@ export function useGyms() {
   });
 }
 
-export function useGym(identifier?: number | string) {
+// identifier can be domain or gymid
+export function useGym(identifier?: number | string, includes?: string) {
   return useQuery<Gym>({
-    queryKey: ["gym", identifier],
-    queryFn: () => identifier ? api.getGym(identifier) : Promise.reject("No identifier"),
+    queryKey: ["gym", identifier, includes],
+    queryFn: () => identifier ? api.getGym(identifier, includes) : Promise.reject("No identifier"),
     enabled: !!identifier,
   });
 }

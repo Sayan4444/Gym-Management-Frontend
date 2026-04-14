@@ -35,11 +35,14 @@ export interface Gym {
   updatedAt: string;
   name: string;
   slug: string;
+  domain: string;
   address: string;
   whatsapp: string;
   users?: User[];
   phone: string;
   email: string;
+  membershipPlans?: MembershipPlan[];
+  addons?: Addon[];
 }
 
 export interface MembershipPlan {

@@ -9,7 +9,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import LandingPage from "./pages/LandingPage";
 import GymHomePage from "./pages/GymHomePage";
 import LoginPage from "./pages/LoginPage";
-import PricingPage from "./pages/PricingPage";
+import PricingPage from "./components/PricingPage";
 import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
 import UnauthorizedPage from "./pages/Unauthorized";
@@ -42,68 +42,84 @@ const queryClient = new QueryClient({
 
 const clientId = window.env?.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_GOOGLE_CLIENT_ID
 
-const App = () => (
-  <GoogleOAuthProvider clientId={clientId}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/bookslot" element={<BookDemoPage />} />
+const App = () => {
+  // get the domain name from the url and pass it to the GymHomePage component
+  let domain = window.location.hostname;
+  if(import.meta.env.DEV) {
+    const urlParams = import.meta.env.VITE_DOMAIN;
+    domain = urlParams==="localhost" ? "ambertune" : urlParams;
+  }
+  const isAmberTune = domain.includes("ambertune");
+  
+  return (
+    <GoogleOAuthProvider clientId={clientId}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <Routes>
+                {/* Public routes - only for AmberTune domain */}
+                {isAmberTune && (
+                  <>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/bookslot" element={<BookDemoPage />} />
+                  </>
+                )}
 
-              {/* Super Admin routes (no gymName prefix) */}
-              <Route element={<ProtectedRoute allowedRoles={['SuperAdmin']} />}>
-                <Route path="/super-admin" element={<DashboardLayout role="super-admin" />}>
-                  <Route index element={<SuperAdminDashboard />} />
-                </Route>
-              </Route>
-
-              {/* Gym-specific routes */}
-              <Route path="/:gymName" element={<ValidGymRoute />}>
-                <Route index element={<GymHomePage />} />
-                <Route path="login" element={<LoginPage />} />
-                <Route path="pricing" element={<PricingPage />} />
-
-                <Route element={<ProtectedRoute allowedRoles={['GymAdmin', 'Trainer', 'Member']} />}>
-                  <Route path="mark-attendance" element={<MarkAttendancePage />} />
-                </Route>
-
-                {/* Gym Admin routes */}
-                <Route element={<ProtectedRoute allowedRoles={['GymAdmin']} />}>
-                  <Route path="admin" element={<DashboardLayout role="admin" />}>
-                    <Route index element={<AdminPanel />} />
+                {/* Super Admin routes (no gymName prefix) */}
+                <Route element={<ProtectedRoute allowedRoles={['SuperAdmin']} />}>
+                  <Route path="/super-admin" element={<DashboardLayout role="super-admin" />}>
+                    <Route index element={<SuperAdminDashboard />} />
                   </Route>
                 </Route>
 
-                {/* Trainer routes */}
-                <Route element={<ProtectedRoute allowedRoles={['Trainer']} />}>
-                  <Route path="trainer" element={<DashboardLayout role="trainer" />}>
-                    <Route index element={<TrainerPanel />} />
+                {/* Gym-specific routes - only for non-AmberTune domains */}
+                {!isAmberTune && (
+                  <Route element={<ValidGymRoute domain={domain} />}>
+                    <Route index element={<GymHomePage domain={domain} />} />
+                    <Route path="login" element={<LoginPage domain={domain} />} />
+                    <Route path="pricing" element={<PricingPage domain={domain} />} />
+
+                    <Route element={<ProtectedRoute allowedRoles={['GymAdmin', 'Trainer', 'Member']} />}>
+                      <Route path="mark-attendance" element={<MarkAttendancePage />} />
+                    </Route>
+
+                    {/* Gym Admin routes */}
+                    <Route element={<ProtectedRoute allowedRoles={['GymAdmin']} />}>
+                      <Route path="admin" element={<DashboardLayout role="admin" />}>
+                        <Route index element={<AdminPanel />} />
+                      </Route>
+                    </Route>
+
+                    {/* Trainer routes */}
+                    <Route element={<ProtectedRoute allowedRoles={['Trainer']} />}>
+                      <Route path="trainer" element={<DashboardLayout role="trainer" />}>
+                        <Route index element={<TrainerPanel />} />
+                      </Route>
+                    </Route>
+
+                    {/* Member routes */}
+                    <Route element={<ProtectedRoute allowedRoles={['Member']} />}>
+                      <Route path="member" element={<DashboardLayout role="member" />}>
+                        <Route index element={<MemberPanel />} />
+                      </Route>
+                    </Route>
                   </Route>
-                </Route>
+                )}
 
-                {/* Member routes */}
-                <Route element={<ProtectedRoute allowedRoles={['Member']} />}>
-                  <Route path="member" element={<DashboardLayout role="member" />}>
-                    <Route index element={<MemberPanel />} />
-                  </Route>
-                </Route>
-              </Route>
+                <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-              <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </ThemeProvider>
-  </GoogleOAuthProvider>
-);
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </ThemeProvider>
+    </GoogleOAuthProvider>
+  );
+};
 
 export default App;

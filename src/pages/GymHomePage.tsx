@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -72,10 +72,9 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   );
 }
 
-export default function GymHomePage() {
-  const { gymName } = useParams<{ gymName: string }>();
+export default function GymHomePage({ domain }: { domain: string }) {
   const navigate = useNavigate();
-  const { data: gym, isLoading } = useGym(gymName);
+  const { data: gym, isLoading } = useGym(domain);
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -90,7 +89,7 @@ export default function GymHomePage() {
       {/* Header */}
       <header className="border-b border-border/20 bg-background/90 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to={`/${gymName}`} className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <Dumbbell className="h-7 w-7 text-brand" />
             <span className="font-display text-xl font-bold">{gym.name}</span>
           </Link>
@@ -101,7 +100,7 @@ export default function GymHomePage() {
           </nav>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Button onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")} variant="outline" className="border-brand/30 text-brand hover:bg-brand/10">
+            <Button onClick={() => navigate("/login")} variant="outline" className="border-brand/30 text-brand hover:bg-brand/10">
               Sign In
             </Button>
           </div>
@@ -121,10 +120,10 @@ export default function GymHomePage() {
               Your complete fitness destination with state-of-the-art equipment, expert trainers, and a community that keeps you motivated.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" onClick={() => navigate(gymName ? `/${gymName}/login` : "/super-admin/login")} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
+              <Button size="lg" onClick={() => navigate("/login")} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
                 Join Now <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" onClick={() => navigate(`/${gymName}/pricing`)} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
+              <Button size="lg" onClick={() => navigate("/pricing")} className="bg-brand text-brand-foreground hover:bg-brand/90 text-base px-8 rounded-full">
                 Pricing
               </Button>
             </div>

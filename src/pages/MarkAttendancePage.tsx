@@ -32,7 +32,7 @@ export default function MarkAttendancePage() {
         
         const status = err?.response?.status;
         if (status === 401) {
-          navigate(`/${me?.gym?.name}/login`);
+          navigate("/login");
         } else {
           toast.error(err?.response?.data?.error || "Failed to record attendance.");
         }

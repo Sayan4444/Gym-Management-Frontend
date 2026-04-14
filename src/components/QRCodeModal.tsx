@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QrCode, Clock, Loader2 } from "lucide-react";
@@ -11,7 +10,6 @@ interface QRCodeModalProps {
 }
 
 export function QRCodeModal({ open, onOpenChange }: QRCodeModalProps) {
-  const { gymName } = useParams<{ gymName: string }>();
   const [countdown, setCountdown] = useState<number>(0);
   const { data: qrData, isLoading: isQRLoading, refetch: refetchQR } = useQRToken();
 

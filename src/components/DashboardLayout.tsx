@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProfileDialog } from "@/components/ProfileDialog";
@@ -14,8 +14,7 @@ import { roleLabels } from "@/lib/constants";
 
 export default function DashboardLayout({ role }: { role: string }) {
   const navigate = useNavigate();
-  const { gymName } = useParams();
-  const prefix = gymName ? `/${gymName}` : "";
+  const prefix = "";
   const [profileOpen, setProfileOpen] = useState(false);
 
   // Use API hooks
@@ -72,10 +71,10 @@ export default function DashboardLayout({ role }: { role: string }) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => {
                     logout(undefined, {
-                      onSuccess: () => navigate(gymName ? `/${gymName}/login` : "/"),
+                      onSuccess: () => navigate("/login"),
                       onError: (error) => {
                         console.error("Logout failed:", error);
-                        navigate(gymName ? `/${gymName}/login` : "/");
+                        navigate("/login");
                       }
                     });
                   }}>

@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -7,9 +7,8 @@ import { useGoogleLogin, TokenResponse } from '@react-oauth/google';
 import { toast } from "sonner";
 import { useGoogleLogin as useGoogleLoginMutation } from "@/hooks/apis/useAuth";
 
-export default function LoginPage() {
+export default function LoginPage({ domain }: { domain: string }) {
   const navigate = useNavigate();
-  const { gymName} = useParams<{ gymName: string }>();
   const [searchParams] = useSearchParams();
   
   const googleLoginMutation = useGoogleLoginMutation();
@@ -25,20 +24,20 @@ export default function LoginPage() {
         // Route based on role
         const role = data.user.role;
 
-        const pendingToken = searchParams.get("token")
+        const pendingToken = searchParams.get("token");
         if (pendingToken) {
-          navigate(`/${gymName}/mark-attendance?token=${pendingToken}`);
+          navigate(`/mark-attendance?token=${pendingToken}`);
           return;
         }
 
         if (role === 'SuperAdmin') {
           navigate('/super-admin');
         } else if (role === 'GymAdmin') {
-          navigate(`/${gymName}/admin`);
+          navigate(`/admin`);
         } else if (role === 'Trainer') {
-          navigate(`/${gymName}/trainer`);
+          navigate(`/trainer`);
         } else {
-          navigate(`/${gymName}/member`);
+          navigate(`/member`);
         }
       },
       onError: (error) => {
