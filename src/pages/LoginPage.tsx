@@ -6,15 +6,17 @@ import { Dumbbell } from "lucide-react";
 import { useGoogleLogin, TokenResponse } from '@react-oauth/google';
 import { toast } from "sonner";
 import { useGoogleLogin as useGoogleLoginMutation } from "@/hooks/apis/useAuth";
+import { useGymIDFromDomain } from "../hooks/useApi";
 
 export default function LoginPage({ domain }: { domain: string }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
   const googleLoginMutation = useGoogleLoginMutation();
+  const { data: gymIdObj } = useGymIDFromDomain(domain);
 
   const handleGoogleSuccess = (tokenResponse: TokenResponse) => {
-    googleLoginMutation.mutate({ access_token: tokenResponse.access_token }, {
+    googleLoginMutation.mutate({ access_token: tokenResponse.access_token, gym_id: gymIdObj?.id }, {
       onSuccess: (data) => {
         // Token is now set as an HTTP-only cookie by the backend.
         // We rely on the `useMe` hook to fetch user metadata, no localStorage needed.
