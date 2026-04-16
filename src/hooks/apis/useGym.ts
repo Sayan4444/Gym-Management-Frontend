@@ -19,12 +19,19 @@ export function useGyms() {
   });
 }
 
-// identifier can be domain or gymid
-export function useGym(identifier?: number | string, includes?: string) {
+export function useGymIDFromDomain(domainName: string) {
+  return useQuery<{id: number}>({
+    queryKey: ["gym-id", domainName],
+    queryFn: () => api.getGymIDFromDomain(domainName),
+    enabled: !!domainName,
+  });
+}
+
+export function useGym(id?: number, includes?: string) {
   return useQuery<Gym>({
-    queryKey: ["gym", identifier, includes],
-    queryFn: () => identifier ? api.getGym(identifier, includes) : Promise.reject("No identifier"),
-    enabled: !!identifier,
+    queryKey: ["gym", id, includes],
+    queryFn: () => id ? api.getGym(id, includes) : Promise.reject("No gym ID"),
+    enabled: !!id,
   });
 }
 
@@ -40,10 +47,10 @@ export interface UpdateGymPayload {
 export function useUpdateGym() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ identifier, data }: { identifier: number | string; data: UpdateGymPayload }) => api.updateGym(identifier, data),
+    mutationFn: ({ id, data }: { id: number; data: UpdateGymPayload }) => api.updateGym(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["gyms"] });
-      queryClient.invalidateQueries({ queryKey: ["gym", variables.identifier] });
+      queryClient.invalidateQueries({ queryKey: ["gym", variables.id] });
     },
   });
 }
@@ -51,7 +58,7 @@ export function useUpdateGym() {
 export function useDeleteGym() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (identifier: number | string) => api.deleteGym(identifier),
+    mutationFn: (id: number) => api.deleteGym(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gyms"] });
     },

@@ -44,7 +44,7 @@ export default function SettingsPage() {
     if (adminGymId) {
       updateGym.mutate(
         {
-          identifier: adminGymId,
+          id: adminGymId,
           data: formData,
         },
         {

@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Dumbbell, CheckCircle2 } from "lucide-react";
-import { useGym } from "@/hooks/useApi";
+import { useGymIDFromDomain, useGym } from "@/hooks/useApi";
 
 
 export default function PricingPage({ domain }: { domain: string }) {
   const navigate = useNavigate();
-  const { data: gym } = useGym(domain,"membership_plans");
+  const { data: gymIdObj } = useGymIDFromDomain(domain);
+  const { data: gym } = useGym(gymIdObj?.id,"membership_plans");
   const plans = gym?.membershipPlans;
   
   return (

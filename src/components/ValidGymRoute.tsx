@@ -1,10 +1,13 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useGym } from "../hooks/useApi";
+import { useGymIDFromDomain, useGym } from "../hooks/useApi";
 
 export default function ValidGymRoute({ domain }: { domain: string }) {
-  const { data: gym, isLoading } = useGym(domain,"membership_plans,addons");
+  const { data: gymIdObj, isLoading: isIdLoading } = useGymIDFromDomain(domain);
+  const { data: gym, isLoading: isGymLoading } = useGym(gymIdObj?.id,"membership_plans,addons");
   const navigate = useNavigate();
+
+  const isLoading = isIdLoading || isGymLoading;
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;

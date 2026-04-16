@@ -6,12 +6,13 @@ export const gymApi = {
   // ----- Gym Routes -----
   addGym: (data: Gym) => fetchApi("/gym", { method: "POST", body: JSON.stringify(data) }),
   getGyms: () => fetchApi("/gyms"),
-  getGym: (identifier: number | string, includes?: string) => {
+  getGymIDFromDomain: (domainName: string) => fetchApi(`/gym/domain/${domainName}`),
+  getGym: (id: number, includes?: string) => {
     const url = includes
-      ? `/gym/${identifier}?include=${includes}`
-      : `/gym/${identifier}`;
+      ? `/gym/${id}?include=${includes}`
+      : `/gym/${id}`;
     return fetchApi(url);
   },
-  updateGym: (identifier: number | string, data: UpdateGymPayload) => fetchApi(`/gym/${identifier}`, { method: "PUT", body: JSON.stringify(data) }),
-  deleteGym: (identifier: number | string) => fetchApi(`/gym/${identifier}`, { method: "DELETE" }),
+  updateGym: (id: number, data: UpdateGymPayload) => fetchApi(`/gym/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteGym: (id: number) => fetchApi(`/gym/${id}`, { method: "DELETE" }),
 };

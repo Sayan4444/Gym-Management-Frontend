@@ -9,7 +9,7 @@ import {
   Fingerprint, MessageSquare, Gift, Share2, Target, Star,
 } from "lucide-react";
 import { useState } from "react";
-import { useGym, useGyms } from "@/hooks/useApi";
+import { useGymIDFromDomain, useGym, useGyms } from "@/hooks/useApi";
 import heroImg from "@/assets/hero-gym.jpg";
 
 /* ─── Testimonials ─── */
@@ -74,9 +74,10 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 export default function GymHomePage({ domain }: { domain: string }) {
   const navigate = useNavigate();
-  const { data: gym, isLoading } = useGym(domain);
+  const { data: gymIdObj, isLoading: isIdLoading } = useGymIDFromDomain(domain);
+  const { data: gym, isLoading: isGymLoading } = useGym(gymIdObj?.id);
 
-  if (isLoading) {
+  if (isIdLoading || isGymLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
