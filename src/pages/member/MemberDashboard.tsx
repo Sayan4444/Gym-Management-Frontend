@@ -14,8 +14,10 @@ export default function MemberDashboard() {
 
   const [page, setPage] = useState(1);
 
-  const sub = me?.subscription;
-  const plan = sub?.plan;
+  const subs = me?.subscription;
+  // Loop over it and find the one which has status = "Active"
+  const activeSub = subs?.find((s) => s.status === "Active");
+  const plan = activeSub?.plan;
 
 
   if (isAuthLoading) {
@@ -30,14 +32,14 @@ export default function MemberDashboard() {
   const totalPages = Math.ceil(attendance.length / ITEMS_PER_PAGE);
   const pagedAttendance = attendance.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  const daysLeft = sub ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
+  const daysLeft = activeSub ? Math.max(0, Math.ceil((new Date(activeSub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold font-display flex items-center gap-2">
           Welcome, {me?.name.split(" ")[0] || "Member"}
-          {sub?.plan?.name.toLowerCase().includes("premium") && (
+          {activeSub?.plan?.name.toLowerCase().includes("premium") && (
             <Crown className="h-6 w-6 text-yellow-500 fill-yellow-400" />
           )}
         </h1>
@@ -52,9 +54,9 @@ export default function MemberDashboard() {
               <div>
                 <p className="text-sm text-muted-foreground">Current Plan</p>
                 <p className="font-bold font-display">{plan?.name || "No Plan"}</p>
-                {sub && (
-                  <Badge variant="outline" className={sub.status === "Active" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}>
-                    {sub.status}
+                {activeSub && (
+                  <Badge variant="outline" className={activeSub.status === "Active" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}>
+                    {activeSub.status}
                   </Badge>
                 )}
               </div>

@@ -10,8 +10,10 @@ import { AddAddonDialog } from "@/components/member/AddAddonDialog";
 export default function MemberSubscription() {
   const { data: me, isLoading: isAuthLoading } = useMe("include=gym,subscription,workout_plan,payments");
 
-  const sub = me?.subscription;
-  const plan = me?.subscription?.plan;
+  const subs = me?.subscription;
+  // Loop over it and find the one which has status = "Active"
+  const activeSub = subs?.find((s) => s.status === "Active");
+  const plan = activeSub?.plan;
   const memberPayments = [...(me?.payments || [])].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
@@ -21,7 +23,7 @@ export default function MemberSubscription() {
 
   const { toast } = useToast();
 
-  const [showRenewDialog, setShowRenewDialog] = useState(false);
+  const [showAddSubscriptionDialog, setShowAddSubscriptionDialog] = useState(false);
   const [showAddonDialog, setShowAddonDialog] = useState(false);
   const [paymentPage, setPaymentPage] = useState(1);
 
@@ -43,9 +45,9 @@ export default function MemberSubscription() {
       </div>
 
       <CurrentPlanCard
-        sub={sub}
+        sub={activeSub}
         plan={plan}
-        onRenew={() => setShowRenewDialog(true)}
+        onAddSubscription={() => setShowAddSubscriptionDialog(true)}
         onAddAddon={() => setShowAddonDialog(true)}
       />
 
@@ -56,16 +58,16 @@ export default function MemberSubscription() {
       />
 
       <RenewSubscriptionDialog
-        open={showRenewDialog}
-        onOpenChange={setShowRenewDialog}
+        open={showAddSubscriptionDialog}
+        onOpenChange={setShowAddSubscriptionDialog}
         gymPlans={gymPlans}
         prefill={prefill}
         onSuccess={() => {
-          setShowRenewDialog(false);
+          setShowAddSubscriptionDialog(false);
           toast({ title: "Payment successful!", description: "Your subscription has been renewed." });
         }}
         onError={() => {
-          setShowRenewDialog(false);
+          setShowAddSubscriptionDialog(false);
           toast({ title: "Payment failed", description: "Your payment could not be processed. Please try again.", variant: "destructive" });
         }}
       />

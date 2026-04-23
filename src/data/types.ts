@@ -11,8 +11,6 @@ export interface User {
   biometricId: string;
   role: string;
   gymId?: number;
-  subscriptionId?: number;
-  userAddonId?: number;
   trainerId?: number;
   address?: string;
   emergencyContactName?: string;
@@ -22,7 +20,7 @@ export interface User {
   weight?: number;
   medicalConditions?: string;
   gym?: Gym;
-  subscription?: Subscription;
+  subscription?: Subscription[];
   userAddon?: UserAddon[];
   trainer?: User;
   workoutPlans?: WorkoutPlan[];

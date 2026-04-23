@@ -8,7 +8,7 @@ import type { Subscription, MembershipPlan } from "@/data/types";
 interface CurrentPlanCardProps {
   sub: Subscription | undefined;
   plan: MembershipPlan | undefined;
-  onRenew: () => void;
+  onAddSubscription: () => void;
   onAddAddon: () => void;
 }
 
@@ -24,7 +24,7 @@ function statusBadge(status: string) {
   return <Badge variant="outline" className={cls[status] || ""}>{status}</Badge>;
 }
 
-export function CurrentPlanCard({ sub, plan, onRenew, onAddAddon }: CurrentPlanCardProps) {
+export function CurrentPlanCard({ sub, plan, onAddSubscription, onAddAddon }: CurrentPlanCardProps) {
   return (
     <Card>
       <CardHeader><CardTitle>Current Plan</CardTitle></CardHeader>
@@ -50,13 +50,13 @@ export function CurrentPlanCard({ sub, plan, onRenew, onAddAddon }: CurrentPlanC
         )}
 
         <div className="col-span-2 mt-4 flex gap-3">
-          <Button onClick={onRenew}>
+          <Button onClick={onAddSubscription}>
             <RotateCcw className="mr-2 h-4 w-4" />
-            Renew Subscription
+            Buy New Subscription
           </Button>
           <Button variant="outline" onClick={onAddAddon}>
             <PackagePlus className="mr-2 h-4 w-4" />
-            Add Addon
+            Buy New Addon
           </Button>
         </div>
       </CardContent>
