@@ -3,11 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PackagePlus, RotateCcw } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import type { Subscription, MembershipPlan } from "@/data/types";
+import type { Subscription, MembershipPlan, UserAddon } from "@/data/types";
 
 interface CurrentPlanCardProps {
   sub: Subscription | undefined;
   plan: MembershipPlan | undefined;
+  upcomingSub?: Subscription;
+  upcomingPlan?: MembershipPlan;
+  userAddons?: UserAddon[];
   onAddSubscription: () => void;
   onAddAddon: () => void;
 }
@@ -24,7 +27,7 @@ function statusBadge(status: string) {
   return <Badge variant="outline" className={cls[status] || ""}>{status}</Badge>;
 }
 
-export function CurrentPlanCard({ sub, plan, onAddSubscription, onAddAddon }: CurrentPlanCardProps) {
+export function CurrentPlanCard({ sub, plan, upcomingSub, upcomingPlan, userAddons = [], onAddSubscription, onAddAddon }: CurrentPlanCardProps) {
   return (
     <Card>
       <CardHeader><CardTitle>Current Plan</CardTitle></CardHeader>
@@ -47,6 +50,40 @@ export function CurrentPlanCard({ sub, plan, onAddSubscription, onAddAddon }: Cu
           </div>
         ) : (
           <div>No current subscription</div>
+        )}
+
+        {upcomingSub && upcomingPlan && (
+          <div className="mt-6 pt-6 border-t">
+            <h4 className="text-sm font-semibold mb-3">Upcoming Plan</h4>
+            <div className="grid grid-cols-2 gap-4">
+              {([
+                ["Plan", upcomingPlan.name],
+                ["Price", `₹${upcomingPlan.price}/mo`],
+                ["Status", null],
+                ["Start Date", formatDate(upcomingSub.startDate)],
+                ["End Date", formatDate(upcomingSub.endDate)],
+                ["Duration", `${upcomingPlan.durationMonths} month(s)`],
+              ] as [string, string | null][]).map(([label, value]) => (
+                <div key={`upcoming-${label}`}>
+                  <p className="text-sm text-muted-foreground">{label}</p>
+                  {label === "Status" ? statusBadge(upcomingSub.status) : <p className="font-medium">{value}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {userAddons.length > 0 && (
+          <div className="mt-6 pt-6 border-t">
+            <h4 className="text-sm font-semibold mb-3">Active Add-ons</h4>
+            <div className="flex flex-wrap gap-2">
+              {userAddons.map((ua) => (
+                <Badge key={ua.id} variant="secondary" className="px-3 py-1">
+                  {ua.addon?.name || "Unknown Addon"} 
+                </Badge>
+              ))}
+            </div>
+          </div>
         )}
 
         <div className="col-span-2 mt-4 flex gap-3">

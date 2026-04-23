@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PaginationFooter } from "@/components/PaginationFooter";
 import { formatDate } from "@/lib/utils";
-import type { Payment } from "@/data/types";
+import type { Payment, MembershipPlan, Addon } from "@/data/types";
 
 const PAYMENTS_PER_PAGE = 8;
 
@@ -23,9 +23,11 @@ interface PaymentHistoryCardProps {
   payments: Payment[];
   page: number;
   setPage: (page: number) => void;
+  gymPlans: MembershipPlan[];
+  gymAddons: Addon[];
 }
 
-export function PaymentHistoryCard({ payments, page, setPage }: PaymentHistoryCardProps) {
+export function PaymentHistoryCard({ payments, page, setPage, gymPlans, gymAddons }: PaymentHistoryCardProps) {
   const totalPages = Math.ceil(payments.length / PAYMENTS_PER_PAGE);
   const pagedPayments = payments.slice(
     (page - 1) * PAYMENTS_PER_PAGE,
@@ -42,6 +44,7 @@ export function PaymentHistoryCard({ payments, page, setPage }: PaymentHistoryCa
               <TableHead>Date</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Payment For</TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -51,6 +54,10 @@ export function PaymentHistoryCard({ payments, page, setPage }: PaymentHistoryCa
                 <TableCell>{formatDate(p.createdAt)}</TableCell>
                 <TableCell>₹{p.amount.toFixed(2)}</TableCell>
                 <TableCell>{p.paymentFor}</TableCell>
+                <TableCell>
+                  {p.planId ? gymPlans.find(plan => plan.id === p.planId)?.name 
+                    : (p.addonId ? gymAddons.find(addon => addon.id === p.addonId)?.name : "-")}
+                </TableCell>
                 <TableCell>{statusBadge(p.status)}</TableCell>
               </TableRow>
             ))}

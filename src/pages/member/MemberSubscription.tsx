@@ -8,7 +8,10 @@ import { RenewSubscriptionDialog } from "@/components/member/RenewSubscriptionDi
 import { AddAddonDialog } from "@/components/member/AddAddonDialog";
 
 export default function MemberSubscription() {
-  const { data: me, isLoading: isAuthLoading } = useMe({ include: "gym,subscription,workout_plan,payments" });
+  const { data: me, isLoading: isAuthLoading } = useMe({ include: "gym,subscription,workout_plan,payments,user_addon" });
+
+  const gymPlans = useMembershipPlansByGym(me?.gymId)?.data?.memberships || [];
+  const gymAddons = useAddons(me?.gymId)?.data?.addons || [];
 
   const subs = me?.subscription;
   // Loop over it and find the one which has status = "Active"
@@ -18,8 +21,13 @@ export default function MemberSubscription() {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  const gymPlans = useMembershipPlansByGym(me?.gymId)?.data?.memberships || [];
-  const gymAddons = useAddons(me?.gymId)?.data?.addons || [];
+  const upcomingSubs = subs?.filter((s) => s.status === "Upcoming")?.sort(
+    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  );
+  const nextUpcomingSub = upcomingSubs?.[0];
+  const upcomingPlan = nextUpcomingSub ? gymPlans.find(p => p.id === nextUpcomingSub.planId) : undefined;
+  
+  const userAddons = me?.userAddon || [];
 
   const { toast } = useToast();
 
@@ -47,6 +55,9 @@ export default function MemberSubscription() {
       <CurrentPlanCard
         sub={activeSub}
         plan={plan}
+        upcomingSub={nextUpcomingSub}
+        upcomingPlan={upcomingPlan}
+        userAddons={userAddons}
         onAddSubscription={() => setShowAddSubscriptionDialog(true)}
         onAddAddon={() => setShowAddonDialog(true)}
       />
@@ -55,6 +66,8 @@ export default function MemberSubscription() {
         payments={memberPayments}
         page={paymentPage}
         setPage={setPaymentPage}
+        gymPlans={gymPlans}
+        gymAddons={gymAddons}
       />
 
       <RenewSubscriptionDialog
