@@ -113,21 +113,15 @@ export function RazorpayButton({
               },
               // ── Step 3: Verify on backend after successful payment ──────────────
               handler: (payload: IVerifyPaymentPayload) => {
-                verifyPayment.mutate(payload, {
-                  onSuccess: () => {
-                    // ── Step 4: Refresh member data ─────────────────────────────────
-                    queryClient.invalidateQueries({ queryKey: ["me"] });
-                    onSuccess?.();
-                    resolve();
-                  },
-                  onError: (err) => {
-                    reject(err);
-                  }
-                });
+                verifyPayment.mutate(payload);
               },
               modal: {
                 // Dismissing the modal is not an error — just resolve quietly
-                ondismiss: () => resolve(),
+                ondismiss: () => {
+                  queryClient.invalidateQueries({ queryKey: ["me"] });
+                  queryClient.invalidateQueries({ queryKey: ["payments"] });
+                  resolve()
+                },
               },
             };
 

@@ -22,9 +22,10 @@ export function useLogout() {
   });
 }
 
-export function useMe(include?:string) {
+// passing an object is optional
+export function useMe(params?: { include?: string }) {
   return useQuery<User>({
-    queryKey: ["me", include],
-    queryFn: () => api.getMe(include),
+    queryKey: ["me", params?.include],
+    queryFn: () => api.getMe(params?.include),
   });
 }

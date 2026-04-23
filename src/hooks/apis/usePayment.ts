@@ -49,8 +49,14 @@ export function useVerifyPayment() {
   return useMutation<IVerifyPaymentResponse, Error, IVerifyPaymentPayload>({
     mutationFn: (data: IVerifyPaymentPayload) => api.verifyPayment(data),
     onSuccess: (responseData: IVerifyPaymentResponse) => {
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
       if (responseData.payment.paymentFor === "Membership Plan") queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
       if (responseData.payment.paymentFor === "Add-On") queryClient.invalidateQueries({ queryKey: ["addons"] });
     },
+    onError: (error: Error) => {
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+    }
   });
 }

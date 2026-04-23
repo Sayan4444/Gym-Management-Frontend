@@ -8,7 +8,7 @@ import { RenewSubscriptionDialog } from "@/components/member/RenewSubscriptionDi
 import { AddAddonDialog } from "@/components/member/AddAddonDialog";
 
 export default function MemberSubscription() {
-  const { data: me, isLoading: isAuthLoading } = useMe("include=gym,subscription,workout_plan,payments");
+  const { data: me, isLoading: isAuthLoading } = useMe({ include: "gym,subscription,workout_plan,payments" });
 
   const subs = me?.subscription;
   // Loop over it and find the one which has status = "Active"
