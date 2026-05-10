@@ -1,3 +1,8 @@
+// https://www.example.com:443/blog/page.html
+// Origin - https://www.example.com:443
+// Hostname - www.example.com
+// Path - /blog/page.html
+
 let baseUrl = window.location.origin;
 if (import.meta.env.DEV) {
   baseUrl = "http://localhost:8080"

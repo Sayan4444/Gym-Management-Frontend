@@ -8,12 +8,14 @@ import { useState } from "react";
 import { Search, Crown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useUsers, useGyms, useSubscriptions, useMembershipPlans } from "@/hooks/useApi";
+import { useUsers, useGyms, useSubscriptions, useMembershipPlans, useUpdateProfile } from "@/hooks/useApi";
 
 export default function SuperAdminUsers() {
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [premiumOnly, setPremiumOnly] = useState(false);
+
+  const updateProfile = useUpdateProfile();
 
   const users = useUsers().data?.users || [];
   const gyms = useGyms().data?.gyms || [];
@@ -102,7 +104,28 @@ export default function SuperAdminUsers() {
                       </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{u.email}</TableCell>
-                    <TableCell><Badge variant="secondary">{u.role}</Badge></TableCell>
+                    <TableCell>
+                      {u.role === "SuperAdmin" ? (
+                        <Badge variant="secondary">{u.role}</Badge>
+                      ) : (
+                        <Select
+                          value={u.role}
+                          onValueChange={(newRole) => {
+                            updateProfile.mutate({ id: u.id, data: { role: newRole } });
+                          }}
+                          disabled={updateProfile.isPending}
+                        >
+                          <SelectTrigger className="w-[130px] h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="GymAdmin">Gym Admin</SelectItem>
+                            <SelectItem value="Trainer">Trainer</SelectItem>
+                            <SelectItem value="Member">Member</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </TableCell>
                     <TableCell className="text-muted-foreground">{gym?.name || "—"}</TableCell>
                   </TableRow>
                 );

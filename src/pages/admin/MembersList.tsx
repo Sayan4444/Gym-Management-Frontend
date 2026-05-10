@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Crown, Eye } from "lucide-react";
-import { useUsers } from "@/hooks/useApi";
+import { useUsers, useUpdateProfile } from "@/hooks/useApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { User, MembershipPlan, Subscription } from "@/data/types";
 import { UserDetailsDialog } from "@/components/UserDetailsDialog";
@@ -24,6 +24,8 @@ export default function MembersList() {
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<{ plan: MembershipPlan; subscription: Subscription } | null>(null);
+
+  const updateProfile = useUpdateProfile();
 
   const itemsPerPage = 10;
 
@@ -103,7 +105,25 @@ export default function MembersList() {
                         {m.role === "trainer" ? "—" : (sub?.status === "Expired" ? <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 cursor-pointer hover:bg-destructive/20" onClick={() => { if (sub && plan) setSelectedPlan({plan, subscription: sub as Subscription}) }}>Expired</Badge> : (plan?.name ? <span className="cursor-pointer hover:underline text-primary" onClick={() => { if (sub && plan) setSelectedPlan({plan, subscription: sub as Subscription}) }}>{plan.name}</span> : "—"))}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="capitalize">{m.role || "member"}</Badge>
+                        {["SuperAdmin", "GymAdmin"].includes(m.role) ? (
+                          <Badge variant="outline" className="capitalize">{m.role}</Badge>
+                        ) : (
+                          <Select
+                            value={m.role || "Member"}
+                            onValueChange={(newRole) => {
+                              updateProfile.mutate({ id: m.id, data: { role: newRole } });
+                            }}
+                            disabled={updateProfile.isPending}
+                          >
+                            <SelectTrigger className="w-[110px] h-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Trainer">Trainer</SelectItem>
+                              <SelectItem value="Member">Member</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="sm" onClick={() => setSelectedUser(m as User)}>

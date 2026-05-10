@@ -8,3 +8,4 @@ export * from "./apis/useAddon";
 export * from "./apis/useWorkoutPlan";
 export * from "./apis/useAttendance";
 export * from "./apis/useDashboardStats";
+export * from "./apis/useBookDemo";
