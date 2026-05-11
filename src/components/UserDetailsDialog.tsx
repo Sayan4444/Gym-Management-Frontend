@@ -76,9 +76,21 @@ export function UserDetailsDialog({ user, open, onOpenChange }: UserDetailsDialo
               </div>
             )}
             {user.medicalConditions && (
-              <div className="grid grid-cols-3 pb-2">
+              <div className="grid grid-cols-3 border-b pb-2">
                 <span className="text-muted-foreground text-right mr-4">Medical Cond.:</span> 
                 <span className="col-span-2">{user.medicalConditions}</span>
+              </div>
+            )}
+            {user.socialMedia && user.socialMedia.length > 0 && user.socialMedia.some(s => s.trim() !== "") && (
+              <div className="grid grid-cols-3 pb-2">
+                <span className="text-muted-foreground text-right mr-4">Social Media:</span> 
+                <span className="col-span-2 space-y-1">
+                  {user.socialMedia.map((url, i) => url.trim() ? (
+                    <a key={i} href={url} target="_blank" rel="noreferrer" className="block text-primary hover:underline truncate">
+                      {url}
+                    </a>
+                  ) : null)}
+                </span>
               </div>
             )}
           </div>

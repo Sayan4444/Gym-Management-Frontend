@@ -25,6 +25,7 @@ export interface User {
   trainer?: User;
   workoutPlans?: WorkoutPlan[];
   payments?: Payment[];
+  socialMedia?: string[];
 }
 
 export interface Gym {

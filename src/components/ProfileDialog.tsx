@@ -14,7 +14,7 @@ import { User } from "@/data/types";
 import { useUpdateProfile } from "@/hooks/useApi";
 import {
   User as UserIcon, Mail, Phone, Calendar, Heart,
-  Ruler, Weight, Droplets, MapPin, ShieldAlert, Activity,
+  Ruler, Weight, Droplets, MapPin, ShieldAlert, Activity, Share2
 } from "lucide-react";
 
 interface ProfileDialogProps {
@@ -42,6 +42,7 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
     height: "",
     weight: "",
     medicalConditions: "",
+    socialMedia: [] as string[],
   });
 
   useEffect(() => {
@@ -59,12 +60,21 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
         height: user.height ? String(user.height) : "",
         weight: user.weight ? String(user.weight) : "",
         medicalConditions: user.medicalConditions || "",
+        socialMedia: user.socialMedia || ["", "", ""],
       });
     }
   }, [open, user]);
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSocialChange = (index: number, value: string) => {
+    setForm((prev) => {
+      const newSocial = [...prev.socialMedia];
+      newSocial[index] = value;
+      return { ...prev, socialMedia: newSocial };
+    });
   };
 
   const updateProfileMutation = useUpdateProfile();
@@ -85,6 +95,7 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
           height: form.height ? parseFloat(form.height) : undefined,
           weight: form.weight ? parseFloat(form.weight) : undefined,
           medicalConditions: form.medicalConditions,
+          socialMedia: form.socialMedia.filter(s => s.trim() !== ""),
         }
       },
       {
@@ -309,6 +320,50 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
                 placeholder="Street address, city, state, zip code"
                 rows={2}
               />
+            </div>
+          </fieldset>
+
+          {/* ── Social Media ── */}
+          <fieldset className="space-y-4">
+            <legend className="flex items-center gap-2 text-sm font-semibold text-foreground border-b pb-2 mb-1 w-full">
+              <Share2 className="h-4 w-4 text-primary" />
+              Social Media Links
+            </legend>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="social-1" className="flex items-center gap-1.5 text-xs font-medium">
+                  Instagram
+                </Label>
+                <Input
+                  id="social-1"
+                  value={form.socialMedia[0]}
+                  onChange={(e) => handleSocialChange(0, e.target.value)}
+                  placeholder="https://instagram.com/..."
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="social-2" className="flex items-center gap-1.5 text-xs font-medium">
+                  Facebook
+                </Label>
+                <Input
+                  id="social-2"
+                  value={form.socialMedia[1]}
+                  onChange={(e) => handleSocialChange(1, e.target.value)}
+                  placeholder="https://facebook.com/..."
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="social-3" className="flex items-center gap-1.5 text-xs font-medium">
+                  X / Twitter
+                </Label>
+                <Input
+                  id="social-3"
+                  value={form.socialMedia[2]}
+                  onChange={(e) => handleSocialChange(2, e.target.value)}
+                  placeholder="https://x.com/..."
+                />
+              </div>
             </div>
           </fieldset>
         </div>

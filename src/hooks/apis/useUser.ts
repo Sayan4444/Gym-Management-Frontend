@@ -26,6 +26,7 @@ export interface UpdateProfilePayload {
   trainerId?: number | null;
   workoutPlanId?: number | null;
   role?: string;
+  socialMedia?: string[];
 }
 
 export function useUpdateProfile() {
