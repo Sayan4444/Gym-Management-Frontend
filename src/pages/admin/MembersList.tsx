@@ -29,8 +29,8 @@ export default function MembersList() {
 
   const itemsPerPage = 10;
 
-  const filtered = members.filter((m: any) => {
-    const sub = m.subscription;
+  const filtered = members.filter((m) => {
+    const sub = m.subscription?.find((s) => s.status === "Active") || m.subscription?.[0];
     const matchesSearch = m.name?.toLowerCase().includes(search.toLowerCase()) || m.email?.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filterStatus === "all" || sub?.status === filterStatus || (!sub && filterStatus === "none");
     if (!matchesSearch || !matchesFilter) return false;
@@ -83,7 +83,7 @@ export default function MembersList() {
               </TableHeader>
               <TableBody>
                 {paginatedMembers.map((m: any) => {
-                  const sub = m.subscription;
+                  const sub = m.subscription?.find((s: any) => s.status === "Active") || m.subscription?.[0];
                   const plan = sub?.plan;
                   return (
                     <TableRow key={m.id}>
