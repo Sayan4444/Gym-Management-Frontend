@@ -9,7 +9,7 @@ import { PaginationFooter } from "@/components/PaginationFooter";
 const ITEMS_PER_PAGE = 5;
 
 export default function MemberDashboard() {
-  const { data: me, isLoading: isAuthLoading } = useMe("subscription");
+  const { data: me, isLoading: isAuthLoading } = useMe({ include: "subscription" });
   const { data: attendanceData } = useAttendance();
 
   const [page, setPage] = useState(1);
