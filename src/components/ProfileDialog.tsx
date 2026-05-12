@@ -92,8 +92,8 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
           emergencyContactName: form.emergencyContactName,
           emergencyContactPhone: form.emergencyContactPhone,
           bloodGroup: form.bloodGroup,
-          height: form.height ? parseFloat(form.height) : undefined,
-          weight: form.weight ? parseFloat(form.weight) : undefined,
+          height: form.height ? parseFloat(form.height) : null,
+          weight: form.weight ? parseFloat(form.weight) : null,
           medicalConditions: form.medicalConditions,
           socialMedia: form.socialMedia.filter(s => s.trim() !== ""),
         }

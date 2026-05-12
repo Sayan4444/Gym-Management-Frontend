@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useAdminDashboardStats, useMe, useSubscriptions } from "@/hooks/useApi";
 
 
-const statusColors = { Active: "hsl(142, 71%, 45%)", Expired: "hsl(0, 84%, 60%)", Frozen: "hsl(38, 92%, 50%)" };
+const statusColors = { Active: "hsl(142, 71%, 45%)", Expired: "hsl(0, 84%, 60%)", Paused: "hsl(38, 92%, 50%)", Upcoming: "hsl(217, 91%, 60%)" };
 
 export default function AdminDashboard() {
   const { data: currentUser } = useMe();
@@ -12,24 +12,20 @@ export default function AdminDashboard() {
   const subscriptions = useSubscriptions().data?.subscriptions || [];
 
   const activeSubs = subscriptions.filter(s => s.status === "Active");
-  const expiringSubs = subscriptions.filter(s => {
-    if (s.status !== "Active") return false;
-    const diff = (new Date(s.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
-    return diff <= 30 && diff > 0;
-  });
 
   const subStatusData = [
     { name: "Active", value: activeSubs.length },
     { name: "Expired", value: subscriptions.filter(s => s.status === "Expired").length },
-    { name: "Frozen", value: subscriptions.filter(s => s.status === "Frozen").length },
+    { name: "Paused", value: subscriptions.filter(s => s.status === "Paused").length },
+    { name: "Upcoming", value: subscriptions.filter(s => s.status === "Upcoming").length },
   ].filter(item => item.value > 0);
 
   const kpiCards = [
     { title: "Total Members", value: stats?.totalMembers ?? 0, icon: Users, color: "text-primary" },
     { title: "Today's Attendance", value: stats?.todaysAttendance ?? 0, icon: CalendarCheck, color: "text-success" },
     { title: "Active Memberships", value: stats?.activeMemberships ?? 0, icon: TrendingUp, color: "text-primary" },
-    { title: "Expiring Soon", value: expiringSubs.length, icon: AlertTriangle, color: "text-warning" },
-    { title: "Total Revenue", value: `$${stats?.totalRevenue?.toFixed(2) ?? "0"}`, icon: CreditCard, color: "text-success" },
+    { title: "Expiring Soon", value: stats?.expiringSoon ?? 0, icon: AlertTriangle, color: "text-warning" },
+    { title: "Total Revenue", value: `₹${stats?.totalRevenue?.toFixed(2) ?? "0"}`, icon: CreditCard, color: "text-success" },
   ];
 
   return (

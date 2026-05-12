@@ -18,8 +18,8 @@ export interface UpdateProfilePayload {
   emergencyContactName?: string;
   emergencyContactPhone?: string;
   bloodGroup?: string;
-  height?: number;
-  weight?: number;
+  height?: number | null;
+  weight?: number | null;
   medicalConditions?: string;
   gymId?: number | null;
   subscriptionId?: number | null;
