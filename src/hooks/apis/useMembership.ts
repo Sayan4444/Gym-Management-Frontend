@@ -53,3 +53,38 @@ export function useDeleteMembershipPlan() {
     },
   });
 }
+
+// ---------- Plan Addon Hooks ----------
+
+export function useAddPlanAddon() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ gymId, membershipId, addonId, frequency }: { gymId: number; membershipId: number; addonId: number; frequency: number }) =>
+      api.addPlanAddon(gymId, membershipId, { addon_id: addonId, frequency }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["membership-plans"] });
+    },
+  });
+}
+
+export function useUpdatePlanAddon() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ gymId, membershipId, planAddonId, frequency }: { gymId: number; membershipId: number; planAddonId: number; frequency: number }) =>
+      api.updatePlanAddon(gymId, membershipId, planAddonId, { frequency }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["membership-plans"] });
+    },
+  });
+}
+
+export function useRemovePlanAddon() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ gymId, membershipId, planAddonId }: { gymId: number; membershipId: number; planAddonId: number }) =>
+      api.removePlanAddon(gymId, membershipId, planAddonId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["membership-plans"] });
+    },
+  });
+}

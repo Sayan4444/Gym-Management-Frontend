@@ -53,6 +53,17 @@ export interface MembershipPlan {
   price: number;
   durationMonths: number;
   isActive: boolean;
+  planAddons?: PlanAddon[];
+}
+
+export interface PlanAddon {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  planId: number;
+  addonId: number;
+  frequency: number; // free-text e.g. "monthly", "twice a week", "12 sessions"
+  addon?: Addon;
 }
 
 export interface Addon {
