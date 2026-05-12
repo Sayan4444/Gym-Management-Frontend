@@ -14,11 +14,13 @@ import { UserDetailsDialog } from "@/components/UserDetailsDialog";
 import { PaginationFooter } from "@/components/PaginationFooter";
 import { QRCodeModal } from "@/components/QRCodeModal";
 import { ManualCheckInModal } from "@/components/ManualCheckInModal";
+import { ManualCheckOutModal } from "@/components/ManualCheckOutModal";
 import { formatDate, formatTime } from "@/lib/utils";
 
 export default function AttendancePage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [isManualCheckoutModalOpen, setIsManualCheckoutModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
@@ -51,6 +53,10 @@ export default function AttendancePage() {
             <Plus className="mr-2 h-4 w-4" /> Manual Check-in
           </Button>
           <ManualCheckInModal open={isManualModalOpen} onOpenChange={setIsManualModalOpen} />
+          <Button variant="secondary" onClick={() => setIsManualCheckoutModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> Manual Check-out
+          </Button>
+          <ManualCheckOutModal open={isManualCheckoutModalOpen} onOpenChange={setIsManualCheckoutModalOpen} />
         </div>
       </div>
 

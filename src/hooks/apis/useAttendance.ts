@@ -42,3 +42,14 @@ export function useMarkManualAttendance() {
     },
   });
 }
+
+export function useMarkManualCheckout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId }: { userId: number }) => api.markManualCheckout(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["attendance"] });
+    },
+  });
+}
