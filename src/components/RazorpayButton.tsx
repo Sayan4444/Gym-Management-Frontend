@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { IOrderPayload, IVerifyPaymentPayload, useCreateOrder, useVerifyPayment } from "@/hooks/apis/usePayment";
+import { IOrderPayload, IVerifyPaymentPayload, useCreateOrder, useVerifyPayment, useFailPayment } from "@/hooks/apis/usePayment";
 import { MembershipPlan, Addon } from "@/data/types";
 
 interface RazorpayButtonProps {
@@ -67,6 +67,7 @@ export function RazorpayButton({
   const queryClient = useQueryClient();
   const createOrder = useCreateOrder();
   const verifyPayment = useVerifyPayment();
+  const failPayment = useFailPayment();
 
   
   function handleClick() {
@@ -115,11 +116,16 @@ export function RazorpayButton({
               },
               // ── Step 3: Verify on backend after successful payment ──────────────
               handler: (payload: IVerifyPaymentPayload) => {
-                verifyPayment.mutate(payload);
+                verifyPayment.mutate(payload, {
+                  onSuccess: () => {
+                    onSuccess?.();
+                  }
+                });
               },
               modal: {
                 // Dismissing the modal is not an error — just resolve quietly
                 ondismiss: () => {
+                  failPayment.mutate({ razorpayOrderId });
                   queryClient.invalidateQueries({ queryKey: ["me"] });
                   queryClient.invalidateQueries({ queryKey: ["payments"] });
                   resolve()
@@ -128,7 +134,10 @@ export function RazorpayButton({
             };
 
             const rzp = new Razorpay(options);
-            rzp.on("payment.failed", () => reject(new Error("Payment failed")));
+            rzp.on("payment.failed", () => {
+              failPayment.mutate({ razorpayOrderId });
+              reject(new Error("Payment failed"));
+            });
             onPaymentStart?.();
             rzp.open();
           });

@@ -19,7 +19,7 @@ export interface IOrderPayload {
 export interface IOrderResponse {
   amount: number;
   currency: string;
-  orderId?: number;
+  orderId: string;
 }
 
 export function useCreateOrder() {
@@ -58,5 +58,16 @@ export function useVerifyPayment() {
       queryClient.invalidateQueries({ queryKey: ["me"] });
       queryClient.invalidateQueries({ queryKey: ["payments"] });
     }
+  });
+}
+
+export function useFailPayment() {
+  const queryClient = useQueryClient();
+  return useMutation<{ message: string }, Error, { razorpayOrderId: string }>({
+    mutationFn: (data: { razorpayOrderId: string }) => api.failPayment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+    },
   });
 }

@@ -6,6 +6,7 @@ export const paymentApi = {
   // ----- Payment Routes -----
   createOrder: (data: IOrderPayload) => fetchApi("/payment/create-order", { method: "POST", body: JSON.stringify(data) }),
   verifyPayment: (data: IVerifyPaymentPayload) => fetchApi("/payment/verify", { method: "POST", body: JSON.stringify(data) }),
+  failPayment: (data: { razorpayOrderId: string }) => fetchApi("/payment/fail", { method: "POST", body: JSON.stringify(data) }),
   getPayments: (params?: { gym_id?: number; user_id?: number; status?: string; search?: string }) => {
     const qs = new URLSearchParams();
     if (params?.gym_id) qs.append("gym_id", params.gym_id.toString());
