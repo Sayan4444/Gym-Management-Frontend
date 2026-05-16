@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarCheck, CreditCard, Clock, Crown, Loader2 } from "lucide-react";
+import { CalendarCheck, CreditCard, Clock, Crown, Loader2, Box } from "lucide-react";
 import { useMe, useAttendance } from "@/hooks/useApi";
 import { formatDate, formatTime } from "@/lib/utils";
 import { PaginationFooter } from "@/components/PaginationFooter";
@@ -9,7 +9,7 @@ import { PaginationFooter } from "@/components/PaginationFooter";
 const ITEMS_PER_PAGE = 5;
 
 export default function MemberDashboard() {
-  const { data: me, isLoading: isAuthLoading } = useMe({ include: "subscription" });
+  const { data: me, isLoading: isAuthLoading } = useMe({ include: "subscription,user_addon" });
   const { data: attendanceData } = useAttendance();
 
   const [page, setPage] = useState(1);
@@ -18,6 +18,9 @@ export default function MemberDashboard() {
   // Loop over it and find the one which has status = "Active"
   const activeSub = subs?.find((s) => s.status === "Active");
   const plan = activeSub?.plan;
+
+  const userAddons = me?.userAddon || [];
+  const scheduledAddons = userAddons.filter((ua) => Boolean(ua.scheduledAt)).length;
 
 
   if (isAuthLoading) {
@@ -46,7 +49,7 @@ export default function MemberDashboard() {
         <p className="text-muted-foreground">Your fitness dashboard</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -81,6 +84,20 @@ export default function MemberDashboard() {
               <div>
                 <p className="text-sm text-muted-foreground">Total Check-ins</p>
                 <p className="text-2xl font-bold font-display">{attendance.length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <Box className="h-8 w-8 text-violet-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Add-ons</p>
+                <p className="text-2xl font-bold font-display">{userAddons.length}</p>
+                <p className="text-xs text-muted-foreground">
+                  {scheduledAddons} scheduled
+                </p>
               </div>
             </div>
           </CardContent>

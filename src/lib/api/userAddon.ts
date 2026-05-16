@@ -1,6 +1,10 @@
 import { UserAddon } from '../../data/types';
 import { fetchApi } from './core';
 
+export interface ScheduleUserAddonPayload {
+  scheduledAt: string | null; // ISO 8601 or null to clear
+}
+
 export const userAddonApi = {
   // ----- User Addon Routes -----
   assignUserAddon: (data: UserAddon) => fetchApi("/user-addons", { method: "POST", body: JSON.stringify(data) }),
@@ -12,5 +16,8 @@ export const userAddonApi = {
     return fetchApi(`/user-addons${search}`);
   },
   updateUserAddon: (id: number , data: UserAddon) => fetchApi(`/user-addons/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  scheduleUserAddon: (id: number, payload: ScheduleUserAddonPayload) =>
+    fetchApi(`/user-addons/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
   deleteUserAddon: (id: number ) => fetchApi(`/user-addons/${id}`, { method: "DELETE" }),
 };
+

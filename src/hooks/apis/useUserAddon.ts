@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { UserAddon } from "@/data/types";
+import type { ScheduleUserAddonPayload } from "@/lib/api/userAddon";
 
 export function useAssignUserAddon() {
     const queryClient = useQueryClient();
@@ -35,6 +36,18 @@ export function useDeleteUserAddon() {
         mutationFn: (id: number) => api.deleteUserAddon(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["user-addons"] });
+        },
+    });
+}
+
+export function useScheduleUserAddon() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, payload }: { id: number; payload: ScheduleUserAddonPayload }) =>
+            api.scheduleUserAddon(id, payload),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["user-addons"] });
+            queryClient.invalidateQueries({ queryKey: ["me"] });
         },
     });
 }

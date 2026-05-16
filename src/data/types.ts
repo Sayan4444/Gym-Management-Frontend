@@ -74,6 +74,7 @@ export interface Addon {
   name: string;
   price: number;
   isActive: boolean;
+  duration: number; // duration in minutes (0 = not set)
 }
 
 export interface UserAddon {
@@ -83,6 +84,7 @@ export interface UserAddon {
   userId: number;
   addonId: number;
   purchasedAt: string;
+  scheduledAt?: string | null; // optional scheduled date/time (ISO 8601)
   addon?: Addon;
 }
 

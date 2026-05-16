@@ -5,6 +5,7 @@ export * from "./apis/useUser";
 export * from "./apis/useSubscription";
 export * from "./apis/usePayment";
 export * from "./apis/useAddon";
+export * from "./apis/useUserAddon";
 export * from "./apis/useWorkoutPlan";
 export * from "./apis/useAttendance";
 export * from "./apis/useDashboardStats";

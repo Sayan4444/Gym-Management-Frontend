@@ -3,6 +3,7 @@ import MemberDashboard from "./MemberDashboard";
 import MemberAttendanceHistory from "./MemberAttendanceHistory";
 import MemberSubscription from "./MemberSubscription";
 import MemberOrderHistory from "./MemberOrderHistory";
+import MemberAddons from "./MemberAddons";
 
 export default function MemberPanel() {
   const [searchParams] = useSearchParams();
@@ -15,6 +16,8 @@ export default function MemberPanel() {
       return <MemberSubscription />;
     case "orders":
       return <MemberOrderHistory />;
+    case "addons":
+      return <MemberAddons />;
     case "dashboard":
     default:
       return <MemberDashboard />;

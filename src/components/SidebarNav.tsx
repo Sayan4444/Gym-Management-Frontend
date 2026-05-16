@@ -6,7 +6,7 @@ import {
 import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Users, CalendarCheck, CreditCard, ClipboardList, Dumbbell,
-  BarChart3, Settings, Building2,
+  BarChart3, Settings, Building2, Box,
 } from "lucide-react";
 
 interface NavItem {
@@ -37,6 +37,7 @@ function getNavItems(role: string, prefix: string): NavItem[] {
       { title: "Dashboard", url: `${prefix}/member?tab=dashboard`, icon: LayoutDashboard },
       { title: "Attendance", url: `${prefix}/member?tab=attendance`, icon: CalendarCheck },
       { title: "Subscription", url: `${prefix}/member?tab=subscription`, icon: ClipboardList },
+      { title: "Add-ons", url: `${prefix}/member?tab=addons`, icon: Box },
       { title: "Order History", url: `${prefix}/member?tab=orders`, icon: CreditCard },
     ],
     "super-admin": [
