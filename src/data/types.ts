@@ -85,6 +85,7 @@ export interface UserAddon {
   addonId: number;
   purchasedAt: string;
   scheduledAt?: string | null; // optional scheduled date/time (ISO 8601)
+  status: string; // Dynamically computed: "Purchased", "Scheduled", "In Progress", "Completed"
   addon?: Addon;
 }
 

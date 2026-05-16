@@ -20,7 +20,8 @@ export default function MemberDashboard() {
   const plan = activeSub?.plan;
 
   const userAddons = me?.userAddon || [];
-  const scheduledAddons = userAddons.filter((ua) => Boolean(ua.scheduledAt)).length;
+  const activeAddons = userAddons.filter((ua) => ua.status !== "Completed");
+  const scheduledAddons = userAddons.filter((ua) => ua.status === "Scheduled" || ua.status === "In Progress").length;
 
 
   if (isAuthLoading) {
@@ -94,7 +95,7 @@ export default function MemberDashboard() {
               <Box className="h-8 w-8 text-violet-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Add-ons</p>
-                <p className="text-2xl font-bold font-display">{userAddons.length}</p>
+                <p className="text-2xl font-bold font-display">{activeAddons.length}</p>
                 <p className="text-xs text-muted-foreground">
                   {scheduledAddons} scheduled
                 </p>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2, PackagePlus, Clock, CalendarClock, CheckCircle2, Package } from "lucide-react";
+import { Loader2, PackagePlus, Clock, CalendarClock, CheckCircle2, Package, History } from "lucide-react";
 import { useAddons, useMe } from "@/hooks/useApi";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,6 +9,13 @@ import { AddAddonDialog } from "@/components/member/AddAddonDialog";
 import { ScheduleAddonDialog } from "@/components/member/ScheduleAddonDialog";
 import type { UserAddon } from "@/data/types";
 import { formatDate } from "@/lib/utils";
+
+const statusBadgeStyles: Record<string, string> = {
+  Purchased: "bg-muted text-muted-foreground border-border",
+  Scheduled: "bg-primary/10 text-primary border-primary/20",
+  "In Progress": "bg-warning/10 text-warning border-warning/20",
+  Completed: "bg-success/10 text-success border-success/20",
+};
 
 export default function MemberAddons() {
   const { data: me, isLoading } = useMe({
@@ -32,8 +39,12 @@ export default function MemberAddons() {
     );
   }
 
-  const scheduled = userAddons.filter((ua) => Boolean(ua.scheduledAt));
-  const unscheduled = userAddons.filter((ua) => !ua.scheduledAt);
+  // Split addons by computed status
+  const activeAddons = userAddons.filter((ua) => ua.status !== "Completed");
+  const completedAddons = userAddons.filter((ua) => ua.status === "Completed");
+
+  const scheduled = activeAddons.filter((ua) => ua.status === "Scheduled" || ua.status === "In Progress");
+  const unscheduled = activeAddons.filter((ua) => ua.status === "Purchased");
 
   return (
     <div className="space-y-6">
@@ -52,11 +63,12 @@ export default function MemberAddons() {
       </div>
 
       {/* Stats strip */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {[
           { label: "Total Add-ons", value: userAddons.length, icon: Package },
           { label: "Scheduled", value: scheduled.length, icon: CalendarClock },
           { label: "Pending", value: unscheduled.length, icon: Clock },
+          { label: "Completed", value: completedAddons.length, icon: CheckCircle2 },
         ].map(({ label, value, icon: Icon }) => (
           <Card key={label} className="text-center">
             <CardContent className="pt-6 pb-5">
@@ -69,7 +81,7 @@ export default function MemberAddons() {
       </div>
 
       {/* Add-ons list */}
-      {userAddons.length === 0 ? (
+      {activeAddons.length === 0 && completedAddons.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 gap-4 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
@@ -124,6 +136,24 @@ export default function MemberAddons() {
               </CardContent>
             </Card>
           )}
+
+          {/* Completed section */}
+          {completedAddons.length > 0 && (
+            <Card className="opacity-75">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <History className="h-4 w-4 text-muted-foreground" />
+                  Completed Sessions
+                </CardTitle>
+                <CardDescription>Past sessions that have already ended</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {completedAddons.map((ua) => (
+                  <AddonRow key={ua.id} ua={ua} onSchedule={setScheduleTarget} completed />
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
@@ -166,11 +196,12 @@ export default function MemberAddons() {
 function AddonRow({
   ua,
   onSchedule,
+  completed = false,
 }: {
   ua: UserAddon;
   onSchedule: (ua: UserAddon) => void;
+  completed?: boolean;
 }) {
-  const isScheduled = Boolean(ua.scheduledAt);
   const scheduledDate = ua.scheduledAt
     ? new Date(ua.scheduledAt).toLocaleString("en-IN", {
         day: "numeric",
@@ -181,11 +212,17 @@ function AddonRow({
       })
     : null;
 
+  const badgeStyle = statusBadgeStyles[ua.status] || "";
+
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-card px-4 py-3 transition-colors hover:bg-muted/40">
+    <div className={`flex items-center gap-3 rounded-lg border bg-card px-4 py-3 transition-colors hover:bg-muted/40 ${completed ? "opacity-60" : ""}`}>
       {/* Icon */}
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-        <Clock className="h-4 w-4 text-primary" />
+        {completed ? (
+          <CheckCircle2 className="h-4 w-4 text-success" />
+        ) : (
+          <Clock className="h-4 w-4 text-primary" />
+        )}
       </div>
 
       {/* Info */}
@@ -198,37 +235,31 @@ function AddonRow({
           <span className="text-xs text-muted-foreground">
             Purchased {formatDate(ua.purchasedAt)}
           </span>
-          {isScheduled && scheduledDate ? (
-            <span className="flex items-center gap-1 text-xs text-success">
+          {scheduledDate && (
+            <span className={`flex items-center gap-1 text-xs ${completed ? "text-muted-foreground" : "text-success"}`}>
               <CheckCircle2 className="h-3 w-3" />
               {scheduledDate}
             </span>
-          ) : (
-            <span className="text-xs text-muted-foreground italic">Not scheduled</span>
           )}
         </div>
       </div>
 
       {/* Badge + action */}
       <div className="flex items-center gap-2 shrink-0">
-        {isScheduled ? (
-          <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs">
-            Scheduled
-          </Badge>
-        ) : (
-          <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
-            Pending
-          </Badge>
+        <Badge variant="outline" className={`${badgeStyle} text-xs`}>
+          {ua.status}
+        </Badge>
+        {!completed && (
+          <Button
+            size="sm"
+            variant={ua.status === "Purchased" ? "default" : "outline"}
+            className="gap-1.5"
+            onClick={() => onSchedule(ua)}
+          >
+            <CalendarClock className="h-3.5 w-3.5" />
+            {ua.status === "Purchased" ? "Schedule" : "Reschedule"}
+          </Button>
         )}
-        <Button
-          size="sm"
-          variant={isScheduled ? "outline" : "default"}
-          className="gap-1.5"
-          onClick={() => onSchedule(ua)}
-        >
-          <CalendarClock className="h-3.5 w-3.5" />
-          {isScheduled ? "Reschedule" : "Schedule"}
-        </Button>
       </div>
     </div>
   );

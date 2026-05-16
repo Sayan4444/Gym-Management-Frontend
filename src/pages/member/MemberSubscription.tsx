@@ -14,6 +14,8 @@ function statusBadge(status: string) {
     Expired: "bg-destructive/10 text-destructive border-destructive/20",
     Frozen: "bg-warning/10 text-warning border-warning/20",
     Upcoming: "bg-primary/10 text-primary border-primary/20",
+    Paused: "bg-warning/10 text-warning border-warning/20",
+    Cancelled: "bg-destructive/10 text-destructive border-destructive/20",
     Paid: "bg-success/10 text-success border-success/20",
     Pending: "bg-warning/10 text-warning border-warning/20",
     Failed: "bg-destructive/10 text-destructive border-destructive/20",

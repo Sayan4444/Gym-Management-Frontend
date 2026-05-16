@@ -25,7 +25,7 @@ export default function MemberProfile() {
   const workouts = [{ id: 1, title: "Hypertrophy Program", description: "Standard 4-day split." }];
 
   const statusBadge = (status: string) => {
-    const cls: Record<string, string> = { Active: "bg-success/10 text-success", Expired: "bg-destructive/10 text-destructive", Frozen: "bg-warning/10 text-warning", Paid: "bg-success/10 text-success", Pending: "bg-warning/10 text-warning", Failed: "bg-destructive/10 text-destructive" };
+    const cls: Record<string, string> = { Active: "bg-success/10 text-success", Expired: "bg-destructive/10 text-destructive", Frozen: "bg-warning/10 text-warning", Paused: "bg-warning/10 text-warning", Cancelled: "bg-destructive/10 text-destructive", Paid: "bg-success/10 text-success", Pending: "bg-warning/10 text-warning", Failed: "bg-destructive/10 text-destructive" };
     return <Badge variant="outline" className={cls[status] || ""}>{status}</Badge>;
   };
 

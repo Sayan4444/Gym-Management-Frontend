@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useAdminDashboardStats, useMe, useSubscriptions } from "@/hooks/useApi";
 
 
-const statusColors = { Active: "hsl(142, 71%, 45%)", Expired: "hsl(0, 84%, 60%)", Paused: "hsl(38, 92%, 50%)", Upcoming: "hsl(217, 91%, 60%)" };
+const statusColors = { Active: "hsl(142, 71%, 45%)", Expired: "hsl(0, 84%, 60%)", Paused: "hsl(38, 92%, 50%)", Cancelled: "hsl(0, 60%, 50%)", Upcoming: "hsl(217, 91%, 60%)" };
 
 export default function AdminDashboard() {
   const { data: currentUser } = useMe();
