@@ -38,6 +38,7 @@ export function AddAddonDialog({
                   prefill={prefill}
                   onSuccess={onSuccess}
                   onError={onError}
+                  onPaymentStart={() => onOpenChange(false)}
                 />
               </div>
             </div>

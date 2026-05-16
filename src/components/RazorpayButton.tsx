@@ -11,6 +11,7 @@ interface RazorpayButtonProps {
   prefill?: { name?: string; email?: string; contact?: string };
   onSuccess?: () => void;
   onError?: (err: unknown) => void;
+  onPaymentStart?: () => void;
   className?: string;
 }
 
@@ -58,6 +59,7 @@ export function RazorpayButton({
   prefill = {},
   onSuccess,
   onError,
+  onPaymentStart,
   className,
 }: RazorpayButtonProps) {
   const [isPaying, setIsPaying] = useState(false);
@@ -127,6 +129,7 @@ export function RazorpayButton({
 
             const rzp = new Razorpay(options);
             rzp.on("payment.failed", () => reject(new Error("Payment failed")));
+            onPaymentStart?.();
             rzp.open();
           });
         } catch (err) {

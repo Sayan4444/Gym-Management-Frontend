@@ -43,6 +43,7 @@ export function RenewSubscriptionDialog({
                   prefill={prefill}
                   onSuccess={onSuccess}
                   onError={onError}
+                  onPaymentStart={() => onOpenChange(false)}
                 />
               </div>
             </div>
