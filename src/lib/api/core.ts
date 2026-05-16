@@ -74,7 +74,19 @@ export async function fetchApi(endpoint: string, options?: RequestInit) {
   // Attach the safely merged headers back to the options
   fetchOptions.headers = headers;
 
-  const response = await fetch(url, fetchOptions);
+  let response;
+  try {
+    response = await fetch(url, fetchOptions);
+  } catch (error) {
+    // If fetch throws, it's typically a network error (e.g., cannot connect to server)
+    if (error instanceof TypeError) {
+      // Only redirect if not already on the server-error page to prevent infinite loops
+      if (window.location.pathname !== '/server-error') {
+        window.location.href = `/server-error?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+      }
+    }
+    throw error;
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));

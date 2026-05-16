@@ -31,6 +31,7 @@ import BookDemoPage from "./pages/BookDemoPage";
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import TrainerPanel from "./pages/trainer/TrainerPanel";
+import ServerError from "./pages/ServerError";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -109,6 +110,7 @@ const App = () => {
                   </Route>
                 )}
 
+                <Route path="/server-error" element={<ServerError />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
                 <Route path="*" element={<NotFound />} />
