@@ -37,6 +37,7 @@ function getNavItems(role: string, prefix: string): NavItem[] {
       { title: "Dashboard", url: `${prefix}/member?tab=dashboard`, icon: LayoutDashboard },
       { title: "Attendance", url: `${prefix}/member?tab=attendance`, icon: CalendarCheck },
       { title: "Subscription", url: `${prefix}/member?tab=subscription`, icon: ClipboardList },
+      { title: "Order History", url: `${prefix}/member?tab=orders`, icon: CreditCard },
     ],
     "super-admin": [
       { title: "Dashboard", url: "/super-admin?tab=overview", icon: LayoutDashboard },

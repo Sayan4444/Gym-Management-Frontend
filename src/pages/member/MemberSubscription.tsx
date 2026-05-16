@@ -3,7 +3,6 @@ import { Loader2 } from "lucide-react";
 import { useAddons, useMe, useMembershipPlansByGym } from "@/hooks/useApi";
 import { useToast } from "@/hooks/use-toast";
 import { CurrentPlanCard } from "@/components/member/CurrentPlanCard";
-import { PaymentHistoryCard } from "@/components/member/PaymentHistoryCard";
 import { RenewSubscriptionDialog } from "@/components/member/RenewSubscriptionDialog";
 import { AddAddonDialog } from "@/components/member/AddAddonDialog";
 
@@ -17,9 +16,6 @@ export default function MemberSubscription() {
   // Loop over it and find the one which has status = "Active"
   const activeSub = subs?.find((s) => s.status === "Active");
   const plan = activeSub?.plan;
-  const memberPayments = [...(me?.payments || [])].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
 
   const upcomingSubs = subs?.filter((s) => s.status === "Upcoming")?.sort(
     (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
@@ -33,7 +29,6 @@ export default function MemberSubscription() {
 
   const [showAddSubscriptionDialog, setShowAddSubscriptionDialog] = useState(false);
   const [showAddonDialog, setShowAddonDialog] = useState(false);
-  const [paymentPage, setPaymentPage] = useState(1);
 
   const prefill = { name: me?.name, email: me?.email, contact: me?.phone };
 
@@ -60,14 +55,6 @@ export default function MemberSubscription() {
         userAddons={userAddons}
         onAddSubscription={() => setShowAddSubscriptionDialog(true)}
         onAddAddon={() => setShowAddonDialog(true)}
-      />
-
-      <PaymentHistoryCard
-        payments={memberPayments}
-        page={paymentPage}
-        setPage={setPaymentPage}
-        gymPlans={gymPlans}
-        gymAddons={gymAddons}
       />
 
       <RenewSubscriptionDialog
