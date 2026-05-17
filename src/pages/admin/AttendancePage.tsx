@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, QrCode } from "lucide-react";
 
@@ -83,6 +83,7 @@ export default function AttendancePage() {
                       <div className="flex items-center gap-3">
                         <div className="relative">
                           <Avatar className="h-8 w-8">
+                            {a.user?.photoUrl && <AvatarImage src={a.user.photoUrl} alt={a.userName} className="object-cover" />}
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
                               {a.userName?.split(" ").map((n: string) => n[0]).join("") || "?"}
                             </AvatarFallback>

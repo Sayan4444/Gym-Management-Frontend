@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { PaginationFooter } from "@/components/PaginationFooter";
 import { useUsers } from "@/hooks/useApi";
@@ -19,6 +19,7 @@ function TrainerCard({ trainer }: { trainer: User }) {
       <CardContent className="pt-6">
         <div className="flex items-center gap-4">
           <Avatar className="h-14 w-14">
+            {trainer.photoUrl && <AvatarImage src={trainer.photoUrl} alt={trainer.name} className="object-cover" />}
             <AvatarFallback className="bg-primary text-primary-foreground font-display">
               {trainer.name.split(" ").map((n) => n[0]).join("")}
             </AvatarFallback>

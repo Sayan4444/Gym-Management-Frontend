@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Fingerprint, Snowflake, RefreshCw, Ban } from "lucide-react";
@@ -42,6 +42,7 @@ export default function MemberProfile() {
 
       <div className="flex flex-col sm:flex-row gap-6 items-start">
         <Avatar className="h-20 w-20">
+          {member.photoUrl && <AvatarImage src={member.photoUrl} alt={member.name} className="object-cover" />}
           <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-display">
             {member.name.split(" ").map(n => n[0]).join("")}
           </AvatarFallback>

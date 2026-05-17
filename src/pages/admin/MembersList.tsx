@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Crown, Eye } from "lucide-react";
@@ -91,6 +91,7 @@ export default function MembersList() {
                         <div className="flex items-center gap-3">
                           <div className="relative">
                             <Avatar className="h-8 w-8">
+                              {m.photoUrl && <AvatarImage src={m.photoUrl} alt={m.name} className="object-cover" />}
                               <AvatarFallback className="bg-primary/10 text-primary text-xs">{m.name?.split(" ").map((n: string) => n[0]).join("").substring(0, 2)}</AvatarFallback>
                             </Avatar>
                             {plan?.name?.toLowerCase().includes("premium") && m.role !== "trainer" && (

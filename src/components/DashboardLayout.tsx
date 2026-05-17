@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProfileDialog } from "@/components/ProfileDialog";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -48,6 +48,7 @@ export default function DashboardLayout({ role }: { role: string }) {
                   <button className="flex items-center gap-2 rounded-full">
                     <div className="relative">
                       <Avatar className="h-8 w-8">
+                        {currentUser?.photoUrl && <AvatarImage src={currentUser.photoUrl} alt={currentUser.name} className="object-cover" />}
                         <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                           {currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : "U"}
                         </AvatarFallback>

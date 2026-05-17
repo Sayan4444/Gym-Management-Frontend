@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -90,6 +90,7 @@ export default function SuperAdminUsers() {
                       <div className="flex items-center gap-3">
                         <div className="relative">
                           <Avatar className="h-8 w-8">
+                            {u.photoUrl && <AvatarImage src={u.photoUrl} alt={u.name} className="object-cover" />}
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">{u.name?.split(" ").map(n => n[0]).join("")}</AvatarFallback>
                           </Avatar>
                           {u.role === "Member" && (() => {

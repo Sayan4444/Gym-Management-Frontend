@@ -14,7 +14,7 @@ import { User } from "@/data/types";
 import { useUpdateProfile } from "@/hooks/useApi";
 import {
   User as UserIcon, Mail, Phone, Calendar, Heart,
-  Ruler, Weight, Droplets, MapPin, ShieldAlert, Activity, Share2
+  Ruler, Weight, Droplets, MapPin, ShieldAlert, Activity, Share2, Camera, Trash2
 } from "lucide-react";
 
 interface ProfileDialogProps {
@@ -28,6 +28,10 @@ const genderOptions = ["Male", "Female", "Other", "Prefer not to say"];
 
 export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) {
   const { toast } = useToast();
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [removeImage, setRemoveImage] = useState<boolean>(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -62,8 +66,26 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
         medicalConditions: user.medicalConditions || "",
         socialMedia: user.socialMedia || ["", "", ""],
       });
+      setImageFile(null);
+      setImagePreview(user.photoUrl || null);
+      setRemoveImage(false);
     }
   }, [open, user]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setRemoveImage(false);
+    }
+  };
+
+  const handleDeleteImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setRemoveImage(true);
+  };
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -80,23 +102,51 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
   const updateProfileMutation = useUpdateProfile();
 
   const handleSave = () => {
+    let payload: any;
+
+    if (imageFile || removeImage) {
+      const formData = new FormData();
+      if (imageFile) formData.append("image", imageFile);
+      if (removeImage) formData.append("remove_image", "true");
+      formData.append("name", form.name);
+      formData.append("phone", form.phone);
+      formData.append("dob", form.dob);
+      formData.append("gender", form.gender);
+      formData.append("address", form.address);
+      formData.append("emergency_contact_name", form.emergencyContactName);
+      formData.append("emergency_contact_phone", form.emergencyContactPhone);
+      formData.append("blood_group", form.bloodGroup);
+      if (form.height) formData.append("height", form.height);
+      if (form.weight) formData.append("weight", form.weight);
+      formData.append("medical_conditions", form.medicalConditions);
+
+      form.socialMedia.filter(s => s.trim() !== "").forEach((s) => {
+        formData.append("social_media", s);
+      });
+
+      payload = formData;
+    } else {
+      payload = {
+        name: form.name,
+        phone: form.phone,
+        dob: form.dob,
+        gender: form.gender,
+        address: form.address,
+        emergencyContactName: form.emergencyContactName,
+        emergencyContactPhone: form.emergencyContactPhone,
+        bloodGroup: form.bloodGroup,
+        height: form.height ? parseFloat(form.height) : null,
+        weight: form.weight ? parseFloat(form.weight) : null,
+        medicalConditions: form.medicalConditions,
+        socialMedia: form.socialMedia.filter(s => s.trim() !== ""),
+        remove_image: removeImage,
+      };
+    }
+
     updateProfileMutation.mutate(
       {
         id: user.id,
-        data: {
-          name: form.name,
-          phone: form.phone,
-          dob: form.dob,
-          gender: form.gender,
-          address: form.address,
-          emergencyContactName: form.emergencyContactName,
-          emergencyContactPhone: form.emergencyContactPhone,
-          bloodGroup: form.bloodGroup,
-          height: form.height ? parseFloat(form.height) : null,
-          weight: form.weight ? parseFloat(form.weight) : null,
-          medicalConditions: form.medicalConditions,
-          socialMedia: form.socialMedia.filter(s => s.trim() !== ""),
-        }
+        data: payload
       },
       {
         onSuccess: () => {
@@ -124,8 +174,12 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
         <div className="p-6 pb-4 border-b relative">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
-              <div className="flex items-center justify-center h-9 w-9 rounded-full bg-primary/10">
-                <UserIcon className="h-5 w-5 text-primary" />
+              <div className="flex items-center justify-center h-9 w-9 rounded-full bg-primary/10 overflow-hidden">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <UserIcon className="h-5 w-5 text-primary" />
+                )}
               </div>
               My Profile
             </DialogTitle>
@@ -136,6 +190,45 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar bg-accent/5">
+          {/* ── Profile Picture ── */}
+          <div className="flex flex-col items-center justify-center space-y-4 mb-2">
+            <div className="relative group">
+              <div className="h-24 w-24 rounded-full overflow-hidden bg-primary/10 border-4 border-background shadow-sm flex items-center justify-center">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Profile Preview" className="h-full w-full object-cover" />
+                ) : (
+                  <UserIcon className="h-10 w-10 text-primary/50" />
+                )}
+              </div>
+              <Label
+                htmlFor="profile-image-upload"
+                className="absolute bottom-0 right-0 h-8 w-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform"
+              >
+                <Camera className="h-4 w-4" />
+              </Label>
+              {imagePreview && (
+                <button
+                  type="button"
+                  onClick={handleDeleteImage}
+                  className="absolute bottom-0 left-0 h-8 w-8 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+              <Input
+                id="profile-image-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
+            </div>
+            <div className="text-center">
+              <h3 className="font-semibold text-lg">{form.name || "Your Name"}</h3>
+              <p className="text-sm text-muted-foreground">{form.email}</p>
+            </div>
+          </div>
+
           {/* ── Personal Information ── */}
           <fieldset className="space-y-4">
             <legend className="flex items-center gap-2 text-sm font-semibold text-foreground border-b pb-2 mb-1 w-full">

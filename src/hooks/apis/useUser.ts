@@ -32,7 +32,7 @@ export interface UpdateProfilePayload {
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateProfilePayload }) => api.updateProfile(id, data),
+    mutationFn: ({ id, data }: { id: number; data: UpdateProfilePayload | FormData }) => api.updateProfile(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["me"] });

@@ -16,6 +16,6 @@ export const userApi = {
     const qs = params.toString() ? `?${params.toString()}` : "";
     return fetchApi(`/users${qs}`);
   },
-  updateProfile: (id: number, data: UpdateProfilePayload) => fetchApi(`/users/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  updateProfile: (id: number, data: UpdateProfilePayload | FormData) => fetchApi(`/users/${id}`, { method: "PUT", body: data instanceof FormData ? (data as any) : JSON.stringify(data) }),
   deleteProfile: (id: number ) => fetchApi(`/users/${id}`, { method: "DELETE" }),
 };
