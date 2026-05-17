@@ -25,6 +25,7 @@ function getNavItems(role: string, prefix: string): NavItem[] {
       { title: "Members", url: `${prefix}/admin?tab=members`, icon: Users },
       { title: "Attendance", url: `${prefix}/admin?tab=attendance`, icon: CalendarCheck },
       { title: "Membership Plans", url: `${prefix}/admin?tab=plans`, icon: ClipboardList },
+      { title: "Add-ons", url: `${prefix}/admin?tab=addons`, icon: Box },
       { title: "Payments", url: `${prefix}/admin?tab=payments`, icon: CreditCard },
       { title: "Trainers", url: `${prefix}/admin?tab=trainers`, icon: Dumbbell },
       { title: "Reports", url: `${prefix}/admin?tab=reports`, icon: BarChart3 },

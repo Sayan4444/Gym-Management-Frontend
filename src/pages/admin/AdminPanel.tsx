@@ -5,6 +5,7 @@ import MembersList from "./MembersList";
 import MemberProfile from "./MemberProfile";
 import AttendancePage from "./AttendancePage";
 import MembershipPlansPage from "./MembershipPlansPage";
+import AddonsPage from "./AddonsPage";
 import PaymentsPage from "./PaymentsPage";
 import TrainersPage from "./TrainersPage";
 import ReportsPage from "./ReportsPage";
@@ -23,6 +24,8 @@ export default function AdminPanel() {
       return <AttendancePage />;
     case "plans":
       return <MembershipPlansPage />;
+    case "addons":
+      return <AddonsPage />;
     case "payments":
       return <PaymentsPage />;
     case "trainers":

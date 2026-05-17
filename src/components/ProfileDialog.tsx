@@ -463,11 +463,11 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
 
         <div className="p-6 pt-4 border-t bg-card">
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={updateProfileMutation.isPending}>
               Cancel
             </Button>
-            <Button onClick={handleSave}>
-              Save Changes
+            <Button onClick={handleSave} disabled={updateProfileMutation.isPending}>
+              {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </div>
