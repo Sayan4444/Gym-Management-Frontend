@@ -47,7 +47,7 @@ export interface UpdateGymPayload {
 export function useUpdateGym() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateGymPayload }) => api.updateGym(id, data),
+    mutationFn: ({ id, data }: { id: number; data: UpdateGymPayload | FormData }) => api.updateGym(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["gyms"] });
       queryClient.invalidateQueries({ queryKey: ["gym", variables.id] });

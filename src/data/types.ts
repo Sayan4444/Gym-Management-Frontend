@@ -40,6 +40,7 @@ export interface Gym {
   users?: User[];
   phone: string;
   email: string;
+  gymIcon?: string;
   membershipPlans?: MembershipPlan[];
   addons?: Addon[];
 }

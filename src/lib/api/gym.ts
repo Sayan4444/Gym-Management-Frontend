@@ -13,6 +13,6 @@ export const gymApi = {
       : `/gym/${id}`;
     return fetchApi(url);
   },
-  updateGym: (id: number, data: UpdateGymPayload) => fetchApi(`/gym/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  updateGym: (id: number, data: UpdateGymPayload | FormData) => fetchApi(`/gym/${id}`, { method: "PUT", body: data instanceof FormData ? (data as any) : JSON.stringify(data) }),
   deleteGym: (id: number) => fetchApi(`/gym/${id}`, { method: "DELETE" }),
 };

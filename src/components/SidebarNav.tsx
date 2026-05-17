@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Users, CalendarCheck, CreditCard, ClipboardList, Dumbbell,
   BarChart3, Settings, Building2, Box,
 } from "lucide-react";
+import { useMe, useGym } from "@/hooks/useApi";
 
 interface NavItem {
   title: string;
@@ -58,17 +59,32 @@ export function SidebarNav({ role, prefix }: { role: string; prefix: string }) {
   const defaultTab = role === "super-admin" ? "overview" : "dashboard";
   const currentTab = searchParams.get("tab") || defaultTab;
 
+  const me = useMe().data;
+  const gym = useGym(me?.gymId).data;
+  const gymName = role === "super-admin" ? "GymFlow" : (gym?.name || "GymFlow");
+  const gymIcon = role !== "super-admin" && gym?.gymIcon ? gym.gymIcon : null;
+
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
         <div className="p-4">
           {!collapsed && (
             <div className="flex items-center gap-2">
-              <Dumbbell className="h-7 w-7 text-primary" />
-              <span className="font-display text-lg font-bold text-foreground">GymFlow</span>
+              {gymIcon ? (
+                <img src={gymIcon} alt={gymName} className="h-7 w-7 rounded-md object-cover" />
+              ) : (
+                <Dumbbell className="h-7 w-7 text-primary" />
+              )}
+              <span className="font-display text-lg font-bold text-foreground truncate" title={gymName}>{gymName}</span>
             </div>
           )}
-          {collapsed && <Dumbbell className="h-7 w-7 text-primary mx-auto" />}
+          {collapsed && (
+             gymIcon ? (
+                <img src={gymIcon} alt={gymName} className="h-7 w-7 rounded-md object-cover mx-auto" />
+              ) : (
+                <Dumbbell className="h-7 w-7 text-primary mx-auto" />
+              )
+          )}
         </div>
         <SidebarGroup>
           <SidebarGroupLabel>{roleLabels[role]}</SidebarGroupLabel>

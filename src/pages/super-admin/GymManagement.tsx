@@ -15,8 +15,12 @@ function GymCard({ gym }: { gym: Gym }) {
       <CardContent className="pt-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Building2 className="h-6 w-6 text-primary" />
+            <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
+              {gym.gymIcon ? (
+                <img src={gym.gymIcon} alt={gym.name} className="h-full w-full object-cover" />
+              ) : (
+                <Building2 className="h-6 w-6 text-primary" />
+              )}
             </div>
             <div>
               <h3 className="font-semibold text-lg">{gym.name}</h3>

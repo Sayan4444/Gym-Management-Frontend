@@ -91,7 +91,11 @@ export default function GymHomePage({ domain }: { domain: string }) {
       <header className="border-b border-border/20 bg-background/90 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2">
-            <Dumbbell className="h-7 w-7 text-brand" />
+            {gym.gymIcon ? (
+              <img src={gym.gymIcon} alt={gym.name} className="h-7 w-7 rounded-md object-cover" />
+            ) : (
+              <Dumbbell className="h-7 w-7 text-brand" />
+            )}
             <span className="font-display text-xl font-bold">{gym.name}</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">

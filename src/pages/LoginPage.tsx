@@ -6,7 +6,7 @@ import { Dumbbell } from "lucide-react";
 import { useGoogleLogin, TokenResponse } from '@react-oauth/google';
 import { toast } from "sonner";
 import { useGoogleLogin as useGoogleLoginMutation } from "@/hooks/apis/useAuth";
-import { useGymIDFromDomain } from "../hooks/useApi";
+import { useGymIDFromDomain, useGym } from "../hooks/useApi";
 
 export default function LoginPage({ domain }: { domain: string }) {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ export default function LoginPage({ domain }: { domain: string }) {
   
   const googleLoginMutation = useGoogleLoginMutation();
   const { data: gymIdObj } = useGymIDFromDomain(domain);
+  const { data: gym } = useGym(gymIdObj?.id);
 
   const handleGoogleSuccess = (tokenResponse: TokenResponse) => {
     googleLoginMutation.mutate({ access_token: tokenResponse.access_token, gym_id: gymIdObj?.id }, {
@@ -65,8 +66,12 @@ export default function LoginPage({ domain }: { domain: string }) {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <Link to="/" className="flex items-center gap-2 justify-center mb-4">
-            <Dumbbell className="h-8 w-8 text-brand" />
-            <span className="font-display text-2xl font-bold">GymFlow</span>
+            {gym?.gymIcon ? (
+              <img src={gym.gymIcon} alt="Gym Logo" className="h-8 w-8 rounded-md object-cover" />
+            ) : (
+              <Dumbbell className="h-8 w-8 text-brand" />
+            )}
+            <span className="font-display text-2xl font-bold">{gym?.name || "GymFlow"}</span>
           </Link>
           <CardTitle className="text-2xl">Welcome</CardTitle>
           <CardDescription>Sign in to your account</CardDescription>
