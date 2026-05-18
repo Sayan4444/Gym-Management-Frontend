@@ -7,10 +7,11 @@ import { useMe, useUsers, useAttendance } from "@/hooks/useApi";
 export default function TrainerDashboard() {
   const me = useMe().data;
 
-  const assignedMembers = useUsers({ include: "workout_plans" }).data?.users || [];
+  const assignedMembers = useUsers({ include: "workout_plan" }).data?.users || [];
 
-  const workouts = assignedMembers.map((m) => m.workoutPlans || []);
-  const todayAttendance = useAttendance().data?.attendance || [];
+  const workouts = assignedMembers.flatMap((m) => m.workoutPlans || []);
+  const todayStr = new Date().toISOString().split('T')[0]; 
+  const todayAttendance = useAttendance({ date: todayStr }).data?.attendance || [];
 
   return (
     <div className="space-y-6">
