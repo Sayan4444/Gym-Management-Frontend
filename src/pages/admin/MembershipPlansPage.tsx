@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PaginationFooter } from "@/components/PaginationFooter";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Package, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, X, SmilePlus } from "lucide-react";
 import {
   useMembershipPlans, useAddons, useMe,
   useCreateMembershipPlan, useUpdateMembershipPlan, useDeleteMembershipPlan,
@@ -48,8 +48,9 @@ export default function MembershipPlansPage() {
 
   // --------------- Plan Dialog State ---------------
   const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<MembershipPlan | null>(null);
-  const [planForm, setPlanForm] = useState({ name: "", price: 0, durationMonths: 1, isActive: true, planIcon: "" });
+  const [planForm, setPlanForm] = useState<{ name: string; price: number; durationMonths: number; isActive: boolean; planIcon: string | null }>({ name: "", price: 0, durationMonths: 1, isActive: true, planIcon: null });
 
   // Local (unsaved) plan-addon list shown inside the dialog
   const [localPlanAddons, setLocalPlanAddons] = useState<LocalPlanAddon[]>([]);
@@ -63,7 +64,7 @@ export default function MembershipPlansPage() {
   const handleOpenPlanDialog = (plan?: MembershipPlan) => {
     if (plan) {
       setEditingPlan(plan);
-      setPlanForm({ name: plan.name, price: plan.price, durationMonths: plan.durationMonths, isActive: plan.isActive, planIcon: plan.planIcon ?? "" });
+      setPlanForm({ name: plan.name, price: plan.price, durationMonths: plan.durationMonths, isActive: plan.isActive, planIcon: plan.planIcon ?? null });
       // Seed local list from the latest server data for this plan.
       // Convert frequency (number from API) to string for the text inputs.
       const latest = plans.find((p) => p.id === plan.id) ?? plan;
@@ -74,7 +75,7 @@ export default function MembershipPlansPage() {
       );
     } else {
       setEditingPlan(null);
-      setPlanForm({ name: "", price: 0, durationMonths: 1, isActive: true, planIcon: "" });
+      setPlanForm({ name: "", price: 0, durationMonths: 1, isActive: true, planIcon: null });
       setLocalPlanAddons([]);
     }
     setNewPlanAddonId("");
@@ -234,7 +235,11 @@ export default function MembershipPlansPage() {
               {paginatedPlans.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell>
-                    <span className="text-2xl">{p.planIcon || "🏋️"}</span>
+                    {p.planIcon ? (
+                      <span className="text-2xl">{p.planIcon}</span>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">—</span>
+                    )}
                   </TableCell>
                   <TableCell className="font-medium">
                     {p.name}
@@ -301,18 +306,28 @@ export default function MembershipPlansPage() {
             <div className="flex gap-4 items-end">
               <div className="grid gap-2 shrink-0">
                 <Label>Icon</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="h-10 w-12 p-0 text-xl">
-                      {planForm.planIcon || "🏋️"}
+                <div className="flex items-center gap-2">
+                  <Popover open={isEmojiPickerOpen} onOpenChange={setIsEmojiPickerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="h-10 w-12 p-0 text-xl" title="Choose Emoji">
+                        {planForm.planIcon || <SmilePlus className="h-5 w-5 text-muted-foreground" />}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 border-none shadow-none" side="right" align="start">
+                      <EmojiPicker
+                        onEmojiClick={(emojiData) => {
+                          setPlanForm({ ...planForm, planIcon: emojiData.emoji });
+                          setIsEmojiPickerOpen(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {planForm.planIcon && (
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => setPlanForm({ ...planForm, planIcon: null })}>
+                      <X className="h-4 w-4" />
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 border-none shadow-none" side="right" align="start">
-                    <EmojiPicker 
-                      onEmojiClick={(emojiData) => setPlanForm({ ...planForm, planIcon: emojiData.emoji })}
-                    />
-                  </PopoverContent>
-                </Popover>
+                  )}
+                </div>
               </div>
               <div className="grid gap-2 flex-1">
                 <Label>Name</Label>
