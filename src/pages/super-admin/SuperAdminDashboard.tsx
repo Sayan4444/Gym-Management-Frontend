@@ -15,10 +15,10 @@ export default function SuperAdminDashboard() {
   const users = useUsers().data?.users || [];
   const { data: stats } = useSuperAdminDashboardStats();
 
-  const totalMembers = stats?.total_members ?? 0;
+  const totalMembers = stats?.totalMembers ?? 0;
   const totalTrainers = users.filter((u) => u.role === "Trainer").length;
-  const totalRevenue = stats?.total_revenue ?? 0;
-  const activeSubscriptions = stats?.active_memberships ?? 0;
+  const totalRevenue = stats?.totalRevenue ?? 0;
+  const activeSubscriptions = stats?.activeMemberships ?? 0;
 
   const gymStats = gyms.map((g) => ({
     name: g.name,
@@ -29,18 +29,17 @@ export default function SuperAdminDashboard() {
     { title: "Total Gyms", value: gyms.length, icon: Building2, color: "text-primary" },
     { title: "Total Members", value: totalMembers, icon: Users, color: "text-success" },
     { title: "Active Subs", value: activeSubscriptions, icon: TrendingUp, color: "text-primary" },
-    { title: "Total Revenue", value: `$${totalRevenue.toFixed(0)}`, icon: CreditCard, color: "text-success" },
+    { title: "Total Revenue", value: `₹${totalRevenue.toFixed(0)}`, icon: CreditCard, color: "text-success" },
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold font-display">Super Admin Dashboard</h1>
-        <p className="text-muted-foreground">Overview of all gyms</p>
-      </div>
-
       {currentTab === "overview" && (
         <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold font-display">Dashboard</h1>
+            <p className="text-muted-foreground">Overview of all gyms</p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {kpis.map((k) => (
               <Card key={k.title}>

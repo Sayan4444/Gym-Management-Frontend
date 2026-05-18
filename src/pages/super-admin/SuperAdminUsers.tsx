@@ -23,7 +23,16 @@ export default function SuperAdminUsers() {
   const plans = useMembershipPlans().data?.memberships || [];
 
   const getGymById = (gymId: number) => gyms.find((g) => g.id === gymId);
-  const getSubscriptionByUser = (userId: number) => subscriptions.find((s) => s.userId === userId && s.status === "Active");
+  const getSubscriptionByUser = (userId: number) => {
+    return subscriptions.find((s) => {
+      if (s.userId !== userId) return false;
+      if (s.status === "Paused" || s.status === "Cancelled") return false;
+      const now = new Date();
+      const start = new Date(s.startDate);
+      const end = new Date(s.endDate);
+      return now >= start && now <= end;
+    });
+  };
   const getPlanById = (planId: number) => plans.find((p) => p.id === planId);
 
   const filtered = users.filter((u) => {
