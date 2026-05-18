@@ -32,6 +32,7 @@ export interface UpdateMembershipPayload {
   price?: number;
   durationMonths?: number;
   isActive?: boolean;
+  planIcon?: string;
 }
 
 export function useUpdateMembershipPlan() {

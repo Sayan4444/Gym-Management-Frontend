@@ -15,6 +15,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import EmojiPicker from "emoji-picker-react";
 import { useToast } from "@/hooks/use-toast";
 import { MembershipPlan, Addon, PlanAddon } from "@/data/types";
 
@@ -29,7 +31,7 @@ export default function MembershipPlansPage() {
 
   const plans = [...(useMembershipPlans().data?.memberships || [])].sort((a, b) => a.id - b.id);
   const [plansPage, setPlansPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const totalPlansPages = Math.ceil(plans.length / itemsPerPage) || 1;
   const paginatedPlans = plans.slice((plansPage - 1) * itemsPerPage, plansPage * itemsPerPage);
 
@@ -47,7 +49,7 @@ export default function MembershipPlansPage() {
   // --------------- Plan Dialog State ---------------
   const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<MembershipPlan | null>(null);
-  const [planForm, setPlanForm] = useState({ name: "", price: 0, durationMonths: 1, isActive: true });
+  const [planForm, setPlanForm] = useState({ name: "", price: 0, durationMonths: 1, isActive: true, planIcon: "" });
 
   // Local (unsaved) plan-addon list shown inside the dialog
   const [localPlanAddons, setLocalPlanAddons] = useState<LocalPlanAddon[]>([]);
@@ -61,7 +63,7 @@ export default function MembershipPlansPage() {
   const handleOpenPlanDialog = (plan?: MembershipPlan) => {
     if (plan) {
       setEditingPlan(plan);
-      setPlanForm({ name: plan.name, price: plan.price, durationMonths: plan.durationMonths, isActive: plan.isActive });
+      setPlanForm({ name: plan.name, price: plan.price, durationMonths: plan.durationMonths, isActive: plan.isActive, planIcon: plan.planIcon ?? "" });
       // Seed local list from the latest server data for this plan.
       // Convert frequency (number from API) to string for the text inputs.
       const latest = plans.find((p) => p.id === plan.id) ?? plan;
@@ -72,7 +74,7 @@ export default function MembershipPlansPage() {
       );
     } else {
       setEditingPlan(null);
-      setPlanForm({ name: "", price: 0, durationMonths: 1, isActive: true });
+      setPlanForm({ name: "", price: 0, durationMonths: 1, isActive: true, planIcon: "" });
       setLocalPlanAddons([]);
     }
     setNewPlanAddonId("");
@@ -218,6 +220,7 @@ export default function MembershipPlansPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Plan Icon</TableHead>
                 <TableHead>Plan Name</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Duration</TableHead>
@@ -230,7 +233,12 @@ export default function MembershipPlansPage() {
             <TableBody>
               {paginatedPlans.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell>
+                    <span className="text-2xl">{p.planIcon || "🏋️"}</span>
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {p.name}
+                  </TableCell>
                   <TableCell>₹{p.price.toFixed(2)}</TableCell>
                   <TableCell>{p.durationMonths} month{p.durationMonths > 1 ? "s" : ""}</TableCell>
                   <TableCell>
@@ -290,12 +298,29 @@ export default function MembershipPlansPage() {
 
           <div className="grid gap-4 py-4">
             {/* Basic plan fields */}
-            <div className="grid gap-2">
-              <Label>Name</Label>
-              <Input
-                value={planForm.name}
-                onChange={(e) => setPlanForm({ ...planForm, name: e.target.value })}
-              />
+            <div className="flex gap-4 items-end">
+              <div className="grid gap-2 shrink-0">
+                <Label>Icon</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="h-10 w-12 p-0 text-xl">
+                      {planForm.planIcon || "🏋️"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 border-none shadow-none" side="right" align="start">
+                    <EmojiPicker 
+                      onEmojiClick={(emojiData) => setPlanForm({ ...planForm, planIcon: emojiData.emoji })}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="grid gap-2 flex-1">
+                <Label>Name</Label>
+                <Input
+                  value={planForm.name}
+                  onChange={(e) => setPlanForm({ ...planForm, name: e.target.value })}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-2">

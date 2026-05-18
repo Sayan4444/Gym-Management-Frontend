@@ -22,7 +22,7 @@ export default function AddonsPage() {
 
   const addons = [...(useAddons().data?.addons || [])].sort((a, b) => a.id - b.id);
   const [addonsPage, setAddonsPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const totalAddonsPages = Math.ceil(addons.length / itemsPerPage) || 1;
   const paginatedAddons = addons.slice((addonsPage - 1) * itemsPerPage, addonsPage * itemsPerPage);
   const { toast } = useToast();

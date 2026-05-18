@@ -54,6 +54,7 @@ export interface MembershipPlan {
   price: number;
   durationMonths: number;
   isActive: boolean;
+  planIcon?: string;
   planAddons?: PlanAddon[];
 }
 

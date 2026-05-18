@@ -53,7 +53,7 @@ export default function TrainersPage() {
   const trainersData = useUsers({ role: "Trainer", include: "workout_plan" }).data?.users || [];
 
   const [page, setPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(trainersData.length / itemsPerPage) || 1;
   const trainers = trainersData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
