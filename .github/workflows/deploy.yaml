@@ -35,7 +35,7 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
-          password: ${{ secrets.VPS_PASSWORD }}
+          key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             # Define image name to keep the script clean
             IMAGE_NAME="${{ secrets.IMAGE_NAME }}"
@@ -53,12 +53,7 @@ jobs:
             ENV_FILE_PATH="/root/.env.frontend"
 
             # 4. Run the new container with the necessary environment variables
-            docker run -d \
-              --name $CONTAINER_NAME \
-              --network gym-network \
-              -p 3000:3000 \
-              --env-file $ENV_FILE_PATH \
-              $IMAGE_NAME
+            docker run -d --name $CONTAINER_NAME --network gym-network -p 3000:3000 --env-file $ENV_FILE_PATH $IMAGE_NAME
 
             # Optional: Clean up old, unused Docker images to save disk space on the VPS
             docker image prune -f
