@@ -73,6 +73,8 @@ export default {
             border: "hsl(var(--sidebar-border))",
             ring: "hsl(var(--sidebar-ring))",
           },
+          "neon-green": "#39ff14",
+          "electric-blue": "#00d2ff",
         },
       borderRadius: {
         lg: "var(--radius)",
