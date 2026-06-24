@@ -41,6 +41,10 @@ export interface Gym {
   phone: string;
   email: string;
   gymIcon?: string;
+  instagram?: string;
+  facebook?: string;
+  youtube?: string;
+  googleMapsLink?: string;
   membershipPlans?: MembershipPlan[];
   addons?: Addon[];
 }

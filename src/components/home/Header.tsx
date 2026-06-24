@@ -1,8 +1,7 @@
-
-
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Dumbbell, Calendar, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface NavLink {
   label: string;
@@ -142,17 +141,13 @@ export default function Header() {
                 <Calendar className="w-4 h-4" />
                 Book Trial
               </a>
-              <a
-                href="#pricing"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLinkClick('#pricing');
-                }}
+              <Link
+                to="/login"
                 className="relative group overflow-hidden px-5 py-2.5 rounded-lg bg-neon-green text-black font-extrabold text-sm tracking-wide shadow-lg shadow-neon-green/20 hover:shadow-neon-green/40 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
               >
-                <span className="relative z-10">JOIN NOW</span>
+                <span className="relative z-10">LOGIN</span>
                 <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0 opacity-20" />
-              </a>
+              </Link>
             </div>
 
             {/* Mobile Menu Toggle */}
@@ -223,16 +218,13 @@ export default function Header() {
                 transition={{ delay: navLinks.length * 0.05 + 0.1 }}
                 className="mt-8 flex flex-col gap-4 max-w-xs mx-auto w-full"
               >
-                <a
-                  href="#pricing"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleLinkClick('#pricing');
-                  }}
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
                   className="py-3 px-6 rounded-lg bg-neon-green text-black font-extrabold text-center tracking-wider shadow-lg shadow-neon-green/30 cursor-pointer"
                 >
-                  JOIN THE CLUB
-                </a>
+                  LOGIN
+                </Link>
                 <a
                   href="#contact"
                   onClick={(e) => {

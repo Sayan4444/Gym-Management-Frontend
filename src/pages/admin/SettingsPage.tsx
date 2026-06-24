@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useGym, useMe } from "@/hooks/useApi";
 import { useUpdateGym } from "@/hooks/apis/useGym";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Trash2, Dumbbell } from "lucide-react";
+import { Camera, Trash2, Dumbbell, Loader2 } from "lucide-react";
 
 export default function SettingsPage() {
   const adminGymId = useMe().data?.gymId;
@@ -22,6 +22,10 @@ export default function SettingsPage() {
     phone: "",
     slug: "",
     whatsapp: "",
+    instagram: "",
+    facebook: "",
+    youtube: "",
+    googleMapsLink: "",
   });
 
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -37,6 +41,10 @@ export default function SettingsPage() {
         phone: gym.phone || "",
         slug: gym.slug || "",
         whatsapp: gym.whatsapp || "",
+        instagram: gym.instagram || "",
+        facebook: gym.facebook || "",
+        youtube: gym.youtube || "",
+        googleMapsLink: gym.googleMapsLink || "",
       });
       setImageFile(null);
       setImagePreview(gym.gymIcon || null);
@@ -76,6 +84,10 @@ export default function SettingsPage() {
         fd.append("phone", formData.phone);
         fd.append("slug", formData.slug);
         fd.append("whatsapp", formData.whatsapp);
+        fd.append("instagram", formData.instagram);
+        fd.append("facebook", formData.facebook);
+        fd.append("youtube", formData.youtube);
+        fd.append("google_maps_link", formData.googleMapsLink);
         payload = fd;
       } else {
         payload = { ...formData, remove_image: removeImage };
@@ -176,6 +188,22 @@ export default function SettingsPage() {
             <Label>WhatsApp</Label>
             <Input name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
           </div>
+          <div className="space-y-2">
+            <Label>Instagram</Label>
+            <Input name="instagram" value={formData.instagram} onChange={handleChange} />
+          </div>
+          <div className="space-y-2">
+            <Label>Facebook</Label>
+            <Input name="facebook" value={formData.facebook} onChange={handleChange} />
+          </div>
+          <div className="space-y-2">
+            <Label>YouTube</Label>
+            <Input name="youtube" value={formData.youtube} onChange={handleChange} />
+          </div>
+          <div className="space-y-2">
+            <Label>Google Maps Link</Label>
+            <Input name="googleMapsLink" value={formData.googleMapsLink} onChange={handleChange} />
+          </div>
             <div className="space-y-2">
               <Label>Slug</Label>
               <Input name="slug" value={formData.slug} onChange={handleChange} />
@@ -183,6 +211,7 @@ export default function SettingsPage() {
           </div>
           <Separator />
           <Button onClick={updateGymChanges} disabled={updateGym.isPending}>
+            {updateGym.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {updateGym.isPending ? "Saving..." : "Save Changes"}
           </Button>
         </CardContent>

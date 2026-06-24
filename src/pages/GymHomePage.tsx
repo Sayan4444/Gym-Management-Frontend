@@ -20,7 +20,7 @@ export default function GymHomePage({ domain }: { domain: string }) {
   if (isIdLoading || isGymLoading) {
     return (
       <div className="bg-black text-white min-h-screen font-sans selection:bg-neon-green/30">
-        <Loader />
+        <Loader isLoadingApi={true} />
       </div>
     );
   }
@@ -30,7 +30,7 @@ export default function GymHomePage({ domain }: { domain: string }) {
   return (
     <div className="bg-black text-white min-h-screen font-sans selection:bg-neon-green/30">
       {/* Full-screen Loading Animation */}
-      <Loader />
+      <Loader isLoadingApi={false} />
 
       {/* Sticky Header Navigation */}
       <Header />
@@ -58,14 +58,14 @@ export default function GymHomePage({ domain }: { domain: string }) {
         <Reviews />
 
         {/* IFrame Google Maps / Contact Sidecard Section */}
-        <MapSection />
+        <MapSection gym={gym} />
 
         {/* Lead capture & free consultation booking Section */}
         <ContactSection gym={gym} />
       </main>
 
       {/* Footer Details & Social Media Block */}
-      <Footer />
+      <Footer gym={gym} />
 
       {/* Viewport tracking scroll indicator back-to-top */}
       <BackToTop />
