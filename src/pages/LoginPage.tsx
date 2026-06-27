@@ -1,14 +1,23 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, Dumbbell, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { CalendarCheck, Crown, Dumbbell, ShieldCheck, Sparkles, UserCog, Users } from "lucide-react";
 import { useGoogleLogin, TokenResponse } from '@react-oauth/google';
 import { toast } from "sonner";
 import { useGoogleLogin as useGoogleLoginMutation } from "@/hooks/apis/useAuth";
 import { useGymIDFromDomain, useGym } from "../hooks/useApi";
+import { API_BASE_URL } from "@/lib/api/core";
+
+const devLoginOptions = [
+  { role: "SuperAdmin", label: "Super Admin", icon: Crown },
+  { role: "GymAdmin", label: "Gym Admin", icon: ShieldCheck },
+  { role: "Trainer", label: "Trainer", icon: Dumbbell },
+  { role: "Member", label: "Member", icon: Users },
+];
 
 export default function LoginPage({ domain }: { domain: string }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const showDevLogin = import.meta.env.DEV;
   
   const googleLoginMutation = useGoogleLoginMutation();
   const { data: gymIdObj } = useGymIDFromDomain(domain);
@@ -55,6 +64,10 @@ export default function LoginPage({ domain }: { domain: string }) {
       toast.error("Failed to login with Google");
     },
   });
+
+  const handleDevLogin = (role: string) => {
+    window.location.assign(`${API_BASE_URL}/dev/login?role=${role}`);
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white selection:bg-neon-green/30">
@@ -166,6 +179,32 @@ export default function LoginPage({ domain }: { domain: string }) {
                 </svg>
                 {googleLoginMutation.isPending ? "Signing in..." : "Continue with Google"}
               </Button>
+
+              {showDevLogin && (
+                <div className="mt-6 border-t border-white/10 pt-5">
+                  <div className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.2em] text-neon-green">
+                    <UserCog className="h-3.5 w-3.5" />
+                    Dev Login
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {devLoginOptions.map((option) => {
+                      const Icon = option.icon;
+                      return (
+                        <Button
+                          key={option.role}
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleDevLogin(option.role)}
+                          className="h-11 justify-start gap-2 rounded-lg border-white/10 bg-white/5 px-3 text-xs font-bold text-neutral-100 hover:border-neon-green/40 hover:bg-neon-green/10 hover:text-neon-green"
+                        >
+                          <Icon className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{option.label}</span>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
                 <p className="text-center text-xs font-medium leading-relaxed text-neutral-400">
