@@ -9,7 +9,6 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import LandingPage from "./pages/LandingPage";
 import GymHomePage from "./pages/GymHomePage";
 import LoginPage from "./pages/LoginPage";
-import PricingPage from "./components/PricingPage";
 import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
 import UnauthorizedPage from "./pages/Unauthorized";
@@ -81,7 +80,6 @@ const App = () => {
                   <Route element={<ValidGymRoute domain={domain} />}>
                     <Route index element={<GymHomePage domain={domain} />} />
                     <Route path="login" element={<LoginPage domain={domain} />} />
-                    <Route path="pricing" element={<PricingPage domain={domain} />} />
 
                     <Route element={<ProtectedRoute allowedRoles={['GymAdmin', 'Trainer', 'Member']} />}>
                       <Route path="mark-attendance" element={<MarkAttendancePage />} />
