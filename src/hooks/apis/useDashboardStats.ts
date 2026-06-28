@@ -1,18 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
-export interface DashboardStatsResponse {
+interface DashboardSummaryStatsResponse {
   totalMembers: number;
-  todaysAttendance: number;
   activeMemberships: number;
-  expiringSoon: number;
   totalRevenue: number;
-  weeklyAttendance: { day: string, count: number }[];
-  monthlyRevenue: { month: string, revenue: number }[];
 }
 
+export interface DashboardStatsResponse extends DashboardSummaryStatsResponse {
+  todaysAttendance: number;
+  expiringSoon: number;
+  currentMonthRevenue: number;
+  activeMembershipChangePercent: number;
+  attendanceChangePercent: number;
+  weeklyAttendance: { day: string, count: number }[];
+  monthlyRevenue: { month: string, revenue: number }[];
+  activeMembersTrend: { month: string, count: number }[];
+  membershipStatus: { name: string, value: number }[];
+}
+
+export type SuperAdminDashboardStatsResponse = DashboardSummaryStatsResponse;
+
 export function useSuperAdminDashboardStats() {
-  return useQuery<DashboardStatsResponse>({
+  return useQuery<SuperAdminDashboardStatsResponse>({
     queryKey: ["superAdminDashboardStats"],
     queryFn: api.getSuperAdminDashboardStats,
   });

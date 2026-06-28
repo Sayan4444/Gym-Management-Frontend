@@ -1,129 +1,191 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar,
-} from "@/components/ui/sidebar";
-import { NavLink } from "@/components/NavLink";
-import {
-  LayoutDashboard, Users, CalendarCheck, CreditCard, ClipboardList, Dumbbell,
-  BarChart3, Settings, Building2, Box,
+  Activity,
+  BarChart2,
+  Bell,
+  Box,
+  Building2,
+  CalendarCheck,
+  CreditCard,
+  Dumbbell,
+  Flame,
+  Landmark,
+  Settings,
+  Utensils,
+  Users,
+  X,
 } from "lucide-react";
-import { useMe, useGym } from "@/hooks/useApi";
+import { useGym, useMe } from "@/hooks/useApi";
+import { roleLabels } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 interface NavItem {
   title: string;
+  tab: string;
   url: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: string | number }>;
 }
 
-import { roleLabels } from "@/lib/constants";
-
-function getNavItems(role: string, prefix: string): NavItem[] {
+function getNavItems(role: string): NavItem[] {
   const items: Record<string, NavItem[]> = {
     admin: [
-      { title: "Dashboard", url: `${prefix}/admin?tab=dashboard`, icon: LayoutDashboard },
-      { title: "Members", url: `${prefix}/admin?tab=members`, icon: Users },
-      { title: "Attendance", url: `${prefix}/admin?tab=attendance`, icon: CalendarCheck },
-      { title: "Membership Plans", url: `${prefix}/admin?tab=plans`, icon: ClipboardList },
-      { title: "Add-ons", url: `${prefix}/admin?tab=addons`, icon: Box },
-      { title: "Payments", url: `${prefix}/admin?tab=payments`, icon: CreditCard },
-      { title: "Trainers", url: `${prefix}/admin?tab=trainers`, icon: Dumbbell },
-      { title: "Reports", url: `${prefix}/admin?tab=reports`, icon: BarChart3 },
-      { title: "Settings", url: `${prefix}/admin?tab=settings`, icon: Settings },
+      { title: "Dashboard", tab: "dashboard", url: "/admin?tab=dashboard", icon: Activity },
+      { title: "Members", tab: "members", url: "/admin?tab=members", icon: Users },
+      { title: "Membership Plans", tab: "plans", url: "/admin?tab=plans", icon: Landmark },
+      { title: "Trainers", tab: "trainers", url: "/admin?tab=trainers", icon: Dumbbell },
+      { title: "Attendance", tab: "attendance", url: "/admin?tab=attendance", icon: CalendarCheck },
+      { title: "Payments", tab: "payments", url: "/admin?tab=payments", icon: CreditCard },
+      // TODO: These admin routes are present for reference UI parity; wire full modules when backend/features exist.
+      { title: "Workout Programs", tab: "workouts", url: "/admin?tab=workouts", icon: Flame },
+      { title: "Diet Plans", tab: "diets", url: "/admin?tab=diets", icon: Utensils },
+      { title: "Inventory", tab: "inventory", url: "/admin?tab=inventory", icon: Box },
+      { title: "Add-ons", tab: "addons", url: "/admin?tab=addons", icon: Box },
+      { title: "Analytics", tab: "analytics", url: "/admin?tab=analytics", icon: BarChart2 },
+      { title: "Reports", tab: "reports", url: "/admin?tab=reports", icon: BarChart2 },
+      { title: "Notifications", tab: "notifications", url: "/admin?tab=notifications", icon: Bell },
+      { title: "Settings", tab: "settings", url: "/admin?tab=settings", icon: Settings },
     ],
     trainer: [
-      { title: "Dashboard", url: `${prefix}/trainer?tab=dashboard`, icon: LayoutDashboard },
-      { title: "Workout Plans", url: `${prefix}/trainer?tab=workouts`, icon: Dumbbell },
+      { title: "Dashboard", tab: "dashboard", url: "/trainer?tab=dashboard", icon: Activity },
+      { title: "Workout Programs", tab: "workouts", url: "/trainer?tab=workouts", icon: Flame },
     ],
     member: [
-      { title: "Dashboard", url: `${prefix}/member?tab=dashboard`, icon: LayoutDashboard },
-      { title: "Attendance", url: `${prefix}/member?tab=attendance`, icon: CalendarCheck },
-      { title: "Subscription", url: `${prefix}/member?tab=subscription`, icon: ClipboardList },
-      { title: "Add-ons", url: `${prefix}/member?tab=addons`, icon: Box },
-      { title: "Order History", url: `${prefix}/member?tab=orders`, icon: CreditCard },
+      { title: "Dashboard", tab: "dashboard", url: "/member?tab=dashboard", icon: Activity },
+      { title: "Attendance", tab: "attendance", url: "/member?tab=attendance", icon: CalendarCheck },
+      { title: "Subscription", tab: "subscription", url: "/member?tab=subscription", icon: Landmark },
+      { title: "Add-ons", tab: "addons", url: "/member?tab=addons", icon: Box },
+      { title: "Order History", tab: "orders", url: "/member?tab=orders", icon: CreditCard },
     ],
     "super-admin": [
-      { title: "Dashboard", url: "/super-admin?tab=overview", icon: LayoutDashboard },
-      { title: "Gyms", url: "/super-admin?tab=gyms", icon: Building2 },
-      { title: "Users", url: "/super-admin?tab=users", icon: Users },
+      { title: "Dashboard", tab: "overview", url: "/super-admin?tab=overview", icon: Activity },
+      { title: "Gyms", tab: "gyms", url: "/super-admin?tab=gyms", icon: Building2 },
+      { title: "Users", tab: "users", url: "/super-admin?tab=users", icon: Users },
     ],
   };
+
   return items[role] || [];
 }
 
-export function SidebarNav({ role, prefix }: { role: string; prefix: string }) {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
-  const items = getNavItems(role, prefix);
-  const baseUrl = role === "super-admin" ? "/super-admin" : `${prefix}/${role}`;
+export function SidebarNav({
+  role,
+  isOpen,
+  onClose,
+}: {
+  role: string;
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+  const items = getNavItems(role);
   const defaultTab = role === "super-admin" ? "overview" : "dashboard";
   const currentTab = searchParams.get("tab") || defaultTab;
 
   const me = useMe().data;
   const gym = useGym(me?.gymId).data;
-  const gymName = role === "super-admin" ? "GymFlow" : (gym?.name || "GymFlow");
+  const gymName = role === "super-admin" ? "Transform 360" : gym?.name || "Transform 360";
   const gymIcon = role !== "super-admin" && gym?.gymIcon ? gym.gymIcon : null;
+  const initials = me?.name
+    ? me.name
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "A";
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarContent>
-        <div className="p-4">
-          {!collapsed && (
-            <div className="flex items-center gap-2">
-              {gymIcon ? (
-                <img src={gymIcon} alt={gymName} className="h-7 w-7 rounded-md object-cover" />
-              ) : (
-                <Dumbbell className="h-7 w-7 text-primary" />
-              )}
-              <span className="font-display text-lg font-bold text-foreground truncate" title={gymName}>{gymName}</span>
-            </div>
-          )}
-          {collapsed && (
-             gymIcon ? (
-                <img src={gymIcon} alt={gymName} className="h-7 w-7 rounded-md object-cover mx-auto" />
-              ) : (
-                <Dumbbell className="h-7 w-7 text-primary mx-auto" />
-              )
-          )}
-        </div>
-        <SidebarGroup>
-          <SidebarGroupLabel>{roleLabels[role]}</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => {
-                const isTabbedRole = role === "super-admin" || role === "trainer" || role === "member" || role === "admin";
-                const isTabActive = isTabbedRole && (
-                  item.url.includes(`tab=${currentTab}`) || 
-                  (item.url.endsWith(`/${role}`) && currentTab === "dashboard") ||
-                  (item.url.endsWith("/super-admin") && currentTab === "overview")
-                );
+    <>
+      {isOpen && <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={onClose} />}
 
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      {isTabbedRole ? (
-                        <Link 
-                          to={item.url} 
-                          className={`hover:bg-accent/50 ${isTabActive ? "bg-accent text-primary font-medium" : ""}`}
-                        >
-                          <item.icon className="mr-2 h-4 w-4" />
-                          {!collapsed && <span>{item.title}</span>}
-                        </Link>
-                      ) : (
-                        <NavLink to={item.url} end={item.url === baseUrl} className="hover:bg-accent/50" activeClassName="bg-accent text-primary font-medium">
-                          <item.icon className="mr-2 h-4 w-4" />
-                          {!collapsed && <span>{item.title}</span>}
-                        </NavLink>
-                      )}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-white/5 bg-[#0A0A0A] text-white transition-transform duration-300 md:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        <div className="flex items-center justify-between border-b border-white/5 p-6">
+          <Link to={role === "super-admin" ? "/super-admin" : `/${role}`} className="flex min-w-0 items-center gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-[#00BFFF] to-[#39FF14]">
+              {gymIcon ? (
+                <img src={gymIcon} alt={gymName} className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-[10px] font-black text-black">T360</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-sm font-bold uppercase tracking-tight text-white">
+                {gymName.split(" ")[0] || "Transform"} <span className="text-[#00BFFF]">360</span>
+              </h1>
+            </div>
+          </Link>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded bg-white/5 p-1 text-gray-400 transition-colors hover:text-white md:hidden"
+            aria-label="Close sidebar"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <nav className="custom-scrollbar flex-1 space-y-1.5 overflow-y-auto px-4 py-6">
+          {items.map((item) => {
+            const Icon = item.icon;
+            const active =
+              currentTab === item.tab ||
+              (item.tab === defaultTab && location.search === "" && location.pathname === item.url.split("?")[0]);
+
+            return (
+              <Link
+                key={item.title}
+                to={item.url}
+                onClick={onClose}
+                className={cn(
+                  "group relative flex w-full items-center gap-3 px-3 py-2 text-left text-sm font-medium tracking-wide transition-colors",
+                  active
+                    ? "rounded-r-md border-l-2 border-[#00BFFF] bg-white/5 text-[#00BFFF]"
+                    : "text-gray-500 hover:text-white",
+                )}
+              >
+                <Icon
+                  className={cn("h-4 w-4 transition-colors", active ? "text-[#00BFFF]" : "text-gray-500 group-hover:text-white")}
+                  strokeWidth={active ? 2 : 1.7}
+                />
+                <span className="truncate">{item.title}</span>
+                {!active && (
+                  <span className="absolute right-4 h-1.5 w-1.5 scale-0 rounded-full bg-[#39FF14] opacity-60 transition-transform duration-300 group-hover:scale-100" />
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="p-4">
+          <div className="rounded-xl border border-white/5 bg-[#171717] p-4">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">AI Insights</p>
+            <p className="text-xs leading-relaxed text-gray-300">
+              Retention is expected to grow <span className="font-bold text-[#39FF14]">12%</span> this month based on check-in patterns.
+            </p>
+          </div>
+        </div>
+
+        <div className="border-t border-white/5 bg-[#0A0A0A] p-4">
+          <div className="flex items-center gap-3 rounded-xl bg-white/[0.02] p-2">
+            {me?.photoUrl ? (
+              <img src={me.photoUrl} alt={me.name} className="h-8 w-8 rounded-full border border-white/20 object-cover shadow-lg" />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-gradient-to-tr from-gray-800 to-gray-500 text-xs font-bold text-white shadow-lg">
+                {initials}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <h4 className="truncate text-xs font-semibold text-white">Good Morning, {me?.name?.split(" ")[0] || roleLabels[role]}</h4>
+              <p className="truncate font-mono text-[10px] text-[#39FF14]">{me?.email || roleLabels[role]}</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }

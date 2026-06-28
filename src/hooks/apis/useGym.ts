@@ -42,6 +42,11 @@ export interface UpdateGymPayload {
     whatsapp: string;
     phone: string;
     email: string;
+    instagram?: string;
+    facebook?: string;
+    youtube?: string;
+    googleMapsLink?: string;
+    remove_image?: boolean;
 }
 
 export function useUpdateGym() {
