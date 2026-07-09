@@ -139,33 +139,33 @@ export function ScheduleAddonDialog({ userAddon, open, onOpenChange }: ScheduleA
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="border-[#00BFFF]/20 bg-[#090909] text-white sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-lg">
-            <CalendarClock className="h-5 w-5 text-primary" />
+          <DialogTitle className="flex items-center gap-2 text-base font-black uppercase tracking-tight">
+            <CalendarClock className="h-5 w-5 text-[#00BFFF]" />
             Schedule Session
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-gray-500">
             Pick a date and time for your <strong>{addonName}</strong> session.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 py-2">
           {/* Addon summary pill */}
-          <div className="flex items-center gap-3 rounded-lg border bg-muted/40 px-4 py-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <Clock className="h-4 w-4 text-primary" />
+          <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#00BFFF]/10">
+              <Clock className="h-4 w-4 text-[#00BFFF]" />
             </div>
             <div className="min-w-0">
-              <p className="font-semibold truncate">{addonName}</p>
+              <p className="truncate font-semibold text-white">{addonName}</p>
               {duration ? (
-                <p className="text-xs text-muted-foreground">{duration} min session</p>
+                <p className="text-xs text-gray-500">{duration} min session</p>
               ) : (
-                <p className="text-xs text-muted-foreground">Session duration not specified</p>
+                <p className="text-xs text-gray-500">Session duration not specified</p>
               )}
             </div>
             {existing && (
-              <Badge variant="outline" className="ml-auto shrink-0 text-xs bg-primary/5 text-primary border-primary/20">
+              <Badge variant="outline" className="ml-auto shrink-0 border-[#00BFFF]/20 bg-[#00BFFF]/10 text-xs text-[#00BFFF]">
                 Scheduled
               </Badge>
             )}
@@ -173,7 +173,7 @@ export function ScheduleAddonDialog({ userAddon, open, onOpenChange }: ScheduleA
 
           {/* Current schedule (if any) */}
           {existing && (
-            <div className="flex items-center gap-2 rounded-md bg-success/10 border border-success/20 px-3 py-2 text-sm text-success">
+            <div className="flex items-center gap-2 rounded-lg border border-[#39FF14]/20 bg-[#39FF14]/10 px-3 py-2 text-sm text-[#39FF14]">
               <CheckCircle2 className="h-4 w-4 shrink-0" />
               Currently: {formatScheduled(existing)}
             </div>
@@ -181,13 +181,13 @@ export function ScheduleAddonDialog({ userAddon, open, onOpenChange }: ScheduleA
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5 flex flex-col">
-              <Label>Date</Label>
+              <Label className="text-xs font-bold text-gray-400">Date</Label>
               <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full justify-start border-white/10 bg-[#111] text-left font-normal text-white hover:bg-white/5 hover:text-white",
                       !date && "text-muted-foreground"
                     )}
                   >
@@ -195,7 +195,7 @@ export function ScheduleAddonDialog({ userAddon, open, onOpenChange }: ScheduleA
                     {date ? format(date, "PPP") : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto border-white/10 bg-[#111] p-0 text-white">
                   <Calendar
                     mode="single"
                     selected={date}
@@ -216,12 +216,12 @@ export function ScheduleAddonDialog({ userAddon, open, onOpenChange }: ScheduleA
             </div>
 
             <div className="space-y-1.5 flex flex-col">
-              <Label>Time</Label>
+              <Label className="text-xs font-bold text-gray-400">Time</Label>
               <Select value={time} onValueChange={setTime}>
-                <SelectTrigger>
+                <SelectTrigger className="border-white/10 bg-[#111] text-white">
                   <SelectValue placeholder="Select time" />
                 </SelectTrigger>
-                <SelectContent className="max-h-56 custom-scrollbar">
+                <SelectContent className="custom-scrollbar max-h-56 border-white/10 bg-[#111] text-white">
                   {TIME_SLOTS.map((slot) => (
                     <SelectItem key={slot} value={slot}>
                       {slot}
@@ -237,7 +237,7 @@ export function ScheduleAddonDialog({ userAddon, open, onOpenChange }: ScheduleA
           {existing && (
             <Button
               variant="ghost"
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 mr-auto"
+              className="mr-auto text-red-400 hover:bg-red-500/10 hover:text-red-300"
               onClick={handleClear}
               disabled={isLoading}
             >
@@ -245,10 +245,10 @@ export function ScheduleAddonDialog({ userAddon, open, onOpenChange }: ScheduleA
               <span className="ml-1.5">Clear</span>
             </Button>
           )}
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="border-white/10 bg-transparent text-gray-300 hover:bg-white/5 hover:text-white">
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!isValid || isLoading}>
+          <Button onClick={handleSave} disabled={!isValid || isLoading} className="bg-gradient-to-r from-[#00BFFF] to-[#39FF14] font-black text-black hover:opacity-90">
             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CalendarClock className="mr-2 h-4 w-4" />}
             {existing ? "Update Schedule" : "Confirm Schedule"}
           </Button>
@@ -257,4 +257,3 @@ export function ScheduleAddonDialog({ userAddon, open, onOpenChange }: ScheduleA
     </Dialog>
   );
 }
-

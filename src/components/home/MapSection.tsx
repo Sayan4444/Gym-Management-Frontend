@@ -3,6 +3,13 @@ import { Gym } from '@/data/types';
 
 export default function MapSection({ gym }: { gym: Gym }) {
   const directionsUrl = gym.googleMapsLink;
+  const mapEmbedUrl = gym.googleMapsLink?.includes('/embed')
+    ? gym.googleMapsLink
+    : `https://www.google.com/maps?q=${encodeURIComponent(gym.address || gym.name)}&output=embed`;
+  const hasTimings = Boolean(gym.openingTime || gym.closingTime);
+  const timingText = hasTimings
+    ? `Daily: ${gym.openingTime || 'Opening time not set'} - ${gym.closingTime || 'Closing time not set'}`
+    : 'Timings not configured';
 
   return (
     <section id="location" className="relative py-20 bg-neutral-950 overflow-hidden">
@@ -34,14 +41,14 @@ export default function MapSection({ gym }: { gym: Gym }) {
           <div className="col-span-12 lg:col-span-7 rounded-3xl overflow-hidden min-h-[350px] lg:min-h-[480px] border border-white/10 shadow-2xl relative group">
             {/* Standard embedded Google Map pointer pointing to a high premium sports block */}
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.133742456012!2d77.3789069150824!3d28.625754582420485!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ceff135555555%3A0x6bbaec43b1f3c306!2sTransform360Gym!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+              src={mapEmbedUrl}
               width="100%"
               height="100%"
               style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) grayscale(10%) contrast(110%)' }}
               allowFullScreen={true}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Transform 360 Gym Plus Location Map"
+              title={`${gym.name} location map`}
               className="absolute inset-0 w-full h-full"
             />
 
@@ -95,10 +102,7 @@ export default function MapSection({ gym }: { gym: Gym }) {
                     <div className="flex flex-col">
                       <span className="text-xs font-black text-white uppercase tracking-wider">CLUB SESSIONS CALENDAR</span>
                       <p className="text-xs text-neutral-400 font-light mt-1">
-                        Mon - Sat: 5:00 AM &ndash; 10:00 PM (Active)
-                      </p>
-                      <p className="text-xs text-neutral-400 font-light mt-0.5">
-                        Sunday: 6:00 AM &ndash; 2:00 PM (Recharge)
+                        {timingText}
                       </p>
                     </div>
                   </div>
@@ -121,13 +125,16 @@ export default function MapSection({ gym }: { gym: Gym }) {
               {/* Action buttons directions link */}
                 <div className="mt-8">
                   <a
-                    href={directionsUrl}
+                    href={directionsUrl || '#location'}
+                    aria-disabled={!directionsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-neon-green to-electric-blue hover:from-white hover:to-white text-black font-extrabold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transform active:scale-95 transition-all shadow-lg shadow-neon-green/10 cursor-pointer"
+                    className={`w-full py-4 rounded-xl bg-gradient-to-r from-neon-green to-electric-blue hover:from-white hover:to-white text-black font-extrabold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transform active:scale-95 transition-all shadow-lg shadow-neon-green/10 ${
+                      directionsUrl ? 'cursor-pointer' : 'pointer-events-none opacity-60'
+                    }`}
                   >
                     <Navigation className="w-4 h-4 text-black fill-black animate-pulse" />
-                    Get Live Directions on Map
+                    {directionsUrl ? 'Get Live Directions on Map' : 'Map Link Not Configured'}
                   </a>
                 </div>
 

@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, Check, Crown, LogOut, Menu, MessageSquare, Plus, Search, Sparkles, User as UserIcon, X } from "lucide-react";
+import { Bell, Check, Crown, LogOut, Menu, Plus, Search, Sparkles, User as UserIcon, X } from "lucide-react";
 import { useMembershipPlans, useMe, useLogout, useSubscriptions } from "@/hooks/useApi";
 import { SidebarNav } from "./SidebarNav";
 import { roleLabels } from "@/lib/constants";
@@ -22,40 +22,23 @@ function formatSystemDate() {
   }).format(new Date());
 }
 
-// TODO: Replace this local notification seed with backend notification data when the API exists.
-const initialTrayNotifications = [
-  {
-    id: "renewal-1",
-    category: "Renewals",
-    message: "2 memberships are approaching renewal. Follow up from the member ledger.",
-    time: "Today",
-    unread: true,
-  },
-  {
-    id: "payment-1",
-    category: "Payments",
-    message: "Pending invoice queue needs review for recent membership changes.",
-    time: "2 hrs ago",
-    unread: true,
-  },
-  {
-    id: "attendance-1",
-    category: "Attendance",
-    message: "Daily attendance sync completed for the current gym.",
-    time: "Yesterday",
-    unread: false,
-  },
-];
+const dashboardTitles: Record<string, string> = {
+  admin: "Admin Dashboard",
+  trainer: "Trainer Dashboard",
+  member: "Member Dashboard",
+  "super-admin": "Super Admin Dashboard",
+};
 
 export default function DashboardLayout({ role }: { role: string }) {
   const navigate = useNavigate();
+  const dashboardTitle = dashboardTitles[role] || "Dashboard";
 
   // Local UI state for shell-only interactions.
   const [profileOpen, setProfileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [notificationTrayOpen, setNotificationTrayOpen] = useState(false);
-  const [trayNotifications, setTrayNotifications] = useState(initialTrayNotifications);
+  const [trayNotifications, setTrayNotifications] = useState([]);
 
   // Backend-backed user, subscription, and plan data used by the profile area.
   const subscriptionsData = useSubscriptions().data?.subscriptions;
@@ -100,7 +83,7 @@ export default function DashboardLayout({ role }: { role: string }) {
     const adminActions: Record<string, string> = {
       "add-member": "/admin?tab=members",
       "create-invoice": "/admin?tab=payments",
-      "mark-attendance": "/admin?tab=attendance&action=manual-checkin",
+      "log-attendance": "/admin?tab=attendance&action=manual-checkin",
       "add-trainer": "/admin?tab=trainers",
     };
 
@@ -108,14 +91,14 @@ export default function DashboardLayout({ role }: { role: string }) {
     const trainerActions: Record<string, string> = {
       "add-member": "/trainer?tab=dashboard",
       "create-invoice": "/trainer?tab=dashboard",
-      "mark-attendance": "/mark-attendance",
+      "log-attendance": "/trainer?tab=dashboard",
       "add-trainer": "/trainer?tab=workouts",
     };
 
     const memberActions: Record<string, string> = {
       "add-member": "/member?tab=dashboard",
       "create-invoice": "/member?tab=orders",
-      "mark-attendance": "/mark-attendance",
+      "log-attendance": "/member?tab=attendance",
       "add-trainer": "/member?tab=subscription",
     };
 
@@ -151,7 +134,7 @@ export default function DashboardLayout({ role }: { role: string }) {
           {/* Page status and backend-backed greeting. */}
           <div className="ml-12 flex flex-col md:ml-0">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs uppercase tracking-widest text-gray-500">Control System</span>
+              <span className="font-mono text-xs uppercase tracking-widest text-gray-500">{dashboardTitle}</span>
               <span className="inline-flex items-center rounded-full border border-[#39FF14]/10 bg-[#39FF14]/10 px-1.5 py-0.5 text-[9px] font-medium text-[#39FF14]">
                 <Sparkles className="mr-1 h-2.5 w-2.5" />
                 LIVE
@@ -193,7 +176,7 @@ export default function DashboardLayout({ role }: { role: string }) {
                     {[
                       { label: "Add Gym Member", actionType: "add-member" },
                       { label: "Issue Pending Invoice", actionType: "create-invoice" },
-                      { label: "Log Daily Attendance", actionType: "mark-attendance" },
+                      { label: "Log Daily Attendance", actionType: "log-attendance" },
                       { label: "Onboard Fitness Trainer", actionType: "add-trainer" },
                     ].map((action) => (
                       <button
@@ -209,16 +192,6 @@ export default function DashboardLayout({ role }: { role: string }) {
                 </>
               )}
             </div>
-
-            {/* TODO: Replace this static message indicator with real messages/conversations. */}
-            <button
-              type="button"
-              className="relative rounded-full border border-white/5 bg-white/[0.03] p-2.5 text-gray-400 transition-all hover:border-[#00BFFF]/30 hover:bg-white/5 hover:text-white"
-              aria-label="Messages"
-            >
-              <MessageSquare className="h-4 w-4" />
-              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#00BFFF]" />
-            </button>
 
             {/* TODO: Connect unread count and tray actions to a backend notifications API. */}
             <button
@@ -336,18 +309,6 @@ export default function DashboardLayout({ role }: { role: string }) {
               >
                 Clear All Logs
               </button>
-              {role === "admin" && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setNotificationTrayOpen(false);
-                    navigate("/admin?tab=notifications");
-                  }}
-                  className="w-full rounded-xl border border-[#00BFFF]/20 px-4 py-2.5 text-xs font-bold text-[#00BFFF] transition-colors hover:bg-[#00BFFF]/10 hover:text-white"
-                >
-                  Open Notifications Page
-                </button>
-              )}
             </div>
           </aside>
         </>

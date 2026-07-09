@@ -3,7 +3,7 @@ import { api } from "@/lib/api";
 import { Payment } from "../../data/types";
 
 export function usePayments(params?: { gym_id?: number; user_id?: number; status?: string; search?: string }) {
-  return useQuery<{ count: number; payments: (Payment & { userName?: string })[] }>({
+  return useQuery<{ count: number; payments: Payment[] }>({
     queryKey: ["payments", params],
     queryFn: () => api.getPayments(params),
   });

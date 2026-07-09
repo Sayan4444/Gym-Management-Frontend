@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Dumbbell } from 'lucide-react';
+import { Gym } from '@/data/types';
 
 let hasAppLoaded = false;
 
-export default function Loader({ isLoadingApi = false }: { isLoadingApi?: boolean }) {
+export default function Loader({ isLoadingApi = false, gym }: { isLoadingApi?: boolean; gym?: Gym }) {
   const [loading, setLoading] = useState(() => {
     if (isLoadingApi) return true;
     if (hasAppLoaded) return false;
     return true;
   });
   const [textIndex, setTextIndex] = useState(0);
-  const texts = ['TRANSFORMATION', 'STRENGTH', 'NUTRITION', 'COMMUNITY', 'TRANSFORM 360  GYM PLUS'];
+  const brandName = gym?.name || 'GYM PLUS';
+  const texts = ['TRANSFORMATION', 'STRENGTH', 'NUTRITION', 'COMMUNITY', brandName.toUpperCase()];
 
   useEffect(() => {
     // Cycle text every 500ms
@@ -102,7 +104,7 @@ export default function Loader({ isLoadingApi = false }: { isLoadingApi?: boolea
 
             {/* Glowing Brand Name */}
             <h2 className="text-xl md:text-2xl font-black tracking-[0.2em] uppercase font-display bg-gradient-to-r from-white via-neutral-400 to-white bg-clip-text text-transparent mb-4">
-              TRANSFORM 360
+              {brandName}
             </h2>
 
             {/* Loading text slider */}

@@ -21,17 +21,17 @@ export function AddAddonDialog({
 }: AddAddonDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="border-[#00BFFF]/20 bg-[#090909] text-white sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add Addon</DialogTitle>
-          <DialogDescription>Choose an add-on to purchase</DialogDescription>
+          <DialogTitle className="text-base font-black uppercase tracking-tight">Add Addon</DialogTitle>
+          <DialogDescription className="text-gray-500">Choose an add-on to purchase</DialogDescription>
         </DialogHeader>
-        <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+        <div className="custom-scrollbar max-h-[60vh] space-y-3 overflow-y-auto pr-1">
           {gymAddons.map((a) => (
-            <div key={a.id} className="flex items-center justify-between rounded-lg border p-4">
-              <p className="font-medium">{a.name}</p>
+            <div key={a.id} className="flex items-center justify-between gap-4 rounded-xl border border-white/5 bg-white/[0.02] p-4">
+              <p className="font-bold text-white">{a.name}</p>
               <div className="flex items-center gap-3">
-                <span className="text-lg font-semibold">₹{a.price.toFixed(2)}</span>
+                <span className="font-mono text-lg font-black text-[#39FF14]">₹{a.price.toFixed(2)}</span>
                 <RazorpayButton
                   item={a}
                   type="Add-On"

@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Dumbbell, Calendar, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Gym } from '@/data/types';
 
 interface NavLink {
   label: string;
   href: string;
 }
 
-export default function Header() {
+export default function Header({ gym }: { gym: Gym }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -87,15 +88,19 @@ export default function Header() {
               }}
               className="flex items-center gap-2 group cursor-pointer"
             >
-              <div className="p-2 rounded-lg bg-gradient-to-br from-electric-blue to-neon-green text-black group-hover:scale-105 transition-transform duration-300">
-                <Dumbbell className="w-5 h-5 text-black font-extrabold" />
+              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-electric-blue to-neon-green text-black transition-transform duration-300 group-hover:scale-105">
+                {gym.gymIcon ? (
+                  <img src={gym.gymIcon} alt={gym.name} className="h-full w-full object-cover" />
+                ) : (
+                  <Dumbbell className="w-5 h-5 text-black font-extrabold" />
+                )}
               </div>
               <div className="flex flex-col">
                 <span className="text-lg md:text-xl font-black tracking-tight text-white leading-none">
-                  TRANSFORM <span className="text-neon-green">360</span>
+                  {gym.name}
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-neutral-400 -mt-0.5">
-                  GYM Plus
+                  Fitness Club
                 </span>
               </div>
             </a>

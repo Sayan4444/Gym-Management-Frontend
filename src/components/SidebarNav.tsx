@@ -1,8 +1,6 @@
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   Activity,
-  BarChart2,
-  Bell,
   Box,
   Building2,
   CalendarCheck,
@@ -11,12 +9,10 @@ import {
   Flame,
   Landmark,
   Settings,
-  Utensils,
   Users,
   X,
 } from "lucide-react";
 import { useGym, useMe } from "@/hooks/useApi";
-import { roleLabels } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -35,14 +31,6 @@ function getNavItems(role: string): NavItem[] {
       { title: "Trainers", tab: "trainers", url: "/admin?tab=trainers", icon: Dumbbell },
       { title: "Attendance", tab: "attendance", url: "/admin?tab=attendance", icon: CalendarCheck },
       { title: "Payments", tab: "payments", url: "/admin?tab=payments", icon: CreditCard },
-      // TODO: These admin routes are present for reference UI parity; wire full modules when backend/features exist.
-      { title: "Workout Programs", tab: "workouts", url: "/admin?tab=workouts", icon: Flame },
-      { title: "Diet Plans", tab: "diets", url: "/admin?tab=diets", icon: Utensils },
-      { title: "Inventory", tab: "inventory", url: "/admin?tab=inventory", icon: Box },
-      { title: "Add-ons", tab: "addons", url: "/admin?tab=addons", icon: Box },
-      { title: "Analytics", tab: "analytics", url: "/admin?tab=analytics", icon: BarChart2 },
-      { title: "Reports", tab: "reports", url: "/admin?tab=reports", icon: BarChart2 },
-      { title: "Notifications", tab: "notifications", url: "/admin?tab=notifications", icon: Bell },
       { title: "Settings", tab: "settings", url: "/admin?tab=settings", icon: Settings },
     ],
     trainer: [
@@ -85,14 +73,6 @@ export function SidebarNav({
   const gym = useGym(me?.gymId).data;
   const gymName = role === "super-admin" ? "Transform 360" : gym?.name || "Transform 360";
   const gymIcon = role !== "super-admin" && gym?.gymIcon ? gym.gymIcon : null;
-  const initials = me?.name
-    ? me.name
-        .split(" ")
-        .map((part) => part[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "A";
 
   return (
     <>
@@ -161,30 +141,6 @@ export function SidebarNav({
           })}
         </nav>
 
-        <div className="p-4">
-          <div className="rounded-xl border border-white/5 bg-[#171717] p-4">
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">AI Insights</p>
-            <p className="text-xs leading-relaxed text-gray-300">
-              Retention is expected to grow <span className="font-bold text-[#39FF14]">12%</span> this month based on check-in patterns.
-            </p>
-          </div>
-        </div>
-
-        <div className="border-t border-white/5 bg-[#0A0A0A] p-4">
-          <div className="flex items-center gap-3 rounded-xl bg-white/[0.02] p-2">
-            {me?.photoUrl ? (
-              <img src={me.photoUrl} alt={me.name} className="h-8 w-8 rounded-full border border-white/20 object-cover shadow-lg" />
-            ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-gradient-to-tr from-gray-800 to-gray-500 text-xs font-bold text-white shadow-lg">
-                {initials}
-              </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <h4 className="truncate text-xs font-semibold text-white">Good Morning, {me?.name?.split(" ")[0] || roleLabels[role]}</h4>
-              <p className="truncate font-mono text-[10px] text-[#39FF14]">{me?.email || roleLabels[role]}</p>
-            </div>
-          </div>
-        </div>
       </aside>
     </>
   );

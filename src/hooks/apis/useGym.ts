@@ -36,16 +36,19 @@ export function useGym(id?: number, includes?: string) {
 }
 
 export interface UpdateGymPayload {
-    name: string;
-    slug: string;
-    address: string;
-    whatsapp: string;
-    phone: string;
-    email: string;
+    name?: string;
+    slug?: string;
+    address?: string;
+    whatsapp?: string;
+    phone?: string;
+    email?: string;
     instagram?: string;
     facebook?: string;
     youtube?: string;
     googleMapsLink?: string;
+    openingTime?: string;
+    closingTime?: string;
+    renewalNoticeDays?: number;
     remove_image?: boolean;
 }
 

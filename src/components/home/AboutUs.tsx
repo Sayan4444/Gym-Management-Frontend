@@ -3,8 +3,9 @@
 import { motion } from 'motion/react';
 import { Target, Eye, Dumbbell, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
 import Counter from './ui/Counter';
+import { Gym } from '@/data/types';
 
-export default function AboutUs() {
+export default function AboutUs({ gym }: { gym: Gym }) {
   const cards = [
     {
       icon: Target,
@@ -117,13 +118,13 @@ export default function AboutUs() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white uppercase font-display leading-none mb-6">
               Why Choose <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-300 to-neon-green">
-                Transform 360 GYM Plus
+                {gym.name}
               </span>
             </h2>
 
             {/* Core Description Text */}
             <p className="text-base sm:text-lg text-neutral-300 font-light leading-relaxed mb-8">
-              Transform 360 GYM Plus is dedicated to helping members achieve their health and fitness goals through expert guidance, modern training equipment, and a supportive environment. Whether you&apos;re a beginner or an experienced athlete, our customized fitness programs are designed to maximize results.
+              {gym.name} is dedicated to helping members achieve their health and fitness goals through expert guidance, modern training equipment, and a supportive environment. Whether you&apos;re a beginner or an experienced athlete, our customized fitness programs are designed to maximize results.
             </p>
 
             {/* Mission & Vision Bento Cards */}

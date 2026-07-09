@@ -21,9 +21,6 @@ import AdminPanel from "./pages/admin/AdminPanel";
 // Member pages
 import MemberPanel from "./pages/member/MemberPanel";
 
-// Mark Attendance Route
-import MarkAttendancePage from "./pages/MarkAttendancePage";
-
 // Super Admin pages
 import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
 import BookDemoPage from "./pages/BookDemoPage";
@@ -80,10 +77,6 @@ const App = () => {
                   <Route element={<ValidGymRoute domain={domain} />}>
                     <Route index element={<GymHomePage domain={domain} />} />
                     <Route path="login" element={<LoginPage domain={domain} />} />
-
-                    <Route element={<ProtectedRoute allowedRoles={['GymAdmin', 'Trainer', 'Member']} />}>
-                      <Route path="mark-attendance" element={<MarkAttendancePage />} />
-                    </Route>
 
                     {/* Gym Admin routes */}
                     <Route element={<ProtectedRoute allowedRoles={['GymAdmin']} />}>

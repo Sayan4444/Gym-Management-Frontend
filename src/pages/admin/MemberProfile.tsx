@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,13 +11,15 @@ import { formatDate, formatTime } from "@/lib/utils";
 
 export default function MemberProfile() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const users = useUsers().data?.users || [];
   const subscriptions = useSubscriptions().data?.subscriptions || [];
   const plans = useMembershipPlans().data?.memberships || [];
 
-  const member = users.find((u) => u.id === Number(id));
+  const memberId = Number(id || searchParams.get("id"));
+  const member = users.find((u) => u.id === memberId);
 
   // Local fake data for endpoints not currently in the backend
   const memberPayments = [{ id: 1, amount: 49.99, paymentDate: "2023-11-01", status: "Paid" }];
@@ -36,7 +38,7 @@ export default function MemberProfile() {
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" onClick={() => navigate("/admin/members")} className="gap-2">
+      <Button variant="ghost" onClick={() => navigate("/admin?tab=members")} className="gap-2">
         <ArrowLeft className="h-4 w-4" /> Back to Members
       </Button>
 

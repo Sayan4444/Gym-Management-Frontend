@@ -3,8 +3,9 @@
 import { motion } from 'motion/react';
 import { Dumbbell, Trophy, Users, ShieldAlert, Award, ChevronRight, Play } from 'lucide-react';
 import Counter from './ui/Counter';
+import { Gym } from '@/data/types';
 
-export default function Hero() {
+export default function Hero({ gym }: { gym: Gym }) {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -32,7 +33,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0">
         <img
           src="https://picsum.photos/seed/aggressive_gym_workout/1920/1080?blur=1"
-          alt="Transform 360 Gym Interior"
+          alt={`${gym.name} gym interior`}
           className="w-full h-full object-cover object-center saturate-50 opacity-45 brightness-50 scale-105"
           referrerPolicy="no-referrer"
         />
@@ -58,7 +59,7 @@ export default function Hero() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 border border-white/10 text-xs font-bold tracking-[0.2em] uppercase text-neon-green self-center lg:self-start mb-6"
             >
               <span className="w-2 h-2 rounded-full bg-neon-green animate-ping" />
-              THE BENCHMARK OF ELITE FITNESS
+              {gym.name}
             </motion.div>
 
             {/* Headline */}
@@ -68,7 +69,7 @@ export default function Hero() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-extrabold uppercase tracking-tight text-white font-display leading-[1.05]"
             >
-              Transform Your Body.<br />
+              {gym.name}<br />
               <span className="bg-gradient-to-r from-neon-green via-electric-blue to-white bg-clip-text text-transparent">
                 Transform Your Life.
               </span>
@@ -81,7 +82,7 @@ export default function Hero() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-6 text-base sm:text-lg md:text-xl text-neutral-300 max-w-2xl mx-auto lg:mx-0 font-light leading-relaxed"
             >
-              Join Transform 360 GYM Plus and achieve your fitness goals with world-class equipment, expert trainers, and a motivating fitness community.
+              Achieve your fitness goals with world-class equipment, expert trainers, and a motivating fitness community.
             </motion.p>
 
             {/* CTA Buttons */}

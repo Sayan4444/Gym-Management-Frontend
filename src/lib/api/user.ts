@@ -1,5 +1,5 @@
 import { User } from '../../data/types';
-import { UpdateProfilePayload } from '../../hooks/apis/useUser';
+import { CreateUserPayload, UpdateProfilePayload } from '../../hooks/apis/useUser';
 import { fetchApi } from './core';
 
 export const userApi = {
@@ -16,6 +16,7 @@ export const userApi = {
     const qs = params.toString() ? `?${params.toString()}` : "";
     return fetchApi(`/users${qs}`);
   },
+  createUser: (data: CreateUserPayload) => fetchApi("/users", { method: "POST", body: JSON.stringify(data) }),
   updateProfile: (id: number, data: UpdateProfilePayload | FormData) => fetchApi(`/users/${id}`, { method: "PUT", body: data instanceof FormData ? (data as any) : JSON.stringify(data) }),
   deleteProfile: (id: number ) => fetchApi(`/users/${id}`, { method: "DELETE" }),
 };

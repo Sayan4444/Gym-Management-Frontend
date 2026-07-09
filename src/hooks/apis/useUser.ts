@@ -11,10 +11,12 @@ export function useUsers({ gymId, trainerId, isPremium, role, search, subscripti
 
 export interface UpdateProfilePayload {
   name?: string;
+  email?: string;
   phone?: string;
   dob?: string;
   gender?: string;
   address?: string;
+  timings?: string | null;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
   bloodGroup?: string;
@@ -27,6 +29,25 @@ export interface UpdateProfilePayload {
   workoutPlanId?: number | null;
   role?: string;
   socialMedia?: string[];
+}
+
+export interface CreateUserPayload extends UpdateProfilePayload {
+  name: string;
+  email: string;
+  phone?: string;
+  role?: string;
+}
+
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateUserPayload) => api.createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["adminDashboardStats"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+    },
+  });
 }
 
 export function useUpdateProfile() {
@@ -47,6 +68,8 @@ export function useDeleteProfile() {
     mutationFn: (id: number) => api.deleteProfile(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["adminDashboardStats"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
     },
   });
 }

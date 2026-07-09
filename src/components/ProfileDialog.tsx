@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@/data/types";
-import { useUpdateProfile } from "@/hooks/useApi";
+import { UpdateProfilePayload, useUpdateProfile } from "@/hooks/useApi";
 import {
   User as UserIcon, Mail, Phone, Calendar, Heart,
   Ruler, Weight, Droplets, MapPin, ShieldAlert, Activity, Share2, Camera, Trash2
@@ -40,6 +40,7 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
     dob: "",
     gender: "",
     address: "",
+    timings: "",
     emergencyContactName: "",
     emergencyContactPhone: "",
     bloodGroup: "",
@@ -58,6 +59,7 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
         dob: user.dob || "",
         gender: user.gender || "",
         address: user.address || "",
+        timings: user.timings || "",
         emergencyContactName: user.emergencyContactName || "",
         emergencyContactPhone: user.emergencyContactPhone || "",
         bloodGroup: user.bloodGroup || "",
@@ -102,7 +104,7 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
   const updateProfileMutation = useUpdateProfile();
 
   const handleSave = () => {
-    let payload: any;
+    let payload: UpdateProfilePayload | FormData;
 
     if (imageFile || removeImage) {
       const formData = new FormData();
@@ -113,6 +115,7 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
       formData.append("dob", form.dob);
       formData.append("gender", form.gender);
       formData.append("address", form.address);
+      formData.append("timings", form.timings);
       formData.append("emergency_contact_name", form.emergencyContactName);
       formData.append("emergency_contact_phone", form.emergencyContactPhone);
       formData.append("blood_group", form.bloodGroup);
@@ -132,6 +135,7 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
         dob: form.dob,
         gender: form.gender,
         address: form.address,
+        timings: form.timings.trim() || null,
         emergencyContactName: form.emergencyContactName,
         emergencyContactPhone: form.emergencyContactPhone,
         bloodGroup: form.bloodGroup,
@@ -412,6 +416,17 @@ export function ProfileDialog({ open, onOpenChange, user }: ProfileDialogProps) 
                 onChange={(e) => handleChange("address", e.target.value)}
                 placeholder="Street address, city, state, zip code"
                 rows={2}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="profile-timings" className="flex items-center gap-1.5 text-xs font-medium">
+                <Calendar className="h-3 w-3 text-muted-foreground" /> Timings
+              </Label>
+              <Input
+                id="profile-timings"
+                value={form.timings}
+                onChange={(e) => handleChange("timings", e.target.value)}
+                placeholder="e.g. 06:00 AM - 11:00 AM"
               />
             </div>
           </fieldset>

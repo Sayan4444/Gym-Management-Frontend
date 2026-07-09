@@ -30,20 +30,20 @@ export default function GymHomePage({ domain }: { domain: string }) {
   return (
     <div className="bg-black text-white min-h-screen font-sans selection:bg-neon-green/30">
       {/* Full-screen Loading Animation */}
-      <Loader isLoadingApi={false} />
+      <Loader isLoadingApi={false} gym={gym} />
 
       {/* Sticky Header Navigation */}
-      <Header />
+      <Header gym={gym} />
 
       <main className="overflow-x-hidden">
         {/* Hero Banner Section */}
-        <Hero />
+        <Hero gym={gym} />
 
         {/* About Brand / Stats Section */}
-        <AboutUs />
+        <AboutUs gym={gym} />
 
         {/* Premium Services Carousel Section */}
-        <Services />
+        <Services gym={gym} />
 
         {/* Lightbox Filterable Gallery Section */}
         <Gallery />
@@ -52,10 +52,10 @@ export default function GymHomePage({ domain }: { domain: string }) {
         <Pricing gymId={gym.id} />
 
         {/* Before / After Success Stories Section */}
-        <Transformation />
+        <Transformation gym={gym} />
 
         {/* Testimonial Auto Slider Section */}
-        <Reviews />
+        <Reviews gym={gym} />
 
         {/* IFrame Google Maps / Contact Sidecard Section */}
         <MapSection gym={gym} />

@@ -13,6 +13,7 @@ export interface User {
   gymId?: number;
   trainerId?: number;
   address?: string;
+  timings?: string | null;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
   bloodGroup?: string;
@@ -45,6 +46,9 @@ export interface Gym {
   facebook?: string;
   youtube?: string;
   googleMapsLink?: string;
+  openingTime?: string;
+  closingTime?: string;
+  renewalNoticeDays?: number;
   membershipPlans?: MembershipPlan[];
   addons?: Addon[];
 }
@@ -55,6 +59,7 @@ export interface MembershipPlan {
   updatedAt: string;
   gymId: number;
   name: string;
+  description?: string | null;
   price: number;
   durationMonths: number;
   isActive: boolean;
@@ -78,6 +83,7 @@ export interface Addon {
   updatedAt: string;
   gymId: number;
   name: string;
+  description?: string | null;
   price: number;
   isActive: boolean;
   duration: number; // duration in minutes (0 = not set)
@@ -120,6 +126,10 @@ export interface Payment {
   razorpayOrderId: string;
   razorpayPaymentId: string;
   razorpaySignature: string;
+  userName?: string;
+  invoice?: string;
+  planName?: string;
+  itemName?: string;
 }
 
 export interface Attendance {
@@ -132,15 +142,6 @@ export interface Attendance {
   timeOut: string | null;
   source: string;
   user?: User;
-}
-
-export interface GymQRToken {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  gymId: number;
-  token: string;
-  expiresAt: string;
 }
 
 export interface WorkoutExercise {

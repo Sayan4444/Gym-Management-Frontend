@@ -1,20 +1,50 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { AnimatePresence, motion } from "motion/react";
+import {
+  Award,
+  Camera,
+  Clock,
+  Dumbbell,
+  Landmark,
+  Loader2,
+  Save,
+  Settings,
+  Trash2,
+} from "lucide-react";
+
 import { useGym, useMe } from "@/hooks/useApi";
-import { useUpdateGym } from "@/hooks/apis/useGym";
+import { UpdateGymPayload, useUpdateGym } from "@/hooks/apis/useGym";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Trash2, Dumbbell, Loader2 } from "lucide-react";
+
+type SettingsPanel = "general" | "gym";
+
+const panelItems: Array<{ id: SettingsPanel; label: string; icon: typeof Settings }> = [
+  { id: "general", label: "General Setup", icon: Settings },
+  { id: "gym", label: "Gym Information", icon: Landmark },
+];
+
+const inputClass =
+  "w-full rounded-lg border border-white/10 bg-[#111] p-2.5 text-xs text-white placeholder:text-gray-600 focus:border-[#00BFFF]/60 focus:outline-none";
+
+const labelClass = "font-sans text-xs font-bold text-gray-400";
 
 export default function SettingsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const panelParam = searchParams.get("panel") as SettingsPanel | null;
+  const activePanel: SettingsPanel = panelParam && panelItems.some((item) => item.id === panelParam) ? panelParam : "general";
+
   const adminGymId = useMe().data?.gymId;
   const gym = useGym(adminGymId).data;
   const updateGym = useUpdateGym();
   const { toast } = useToast();
-  
+
+  const [generalSettings, setGeneralSettings] = useState({
+    openingTime: "",
+    closingTime: "",
+    renewalNoticeDays: 30,
+  });
+
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -27,38 +57,50 @@ export default function SettingsPage() {
     youtube: "",
     googleMapsLink: "",
   });
-
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [removeImage, setRemoveImage] = useState<boolean>(false);
+  const [removeImage, setRemoveImage] = useState(false);
 
   useEffect(() => {
-    if (gym) {
-      setFormData({
-        name: gym.name || "",
-        address: gym.address || "",
-        email: gym.email || "",
-        phone: gym.phone || "",
-        slug: gym.slug || "",
-        whatsapp: gym.whatsapp || "",
-        instagram: gym.instagram || "",
-        facebook: gym.facebook || "",
-        youtube: gym.youtube || "",
-        googleMapsLink: gym.googleMapsLink || "",
-      });
-      setImageFile(null);
-      setImagePreview(gym.gymIcon || null);
-      setRemoveImage(false);
-    }
+    if (!gym) return;
+
+    setGeneralSettings({
+      openingTime: gym.openingTime || "",
+      closingTime: gym.closingTime || "",
+      renewalNoticeDays: gym.renewalNoticeDays || 30,
+    });
+    setFormData({
+      name: gym.name || "",
+      address: gym.address || "",
+      email: gym.email || "",
+      phone: gym.phone || "",
+      slug: gym.slug || "",
+      whatsapp: gym.whatsapp || "",
+      instagram: gym.instagram || "",
+      facebook: gym.facebook || "",
+      youtube: gym.youtube || "",
+      googleMapsLink: gym.googleMapsLink || "",
+    });
+    setImageFile(null);
+    setImagePreview(gym.gymIcon || null);
+    setRemoveImage(false);
   }, [gym]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
-      setRemoveImage(false);
-    }
+  const changePanel = (panel: SettingsPanel) => {
+    setSearchParams(panel === "general" ? { tab: "settings" } : { tab: "settings", panel });
+  };
+
+  const handleGymFieldChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setFormData((current) => ({ ...current, [event.target.name]: event.target.value }));
+  };
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files?.[0]) return;
+
+    const file = event.target.files[0];
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setRemoveImage(false);
   };
 
   const handleDeleteImage = () => {
@@ -67,155 +109,282 @@ export default function SettingsPage() {
     setRemoveImage(true);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleGeneralSubmit = (event: FormEvent) => {
+    event.preventDefault();
+
+    if (!adminGymId) {
+      toast({ title: "Gym not found for this admin", variant: "destructive" });
+      return;
+    }
+
+    updateGym.mutate(
+      {
+        id: adminGymId,
+        data: {
+          openingTime: generalSettings.openingTime,
+          closingTime: generalSettings.closingTime,
+          renewalNoticeDays: generalSettings.renewalNoticeDays,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast({ title: "Settings updated", description: "Operational timings and renewal window have been saved." });
+        },
+        onError: (error: unknown) => {
+          const message = error instanceof Error ? error.message : "Failed to update settings.";
+          toast({ title: "Error", description: message, variant: "destructive" });
+        },
+      },
+    );
   };
 
-  const updateGymChanges = () => {
-    if (adminGymId) {
-      let payload: any;
-      if (imageFile || removeImage) {
-        const fd = new FormData();
-        if (imageFile) fd.append("gym_icon", imageFile);
-        if (removeImage) fd.append("remove_image", "true");
-        fd.append("name", formData.name);
-        fd.append("address", formData.address);
-        fd.append("email", formData.email);
-        fd.append("phone", formData.phone);
-        fd.append("slug", formData.slug);
-        fd.append("whatsapp", formData.whatsapp);
-        fd.append("instagram", formData.instagram);
-        fd.append("facebook", formData.facebook);
-        fd.append("youtube", formData.youtube);
-        fd.append("google_maps_link", formData.googleMapsLink);
-        payload = fd;
-      } else {
-        payload = { ...formData, remove_image: removeImage };
-      }
+  const handleGymSubmit = (event: FormEvent) => {
+    event.preventDefault();
 
-      updateGym.mutate(
-        {
-          id: adminGymId,
-          data: payload,
-        },
-        {
-          onSuccess: () => {
-            toast({
-              title: "Success",
-              description: "Gym settings updated successfully.",
-            });
-          },
-          onError: (err: unknown) => {
-            const message = err instanceof Error ? err.message : "Failed to update gym settings.";
-            toast({
-              variant: "destructive",
-              title: "Error",
-              description: message,
-            });
-          },
-        }
-      );
+    if (!adminGymId) {
+      toast({ title: "Gym not found for this admin", variant: "destructive" });
+      return;
     }
+
+    let payload: UpdateGymPayload | FormData;
+    if (imageFile || removeImage) {
+      const data = new FormData();
+      if (imageFile) data.append("gym_icon", imageFile);
+      if (removeImage) data.append("remove_image", "true");
+      data.append("name", formData.name);
+      data.append("address", formData.address);
+      data.append("email", formData.email);
+      data.append("phone", formData.phone);
+      data.append("slug", formData.slug);
+      data.append("whatsapp", formData.whatsapp);
+      data.append("instagram", formData.instagram);
+      data.append("facebook", formData.facebook);
+      data.append("youtube", formData.youtube);
+      data.append("google_maps_link", formData.googleMapsLink);
+      payload = data;
+    } else {
+      payload = { ...formData, remove_image: removeImage };
+    }
+
+    updateGym.mutate(
+      { id: adminGymId, data: payload },
+      {
+        onSuccess: () => {
+          toast({ title: "Gym settings updated", description: "Your backend gym profile has been saved." });
+        },
+        onError: (error: unknown) => {
+          const message = error instanceof Error ? error.message : "Failed to update gym settings.";
+          toast({ title: "Error", description: message, variant: "destructive" });
+        },
+      },
+    );
   };
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div>
-        <h1 className="text-3xl font-bold font-display">Settings</h1>
-        <p className="text-muted-foreground">Manage your gym profile</p>
+    <div className="space-y-6" id="settings-workbench">
+      <div className="glass-card rounded-2xl border border-white/5 bg-gradient-to-tr from-[#111] to-[#00BFFF]/5 p-5">
+        <h3 className="text-base font-bold tracking-tight text-white">Settings</h3>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Gym Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="relative group">
-              <div className="h-24 w-24 rounded-full overflow-hidden bg-primary/10 border-4 border-background shadow-sm flex items-center justify-center">
-                {imagePreview ? (
-                  <img src={imagePreview} alt="Gym Logo Preview" className="h-full w-full object-cover" />
-                ) : (
-                  <Dumbbell className="h-10 w-10 text-primary/50" />
-                )}
-              </div>
-              <Label
-                htmlFor="gym-logo-upload"
-                className="absolute bottom-0 right-0 h-8 w-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform"
-              >
-                <Camera className="h-4 w-4" />
-              </Label>
-              {imagePreview && (
+      <div className="glass-card overflow-hidden rounded-2xl border border-white/5 bg-[#0a0a0a] shadow-2xl">
+        <div className="border-b border-white/5 bg-[#090909] p-3">
+          <div className="flex w-full flex-col gap-2 rounded-xl bg-white/[0.02] p-1 sm:inline-flex sm:w-auto sm:flex-row">
+            {panelItems.map((item) => {
+              const Icon = item.icon;
+              const active = activePanel === item.id;
+              return (
                 <button
+                  key={item.id}
                   type="button"
-                  onClick={handleDeleteImage}
-                  className="absolute bottom-0 left-0 h-8 w-8 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center cursor-pointer shadow-md hover:scale-105 transition-transform"
+                  onClick={() => changePanel(item.id)}
+                  className={`flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold transition-all ${
+                    active ? "bg-[#00BFFF] text-black shadow-[0_0_18px_rgba(0,191,255,0.24)]" : "text-gray-400 hover:bg-white/5 hover:text-white"
+                  }`}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Icon className="h-4 w-4" />
+                  <span>{item.label}</span>
                 </button>
-              )}
-              <Input
-                id="gym-logo-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageChange}
-              />
-            </div>
-            <div className="text-center">
-              <h3 className="font-semibold text-lg">Gym Logo</h3>
-            </div>
+              );
+            })}
           </div>
+        </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Gym Name</Label>
-              <Input name="name" value={formData.name} onChange={handleChange} />
-            </div>
-          <div className="space-y-2">
-            <Label>Address</Label>
-            <Input name="address" value={formData.address} onChange={handleChange} />
-          </div>
-          <div className="space-y-2">
-            <Label>Contact Email</Label>
-            <Input name="email" value={formData.email} onChange={handleChange} />
-          </div>
-          <div className="space-y-2">
-            <Label>Phone</Label>
-            <Input name="phone" value={formData.phone} onChange={handleChange} />
-          </div>
-          <div className="space-y-2">
-            <Label>WhatsApp</Label>
-            <Input name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
-          </div>
-          <div className="space-y-2">
-            <Label>Instagram</Label>
-            <Input name="instagram" value={formData.instagram} onChange={handleChange} />
-          </div>
-          <div className="space-y-2">
-            <Label>Facebook</Label>
-            <Input name="facebook" value={formData.facebook} onChange={handleChange} />
-          </div>
-          <div className="space-y-2">
-            <Label>YouTube</Label>
-            <Input name="youtube" value={formData.youtube} onChange={handleChange} />
-          </div>
-          <div className="space-y-2">
-            <Label>Google Maps Link</Label>
-            <Input name="googleMapsLink" value={formData.googleMapsLink} onChange={handleChange} />
-          </div>
-            <div className="space-y-2">
-              <Label>Slug</Label>
-              <Input name="slug" value={formData.slug} onChange={handleChange} />
-            </div>
-          </div>
-          <Separator />
-          <Button onClick={updateGymChanges} disabled={updateGym.isPending}>
-            {updateGym.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {updateGym.isPending ? "Saving..." : "Save Changes"}
-          </Button>
-        </CardContent>
-      </Card>
+        <div className="p-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activePanel}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18 }}
+            >
+              {activePanel === "general" && (
+                <form onSubmit={handleGeneralSubmit} className="space-y-4 font-sans text-xs">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300">General Operational Timings</h4>
+                    <Clock className="h-4 w-4 text-[#00BFFF]" />
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Daily Opening Timings</label>
+                      <input
+                        type="text"
+                        value={generalSettings.openingTime}
+                        placeholder="05:00 AM"
+                        onChange={(event) => setGeneralSettings({ ...generalSettings, openingTime: event.target.value })}
+                        className={inputClass}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Daily Closing Timings</label>
+                      <input
+                        type="text"
+                        value={generalSettings.closingTime}
+                        placeholder="10:00 PM"
+                        onChange={(event) => setGeneralSettings({ ...generalSettings, closingTime: event.target.value })}
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Renewals alert threshold range (Days)</label>
+                      <input
+                        type="number"
+                        value={generalSettings.renewalNoticeDays}
+                        onChange={(event) => setGeneralSettings({ ...generalSettings, renewalNoticeDays: Number(event.target.value) })}
+                        className={`${inputClass} font-mono`}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end border-t border-white/5 pt-4">
+                    <button
+                      type="submit"
+                      disabled={updateGym.isPending}
+                      className="flex items-center gap-1.5 rounded-xl bg-[#00BFFF] px-5 py-2.5 font-black text-black disabled:opacity-50"
+                    >
+                      {updateGym.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                      <span>{updateGym.isPending ? "Saving..." : "Save Settings"}</span>
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {activePanel === "gym" && (
+                <form onSubmit={handleGymSubmit} className="space-y-5 font-sans text-xs">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300">Registered Gym Corporate Address Details</h4>
+                    <Award className="h-4 w-4 text-[#39FF14]" />
+                  </div>
+
+                  <div className="flex flex-col gap-4 rounded-xl border border-white/5 bg-white/[0.01] p-4 sm:flex-row sm:items-center">
+                    <div className="relative h-24 w-24 shrink-0">
+                      <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#111]">
+                        {imagePreview ? (
+                          <img src={imagePreview} alt="Gym Logo Preview" className="h-full w-full object-cover" />
+                        ) : (
+                          <Dumbbell className="h-10 w-10 text-[#00BFFF]/60" />
+                        )}
+                      </div>
+                      <label
+                        htmlFor="gym-logo-upload"
+                        className="absolute -right-2 bottom-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-[#00BFFF] text-black shadow-md transition-transform hover:scale-105"
+                      >
+                        <Camera className="h-4 w-4" />
+                      </label>
+                      {imagePreview && (
+                        <button
+                          type="button"
+                          onClick={handleDeleteImage}
+                          className="absolute -left-2 bottom-1 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-transform hover:scale-105"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                      <input id="gym-logo-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                    </div>
+                    <div>
+                      <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#39FF14]">Brand Identity</p>
+                      <h5 className="mt-1 text-sm font-bold text-white">Gym Logo & Public Profile</h5>
+                      <p className="mt-1 max-w-xl text-xs leading-relaxed text-gray-500">
+                        Logo and gym details are saved to the backend gym profile used across the dashboard shell.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Gym Brand Legal Name</label>
+                      <input name="name" value={formData.name} onChange={handleGymFieldChange} className={inputClass} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Customer support phone</label>
+                      <input name="phone" value={formData.phone} onChange={handleGymFieldChange} className={`${inputClass} font-mono`} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className={labelClass}>Post/Mail registered corporation Address</label>
+                    <input name="address" value={formData.address} onChange={handleGymFieldChange} className={inputClass} />
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Support Email credentials</label>
+                      <input name="email" type="email" value={formData.email} onChange={handleGymFieldChange} className={`${inputClass} font-mono`} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Gym URL Slug</label>
+                      <input name="slug" value={formData.slug} onChange={handleGymFieldChange} className={`${inputClass} font-mono`} />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>WhatsApp Contact</label>
+                      <input name="whatsapp" value={formData.whatsapp} onChange={handleGymFieldChange} className={`${inputClass} font-mono`} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Google Maps Link</label>
+                      <input name="googleMapsLink" value={formData.googleMapsLink} onChange={handleGymFieldChange} className={inputClass} />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Instagram</label>
+                      <input name="instagram" value={formData.instagram} onChange={handleGymFieldChange} className={inputClass} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Facebook</label>
+                      <input name="facebook" value={formData.facebook} onChange={handleGymFieldChange} className={inputClass} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>YouTube</label>
+                      <input name="youtube" value={formData.youtube} onChange={handleGymFieldChange} className={inputClass} />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end border-t border-white/5 pt-4">
+                    <button
+                      type="submit"
+                      disabled={updateGym.isPending}
+                      className="flex items-center gap-1.5 rounded-xl bg-[#00BFFF] px-5 py-2.5 font-black text-black disabled:opacity-50"
+                    >
+                      {updateGym.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                      <span>{updateGym.isPending ? "Updating..." : "Update Corp Profile"}</span>
+                    </button>
+                  </div>
+                </form>
+              )}
+
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 }

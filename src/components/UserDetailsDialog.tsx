@@ -53,6 +53,12 @@ export function UserDetailsDialog({ user, open, onOpenChange }: UserDetailsDialo
                 <span className="col-span-2">{user.address}</span>
               </div>
             )}
+            {user.timings && (
+              <div className="grid grid-cols-3 border-b pb-2">
+                <span className="text-muted-foreground text-right mr-4">Timings:</span>
+                <span className="col-span-2">{user.timings}</span>
+              </div>
+            )}
             {user.emergencyContactName && (
               <div className="grid grid-cols-3 border-b pb-2">
                 <span className="text-muted-foreground text-right mr-4">Emergency Contact:</span> 

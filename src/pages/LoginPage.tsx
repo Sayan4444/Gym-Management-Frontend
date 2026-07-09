@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CalendarCheck, Crown, Dumbbell, ShieldCheck, Sparkles, UserCog, Users } from "lucide-react";
 import { useGoogleLogin, TokenResponse } from '@react-oauth/google';
@@ -16,7 +16,6 @@ const devLoginOptions = [
 
 export default function LoginPage({ domain }: { domain: string }) {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const showDevLogin = import.meta.env.DEV;
   
   const googleLoginMutation = useGoogleLoginMutation();
@@ -33,12 +32,6 @@ export default function LoginPage({ domain }: { domain: string }) {
 
         // Route based on role
         const role = data.user.role;
-
-        const pendingToken = searchParams.get("token");
-        if (pendingToken) {
-          navigate(`/mark-attendance?token=${pendingToken}`);
-          return;
-        }
 
         if (role === 'SuperAdmin') {
           navigate('/super-admin');

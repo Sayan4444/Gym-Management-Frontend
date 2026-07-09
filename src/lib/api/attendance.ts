@@ -1,10 +1,7 @@
 import { fetchApi } from './core';
-import type { ScanQRAttendancePayload } from '@/hooks/apis/useAttendance';
 
 export const attendanceApi = {
   // ----- Attendance Routes -----
-  getQRToken: () => fetchApi("/attendance/qr"),
-  scanQRAttendance: (data: ScanQRAttendancePayload) => fetchApi("/attendance/qr/scan", { method: "POST", body: JSON.stringify(data) }),
   markManualAttendance: (userId: number) => fetchApi(`/attendance/${userId}`, { method: "POST"}),
   markManualCheckout: (userId: number) => fetchApi(`/attendance/${userId}/checkout`, { method: "POST"}),
   getAttendance: (params?: { date?: string; user_id?: number; gym_id?: number; search?: string }) => {
