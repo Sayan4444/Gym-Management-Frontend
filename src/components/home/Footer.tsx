@@ -1,8 +1,10 @@
 import { Dumbbell, Globe, Video, MapPin, Phone, Mail, Camera, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { Gym } from '@/data/types';
+import { useFeaturedReviews } from '@/hooks/useApi';
 
 export default function Footer({ gym }: { gym: Gym }) {
   const currentYear = new Date().getFullYear();
+  const hasReviews = (useFeaturedReviews(gym.id).data?.count ?? 0) > 0;
 
   const handleSmoothScroll = (id: string) => {
     const element = document.getElementById(id);
@@ -21,8 +23,7 @@ export default function Footer({ gym }: { gym: Gym }) {
     { label: 'Our Services', target: 'services' },
     { label: 'Gallery', target: 'gallery' },
     { label: 'Pricing Plans', target: 'pricing' },
-    { label: 'Transformations', target: 'transformations' },
-    { label: 'Testimonials', target: 'reviews' },
+    ...(hasReviews ? [{ label: 'Testimonials', target: 'reviews' }] : []),
     { label: 'Visit Location', target: 'location' },
     { label: 'Contact', target: 'contact' },
   ];

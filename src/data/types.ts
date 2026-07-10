@@ -144,6 +144,19 @@ export interface Attendance {
   user?: User;
 }
 
+export interface Review {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  gymId: number;
+  userId: number;
+  userName: string;
+  userPhotoUrl: string;
+  rating: number;
+  content: string;
+  isFeatured: boolean;
+}
+
 export interface WorkoutExercise {
   id: number;
   createdAt: string;

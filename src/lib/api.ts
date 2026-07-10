@@ -11,6 +11,7 @@ import { workoutPlanApi } from './api/workoutplan';
 import { attendanceApi } from './api/attendance';
 import { dashboardStatsApi } from './api/DashboardStats';
 import { bookDemoApi } from './api/bookDemo';
+import { reviewApi } from './api/review';
 
 export { fetchApi, API_BASE_URL };
 
@@ -26,5 +27,6 @@ export const api = {
   ...workoutPlanApi,
   ...attendanceApi,
   ...dashboardStatsApi,
-  ...bookDemoApi
+  ...bookDemoApi,
+  ...reviewApi
 };

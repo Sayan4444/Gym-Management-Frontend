@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarCheck, CreditCard, Clock, Crown, Loader2, Box } from "lucide-react";
+import { CreditCard, Clock, Crown, Loader2, Box } from "lucide-react";
 import { useMe, useAttendance } from "@/hooks/useApi";
 import { formatDate, formatTime } from "@/lib/utils";
 import { PaginationFooter } from "@/components/PaginationFooter";
@@ -38,86 +38,64 @@ export default function MemberDashboard() {
 
   const daysLeft = activeSub ? Math.max(0, Math.ceil((new Date(activeSub.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold font-display flex items-center gap-2">
-          Welcome, {me?.name.split(" ")[0] || "Member"}
-          {activeSub?.plan?.name.toLowerCase().includes("premium") && (
-            <Crown className="h-6 w-6 text-yellow-500 fill-yellow-400" />
-          )}
-        </h1>
-        <p className="text-muted-foreground">Your fitness dashboard</p>
-      </div>
+  const kpiCards = [
+    { title: "Current Plan", value: plan?.name || "No Plan", badge: activeSub?.status || "Inactive", icon: CreditCard, color: "text-[#00BFFF]", highlight: true },
+    { title: "Days Remaining", value: daysLeft, icon: Clock, color: "text-amber-400" },
+    { title: "Add-ons", value: activeAddons.length, badge: `${scheduledAddons} scheduled`, icon: Box, color: "text-purple-400" },
+  ];
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <CreditCard className="h-8 w-8 text-primary" />
-              <div>
-                <p className="text-sm text-muted-foreground">Current Plan</p>
-                <p className="font-bold font-display">{plan?.name || "No Plan"}</p>
-                {activeSub && (
-                  <Badge variant="outline" className={activeSub.status === "Active" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}>
-                    {activeSub.status}
-                  </Badge>
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {kpiCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={card.title}
+              className={`flex min-h-[110px] cursor-pointer flex-col justify-between rounded-2xl border border-white/5 bg-[#111111]/50 p-5 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-white/10 ${
+                card.highlight ? "border-b-2 border-b-[#00BFFF]/40" : ""
+              }`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-xs font-medium uppercase tracking-wider text-gray-400">{card.title}</p>
+                {card.badge && (
+                  <span className="max-w-[120px] truncate rounded bg-[#39FF14]/10 px-1.5 py-0.5 font-mono text-[10px] text-[#39FF14]">{card.badge}</span>
                 )}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Clock className="h-8 w-8 text-warning" />
-              <div>
-                <p className="text-sm text-muted-foreground">Days Remaining</p>
-                <p className="text-2xl font-bold font-display">{daysLeft}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <CalendarCheck className="h-8 w-8 text-success" />
-              <div>
-                <p className="text-sm text-muted-foreground">Total Check-ins</p>
-                <p className="text-2xl font-bold font-display">{attendance.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Box className="h-8 w-8 text-violet-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">Add-ons</p>
-                <p className="text-2xl font-bold font-display">{activeAddons.length}</p>
-                <p className="text-xs text-muted-foreground">
-                  {scheduledAddons} scheduled
+              <div className="mt-4 flex items-end justify-between gap-3">
+                <p className="truncate font-mono text-2xl font-bold tracking-tight text-white" title={String(card.value)}>
+                  {card.value}
                 </p>
+                <div className={`rounded-lg bg-white/[0.02] p-2 ${card.color}`}>
+                  <Icon className="h-4 w-4" />
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          );
+        })}
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Recent Attendance</CardTitle></CardHeader>
+      <Card className="glass-card rounded-2xl border-white/5 bg-transparent text-white shadow-2xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white">
+            Recent Attendance
+            {activeSub?.plan?.name.toLowerCase().includes("premium") && <Crown className="h-4 w-4 fill-yellow-400 text-yellow-500" />}
+          </CardTitle>
+          <p className="font-mono text-xs text-gray-500">Welcome, {me?.name.split(" ")[0] || "Member"}</p>
+        </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {pagedAttendance.map((a) => (
-              <div key={a.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+              <div key={a.id} className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.03] p-3">
                 <div>
-                  <p className="font-medium">{formatDate(a.date)}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium text-white">{formatDate(a.date)}</p>
+                  <p className="text-sm text-gray-400">
                     {formatTime(a.timeIn)} – {a.timeOut ? formatTime(a.timeOut) : "In progress"}
                   </p>
                 </div>
-                <Badge variant={a.source === "Biometric" ? "default" : "secondary"}>{a.source}</Badge>
+                <Badge variant={a.source === "Biometric" ? "default" : "secondary"} className={a.source === "Biometric" ? "bg-[#00BFFF] text-black" : "bg-white/10 text-white"}>
+                  {a.source}
+                </Badge>
               </div>
             ))}
           </div>

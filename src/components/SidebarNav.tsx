@@ -8,6 +8,7 @@ import {
   Dumbbell,
   Flame,
   Landmark,
+  MessageSquareQuote,
   Settings,
   Users,
   X,
@@ -31,6 +32,7 @@ function getNavItems(role: string): NavItem[] {
       { title: "Trainers", tab: "trainers", url: "/admin?tab=trainers", icon: Dumbbell },
       { title: "Attendance", tab: "attendance", url: "/admin?tab=attendance", icon: CalendarCheck },
       { title: "Payments", tab: "payments", url: "/admin?tab=payments", icon: CreditCard },
+      { title: "Reviews", tab: "reviews", url: "/admin?tab=reviews", icon: MessageSquareQuote },
       { title: "Settings", tab: "settings", url: "/admin?tab=settings", icon: Settings },
     ],
     trainer: [
@@ -42,7 +44,8 @@ function getNavItems(role: string): NavItem[] {
       { title: "Attendance", tab: "attendance", url: "/member?tab=attendance", icon: CalendarCheck },
       { title: "Subscription", tab: "subscription", url: "/member?tab=subscription", icon: Landmark },
       { title: "Add-ons", tab: "addons", url: "/member?tab=addons", icon: Box },
-      { title: "Order History", tab: "orders", url: "/member?tab=orders", icon: CreditCard },
+      { title: "Payment History", tab: "orders", url: "/member?tab=orders", icon: CreditCard },
+      { title: "My Review", tab: "review", url: "/member?tab=review", icon: MessageSquareQuote },
     ],
     "super-admin": [
       { title: "Dashboard", tab: "overview", url: "/super-admin?tab=overview", icon: Activity },

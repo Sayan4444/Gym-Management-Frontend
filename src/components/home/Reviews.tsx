@@ -1,10 +1,10 @@
-
-
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { Gym } from '@/data/types';
+import { useFeaturedReviews } from '@/hooks/useApi';
 
-interface Review {
+interface DisplayReview {
   id: number;
   name: string;
   role: string;
@@ -13,65 +13,36 @@ interface Review {
   text: string;
 }
 
-export default function Reviews() {
+export default function Reviews({ gym }: { gym: Gym }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const reviews: Review[] = [
-    {
-      id: 0,
-      name: 'Rahul S.',
-      role: 'CrossFit Athlete',
-      avatar: 'https://picsum.photos/seed/young_bearded_indian_man/150/150',
-      rating: 5,
-      text: 'Excellent gym with modern equipment and supportive trainers. The high-performance Compound zone combined with clean, well-maintained lockers makes every session a truly luxurious and rigorous sweat out.',
-    },
-    {
-      id: 1,
-      name: 'Priya M.',
-      role: 'Yoga & Pilates Regular',
-      avatar: 'https://picsum.photos/seed/smiling_young_indian_woman/150/150',
-      rating: 5,
-      text: 'Great environment and amazing workout experience. I love how they balance top physical engineering gear with calming functional spaces. The custom nutrition matrices changed how my daily stamina tracks.',
-    },
-    {
-      id: 2,
-      name: 'Amit K.',
-      role: 'Classic Physiques Lifter',
-      avatar: 'https://picsum.photos/seed/muscular_bearded_athlete/150/150',
-      rating: 5,
-      text: 'Best fitness center in the area. Highly recommended. The master trainers actually follow up on physical form and structural adaptations rather than just letting you stand around. The elite ISO-machines are pristine.',
-    },
-    {
-      id: 3,
-      name: 'Vikram R.',
-      role: 'Powerlifter Elite',
-      avatar: 'https://picsum.photos/seed/bald_strong_trainer/150/150',
-      rating: 5,
-      text: 'I train purely compound powerlifting lifts. The plates collections here are massive, and the floor layout supports drop impacts safely without vibration. Standard of absolute steel lifters core.',
-    },
-  ];
-
-  const resetTimeout = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-  };
+  const featuredReviews = useFeaturedReviews(gym.id).data?.reviews;
+  const reviews: DisplayReview[] = featuredReviews?.map((review) => ({
+        id: review.id,
+        name: review.userName || 'Gym Member',
+        role: `Verified member of ${gym.name}`,
+        avatar: review.userPhotoUrl,
+        rating: review.rating,
+        text: review.content,
+      })) ?? [];
+  const currentReview = reviews[activeIndex];
 
   useEffect(() => {
-    resetTimeout();
-    timeoutRef.current = setTimeout(
+    if (activeIndex >= reviews.length) {
+      setActiveIndex(0);
+      return;
+    }
+    if (reviews.length <= 1) return;
+
+    const timeout = window.setTimeout(
       () =>
         setActiveIndex((prevIndex) =>
           prevIndex === reviews.length - 1 ? 0 : prevIndex + 1
         ),
-      6000 // Auto-slide every 6 seconds
+      6000
     );
 
-    return () => {
-      resetTimeout();
-    };
-  }, [activeIndex]);
+    return () => window.clearTimeout(timeout);
+  }, [activeIndex, reviews.length]);
 
   const handleNext = () => {
     setActiveIndex((prev) => (prev === reviews.length - 1 ? 0 : prev + 1));
@@ -80,6 +51,8 @@ export default function Reviews() {
   const handlePrev = () => {
     setActiveIndex((prev) => (prev === 0 ? reviews.length - 1 : prev - 1));
   };
+
+  if (!currentReview) return null;
 
   return (
     <section id="reviews" className="relative py-20 bg-neutral-900 overflow-hidden">
@@ -100,7 +73,7 @@ export default function Reviews() {
             WHAT OUR MEMBERS SAY
           </h2>
           <p className="mt-4 text-neutral-400 font-light text-sm sm:text-base">
-            Read authentic feedback from regular members and certified athletes who calls Transform 360 Gym Plus home.
+            Read authentic feedback from regular members and certified athletes who call {gym.name} home.
           </p>
         </div>
 
@@ -125,32 +98,38 @@ export default function Reviews() {
 
                 {/* Stars Rating banner */}
                 <div className="flex items-center gap-1 mb-6 text-yellow-400 select-none">
-                  {[...Array(reviews[activeIndex].rating)].map((_, starIdx) => (
+                  {[...Array(currentReview.rating)].map((_, starIdx) => (
                     <Star key={starIdx} className="w-5 h-5 fill-current" />
                   ))}
                 </div>
 
                 {/* Review Text */}
                 <blockquote className="text-lg md:text-2xl font-light text-neutral-200 leading-relaxed max-w-3xl mb-8 italic">
-                  &ldquo;{reviews[activeIndex].text}&rdquo;
+                  &ldquo;{currentReview.text}&rdquo;
                 </blockquote>
 
                 {/* Author Info */}
                 <div className="flex items-center gap-4 text-left">
                   <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-neon-green/45 shrink-0 shadow-lg shadow-neon-green/10">
-                    <img
-                      src={reviews[activeIndex].avatar}
-                      alt={reviews[activeIndex].name}
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
+                    {currentReview.avatar ? (
+                      <img
+                        src={currentReview.avatar}
+                        alt={currentReview.name}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-neutral-800 text-sm font-black text-white">
+                        {currentReview.name.slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h4 className="text-base font-black text-white uppercase tracking-wider font-display leading-none">
-                      {reviews[activeIndex].name}
+                      {currentReview.name}
                     </h4>
                     <span className="text-xs text-neutral-400 font-medium tracking-wide mt-1 block">
-                      {reviews[activeIndex].role}
+                      {currentReview.role}
                     </span>
                   </div>
                 </div>

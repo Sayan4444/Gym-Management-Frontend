@@ -1,163 +1,172 @@
 import { useState } from "react";
-import { Loader2, PackagePlus, Clock, CalendarClock, CheckCircle2, Package, History } from "lucide-react";
-import { useAddons, useMe } from "@/hooks/useApi";
-import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { CalendarClock, CheckCircle2, Clock, History, Loader2, Package, PackagePlus } from "lucide-react";
+
 import { AddAddonDialog } from "@/components/member/AddAddonDialog";
 import { ScheduleAddonDialog } from "@/components/member/ScheduleAddonDialog";
-import type { UserAddon } from "@/data/types";
+import { UserAddon } from "@/data/types";
+import { useAddons, useMe } from "@/hooks/useApi";
+import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
 
-const statusBadgeStyles: Record<string, string> = {
-  Purchased: "bg-muted text-muted-foreground border-border",
-  Scheduled: "bg-primary/10 text-primary border-primary/20",
-  "In Progress": "bg-warning/10 text-warning border-warning/20",
-  Completed: "bg-success/10 text-success border-success/20",
-};
+function statusClass(status: string) {
+  if (status === "Completed") return "border-[#39FF14]/20 bg-[#39FF14]/10 text-[#39FF14]";
+  if (status === "Scheduled" || status === "In Progress") return "border-[#00BFFF]/20 bg-[#00BFFF]/10 text-[#00BFFF]";
+  if (status === "Purchased") return "border-amber-400/20 bg-amber-400/10 text-amber-400";
+  return "border-white/10 bg-white/5 text-gray-300";
+}
+
+function AddonRow({ userAddon, onSchedule, completed = false }: { userAddon: UserAddon; onSchedule: (addon: UserAddon) => void; completed?: boolean }) {
+  const scheduledDate = userAddon.scheduledAt
+    ? new Date(userAddon.scheduledAt).toLocaleString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
+
+  return (
+    <div className={`flex flex-col gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.04] sm:flex-row sm:items-center ${completed ? "opacity-70" : ""}`}>
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#00BFFF]/10">
+        {completed ? <CheckCircle2 className="h-5 w-5 text-[#39FF14]" /> : <Clock className="h-5 w-5 text-[#00BFFF]" />}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-bold text-white">{userAddon.addon?.name ?? "Unknown Add-on"}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+          {userAddon.addon?.duration ? <span>{userAddon.addon.duration} min</span> : null}
+          <span>Purchased {formatDate(userAddon.purchasedAt)}</span>
+          {scheduledDate && (
+            <span className={`flex items-center gap-1 ${completed ? "text-gray-500" : "text-[#39FF14]"}`}>
+              <CheckCircle2 className="h-3 w-3" />
+              {scheduledDate}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2">
+        <span className={`rounded-full border px-2.5 py-1 font-mono text-[10px] font-black uppercase ${statusClass(userAddon.status)}`}>{userAddon.status}</span>
+        {!completed && (
+          <button
+            type="button"
+            onClick={() => onSchedule(userAddon)}
+            className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-black transition-colors ${
+              userAddon.status === "Purchased"
+                ? "bg-gradient-to-r from-[#00BFFF] to-[#39FF14] text-black"
+                : "border border-[#00BFFF]/20 text-[#00BFFF] hover:bg-[#00BFFF]/10"
+            }`}
+          >
+            <CalendarClock className="h-3.5 w-3.5" />
+            {userAddon.status === "Purchased" ? "Schedule" : "Reschedule"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function MemberAddons() {
-  const { data: me, isLoading } = useMe({
-    include: "gym,subscription,user_addon",
-  });
-
-  const gymAddons = useAddons(me?.gymId)?.data?.addons || [];
+  const { data: me, isLoading } = useMe({ include: "gym,subscription,user_addon" });
+  const gymAddons = useAddons(me?.gymId).data?.addons || [];
   const userAddons: UserAddon[] = me?.userAddon || [];
-
   const prefill = { name: me?.name, email: me?.email, contact: me?.phone };
-
   const { toast } = useToast();
+
   const [showAddonDialog, setShowAddonDialog] = useState(false);
   const [scheduleTarget, setScheduleTarget] = useState<UserAddon | null>(null);
 
   if (isLoading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#00BFFF]" />
       </div>
     );
   }
 
-  // Split addons by computed status
-  const activeAddons = userAddons.filter((ua) => ua.status !== "Completed");
-  const completedAddons = userAddons.filter((ua) => ua.status === "Completed");
-
-  const scheduled = activeAddons.filter((ua) => ua.status === "Scheduled" || ua.status === "In Progress");
-  const unscheduled = activeAddons.filter((ua) => ua.status === "Purchased");
+  const activeAddons = userAddons.filter((addon) => addon.status !== "Completed");
+  const completedAddons = userAddons.filter((addon) => addon.status === "Completed");
+  const scheduled = activeAddons.filter((addon) => addon.status === "Scheduled" || addon.status === "In Progress");
+  const unscheduled = activeAddons.filter((addon) => addon.status === "Purchased");
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="space-y-6" id="member-addons-panel">
+      <div className="glass-card flex flex-col justify-between gap-4 rounded-2xl border border-white/5 bg-gradient-to-tr from-[#111] to-[#00BFFF]/5 p-5 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold font-display">My Add-ons</h1>
-          <p className="text-muted-foreground">
-            View and schedule your purchased add-on sessions
-          </p>
+          <h1 className="mt-1 text-xl font-black uppercase tracking-tight text-white">My Add-ons</h1>
         </div>
-        <Button onClick={() => setShowAddonDialog(true)} className="shrink-0">
-          <PackagePlus className="mr-2 h-4 w-4" />
+        <button
+          type="button"
+          onClick={() => setShowAddonDialog(true)}
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-4 py-2.5 text-xs font-black text-black transition-opacity hover:opacity-90"
+          id="buy-addon-btn"
+        >
+          <PackagePlus className="h-4 w-4" />
           Buy New Add-on
-        </Button>
+        </button>
       </div>
 
-      {/* Stats strip */}
-      <div className="grid grid-cols-4 gap-4">
-        {[
-          { label: "Total Add-ons", value: userAddons.length, icon: Package },
-          { label: "Scheduled", value: scheduled.length, icon: CalendarClock },
-          { label: "Pending", value: unscheduled.length, icon: Clock },
-          { label: "Completed", value: completedAddons.length, icon: CheckCircle2 },
-        ].map(({ label, value, icon: Icon }) => (
-          <Card key={label} className="text-center">
-            <CardContent className="pt-6 pb-5">
-              <Icon className="mx-auto mb-2 h-5 w-5 text-primary" />
-              <p className="text-2xl font-bold">{value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Add-ons list */}
       {activeAddons.length === 0 && completedAddons.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-              <Package className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="font-semibold text-lg">No add-ons yet</p>
-              <p className="text-muted-foreground text-sm mt-1">
-                Purchase an add-on to unlock extra sessions and services.
-              </p>
-            </div>
-            <Button onClick={() => setShowAddonDialog(true)}>
-              <PackagePlus className="mr-2 h-4 w-4" />
-              Buy Add-on
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="glass-card flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-[#0a0a0a] px-6 py-16 text-center shadow-2xl">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#00BFFF]/20 bg-[#00BFFF]/10">
+            <Package className="h-8 w-8 text-[#00BFFF]" />
+          </div>
+          <p className="text-lg font-black text-white">No add-ons yet</p>
+          <p className="mt-1 text-sm text-gray-500">Purchase an add-on to unlock extra sessions and services.</p>
+          <button
+            type="button"
+            onClick={() => setShowAddonDialog(true)}
+            className="mt-5 flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-4 py-2.5 text-xs font-black text-black"
+          >
+            <PackagePlus className="h-4 w-4" />
+            Buy Add-on
+          </button>
+        </div>
       ) : (
         <div className="space-y-4">
-          {/* Scheduled section */}
           {scheduled.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <CalendarClock className="h-4 w-4 text-primary" />
+            <section className="glass-card rounded-2xl border border-white/5 bg-[#0a0a0a] p-5 shadow-2xl">
+              <div className="mb-4 border-b border-white/5 pb-3">
+                <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-tight text-white">
+                  <CalendarClock className="h-4 w-4 text-[#00BFFF]" />
                   Scheduled Sessions
-                </CardTitle>
-                <CardDescription>These sessions have a confirmed date &amp; time</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {scheduled.map((ua) => (
-                  <AddonRow key={ua.id} ua={ua} onSchedule={setScheduleTarget} />
-                ))}
-              </CardContent>
-            </Card>
+                  <span className="rounded-full border border-[#00BFFF]/20 bg-[#00BFFF]/10 px-2 py-0.5 font-mono text-[10px] text-[#00BFFF]">{scheduled.length}</span>
+                </h2>
+                <p className="mt-1 text-xs text-gray-500">These sessions have a confirmed date and time</p>
+              </div>
+              <div className="space-y-2">{scheduled.map((addon) => <AddonRow key={addon.id} userAddon={addon} onSchedule={setScheduleTarget} />)}</div>
+            </section>
           )}
 
-          {/* Unscheduled section */}
           {unscheduled.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-warning" />
+            <section className="glass-card rounded-2xl border border-white/5 bg-[#0a0a0a] p-5 shadow-2xl">
+              <div className="mb-4 border-b border-white/5 pb-3">
+                <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-tight text-white">
+                  <Clock className="h-4 w-4 text-amber-400" />
                   Awaiting Scheduling
-                </CardTitle>
-                <CardDescription>Pick a date and time for these sessions</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {unscheduled.map((ua) => (
-                  <AddonRow key={ua.id} ua={ua} onSchedule={setScheduleTarget} />
-                ))}
-              </CardContent>
-            </Card>
+                  <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-0.5 font-mono text-[10px] text-amber-400">{unscheduled.length}</span>
+                </h2>
+              </div>
+              <div className="space-y-2">{unscheduled.map((addon) => <AddonRow key={addon.id} userAddon={addon} onSchedule={setScheduleTarget} />)}</div>
+            </section>
           )}
 
-          {/* Completed section */}
           {completedAddons.length > 0 && (
-            <Card className="opacity-75">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <History className="h-4 w-4 text-muted-foreground" />
+            <section className="glass-card rounded-2xl border border-white/5 bg-[#0a0a0a] p-5 shadow-2xl">
+              <div className="mb-4 border-b border-white/5 pb-3">
+                <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-tight text-white">
+                  <History className="h-4 w-4 text-gray-500" />
                   Completed Sessions
-                </CardTitle>
-                <CardDescription>Past sessions that have already ended</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {completedAddons.map((ua) => (
-                  <AddonRow key={ua.id} ua={ua} onSchedule={setScheduleTarget} completed />
-                ))}
-              </CardContent>
-            </Card>
+                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[10px] text-gray-300">{completedAddons.length}</span>
+                </h2>
+              </div>
+              <div className="space-y-2">{completedAddons.map((addon) => <AddonRow key={addon.id} userAddon={addon} onSchedule={setScheduleTarget} completed />)}</div>
+            </section>
           )}
         </div>
       )}
 
-      {/* Dialogs */}
       <AddAddonDialog
         open={showAddonDialog}
         onOpenChange={setShowAddonDialog}
@@ -165,18 +174,11 @@ export default function MemberAddons() {
         prefill={prefill}
         onSuccess={() => {
           setShowAddonDialog(false);
-          toast({
-            title: "Payment successful!",
-            description: "Your add-on has been activated.",
-          });
+          toast({ title: "Payment successful!", description: "Your add-on has been activated." });
         }}
         onError={() => {
           setShowAddonDialog(false);
-          toast({
-            title: "Payment failed",
-            description: "Your payment could not be processed. Please try again.",
-            variant: "destructive",
-          });
+          toast({ title: "Payment failed", description: "Your payment could not be processed. Please try again.", variant: "destructive" });
         }}
       />
 
@@ -187,80 +189,6 @@ export default function MemberAddons() {
           if (!open) setScheduleTarget(null);
         }}
       />
-    </div>
-  );
-}
-
-/* ─── Row component ─────────────────────────────────────────────────────────── */
-
-function AddonRow({
-  ua,
-  onSchedule,
-  completed = false,
-}: {
-  ua: UserAddon;
-  onSchedule: (ua: UserAddon) => void;
-  completed?: boolean;
-}) {
-  const scheduledDate = ua.scheduledAt
-    ? new Date(ua.scheduledAt).toLocaleString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : null;
-
-  const badgeStyle = statusBadgeStyles[ua.status] || "";
-
-  return (
-    <div className={`flex items-center gap-3 rounded-lg border bg-card px-4 py-3 transition-colors hover:bg-muted/40 ${completed ? "opacity-60" : ""}`}>
-      {/* Icon */}
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-        {completed ? (
-          <CheckCircle2 className="h-4 w-4 text-success" />
-        ) : (
-          <Clock className="h-4 w-4 text-primary" />
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="min-w-0 flex-1">
-        <p className="font-medium truncate">{ua.addon?.name ?? "Unknown Add-on"}</p>
-        <div className="flex flex-wrap items-center gap-2 mt-0.5">
-          {ua.addon?.duration ? (
-            <span className="text-xs text-muted-foreground">{ua.addon.duration} min</span>
-          ) : null}
-          <span className="text-xs text-muted-foreground">
-            Purchased {formatDate(ua.purchasedAt)}
-          </span>
-          {scheduledDate && (
-            <span className={`flex items-center gap-1 text-xs ${completed ? "text-muted-foreground" : "text-success"}`}>
-              <CheckCircle2 className="h-3 w-3" />
-              {scheduledDate}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Badge + action */}
-      <div className="flex items-center gap-2 shrink-0">
-        <Badge variant="outline" className={`${badgeStyle} text-xs`}>
-          {ua.status}
-        </Badge>
-        {!completed && (
-          <Button
-            size="sm"
-            variant={ua.status === "Purchased" ? "default" : "outline"}
-            className="gap-1.5"
-            onClick={() => onSchedule(ua)}
-          >
-            <CalendarClock className="h-3.5 w-3.5" />
-            {ua.status === "Purchased" ? "Schedule" : "Reschedule"}
-          </Button>
-        )}
-      </div>
     </div>
   );
 }

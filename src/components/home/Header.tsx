@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Dumbbell, Calendar, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Gym } from '@/data/types';
+import { useFeaturedReviews } from '@/hooks/useApi';
 
 interface NavLink {
   label: string;
@@ -13,18 +14,19 @@ export default function Header({ gym }: { gym: Gym }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const hasReviews = (useFeaturedReviews(gym.id).data?.count ?? 0) > 0;
 
-  const navLinks: NavLink[] = [
-    { label: 'Home', href: '#home' },
-    { label: 'About Us', href: '#about' },
-    { label: 'Services', href: '#services' },
-    { label: 'Gallery', href: '#gallery' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'Results', href: '#transformations' },
-    { label: 'Reviews', href: '#reviews' },
-    { label: 'Location', href: '#location' },
-    { label: 'Contact', href: '#contact' },
-  ];
+  const navLinks: NavLink[] = useMemo(() => [
+      { label: 'Home', href: '#home' },
+      { label: 'About Us', href: '#about' },
+      { label: 'Services', href: '#services' },
+      { label: 'Gallery', href: '#gallery' },
+      { label: 'Pricing', href: '#pricing' },
+      { label: 'Results', href: '#transformations' },
+      ...(hasReviews ? [{ label: 'Reviews', href: '#reviews' }] : []),
+      { label: 'Location', href: '#location' },
+      { label: 'Contact', href: '#contact' },
+    ], [hasReviews]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,7 +55,7 @@ export default function Header({ gym }: { gym: Gym }) {
     window.addEventListener('scroll', handleScroll);
     handleScroll(); // Run immediately to set initial active section
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [navLinks]);
 
   const handleLinkClick = (href: string) => {
     setIsOpen(false);

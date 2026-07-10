@@ -6,7 +6,6 @@ import AboutUs from "@/components/home/AboutUs";
 import Services from "@/components/home/Services";
 import Gallery from "@/components/home/Gallery";
 import Pricing from "@/components/home/Pricing";
-import Transformation from "@/components/home/Transformation";
 import Reviews from "@/components/home/Reviews";
 import MapSection from "@/components/home/MapSection";
 import ContactSection from "@/components/home/ContactSection";
@@ -51,8 +50,6 @@ export default function GymHomePage({ domain }: { domain: string }) {
         {/* Glassmorphic Membership Pricing Section */}
         <Pricing gymId={gym.id} />
 
-        {/* Before / After Success Stories Section */}
-        <Transformation gym={gym} />
 
         {/* Testimonial Auto Slider Section */}
         <Reviews gym={gym} />
