@@ -35,12 +35,12 @@ export default function AboutUs({ gym }: { gym: Gym }) {
       {/* Background radial highlight */}
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-neon-green/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-12 gap-12 items-center">
+      <div className="relative z-10 mx-auto w-full min-w-0 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid min-w-0 grid-cols-1 items-center gap-12 lg:grid-cols-12">
 
           {/* Left Column: Premium Interactive Images & Stats */}
-          <div className="col-span-12 lg:col-span-6 order-2 lg:order-1">
-            <div className="grid grid-cols-2 gap-4 relative">
+          <div className="order-2 min-w-0 lg:order-1 lg:col-span-6">
+            <div className="relative grid min-w-0 grid-cols-2 gap-3 sm:gap-4">
 
               {/* Image 1: Main action shot */}
               <div className="relative rounded-2xl overflow-hidden aspect-[3/4] col-span-1 group shadow-2xl border border-white/5">
@@ -73,30 +73,28 @@ export default function AboutUs({ gym }: { gym: Gym }) {
               </div>
 
               {/* Stat badging below images */}
-              <div className="col-span-2 mt-4 sm:mt-8 w-full bg-neutral-900/50 rounded-xl p-5 border border-white/10 shadow-2xl flex items-center justify-around text-center backdrop-blur-xl">
-                <div className="flex flex-col">
+              <div className="col-span-2 mt-4 grid w-full min-w-0 grid-cols-3 gap-2 rounded-xl border border-white/10 bg-neutral-900/50 p-4 text-center shadow-2xl backdrop-blur-xl sm:mt-8 sm:p-5">
+                <div className="flex min-w-0 flex-col">
                   <span className="text-xl sm:text-2xl font-black text-neon-green font-display leading-none">
                     <Counter end={100} suffix="%" />
                   </span>
-                  <span className="text-[10px] font-bold tracking-widest text-neutral-400 uppercase mt-1">
+                  <span className="mt-1 break-words text-[9px] font-bold uppercase tracking-wide text-neutral-400 sm:text-[10px] sm:tracking-widest">
                     Premium Quality
                   </span>
                 </div>
-                <div className="w-[1px] h-8 bg-white/10" />
-                <div className="flex flex-col">
+                <div className="flex min-w-0 flex-col border-x border-white/10 px-1">
                   <span className="text-xl sm:text-2xl font-black text-white font-display leading-none">
                     <Counter end={24} suffix="/7" />
                   </span>
-                  <span className="text-[10px] font-bold tracking-widest text-neutral-400 uppercase mt-1">
+                  <span className="mt-1 break-words text-[9px] font-bold uppercase tracking-wide text-neutral-400 sm:text-[10px] sm:tracking-widest">
                     Club Support
                   </span>
                 </div>
-                <div className="w-[1px] h-8 bg-white/10" />
-                <div className="flex flex-col">
+                <div className="flex min-w-0 flex-col">
                   <span className="text-xl sm:text-2xl font-black text-electric-blue font-display leading-none">
                     <Counter end={360} suffix="°" />
                   </span>
-                  <span className="text-[10px] font-bold tracking-widest text-neutral-400 uppercase mt-1">
+                  <span className="mt-1 break-words text-[9px] font-bold uppercase tracking-wide text-neutral-400 sm:text-[10px] sm:tracking-widest">
                     Care Matrix
                   </span>
                 </div>
@@ -105,7 +103,7 @@ export default function AboutUs({ gym }: { gym: Gym }) {
           </div>
 
           {/* Right Column: Descriptions & Statements */}
-          <div className="col-span-12 lg:col-span-6 order-1 lg:order-2 flex flex-col justify-center">
+          <div className="order-1 flex min-w-0 flex-col justify-center lg:order-2 lg:col-span-6">
             {/* Super header */}
             <div className="flex items-center gap-2 mb-3">
               <span className="w-1.5 h-6 bg-neon-green rounded-full" />

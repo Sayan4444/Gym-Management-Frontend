@@ -130,10 +130,10 @@ export default function ContactSection({ gym }: ContactSectionProps) {
         </div>
 
         {/* Form Grid */}
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-stretch max-w-6xl mx-auto">
+        <div className="mx-auto grid min-w-0 max-w-6xl grid-cols-1 items-stretch gap-8 lg:grid-cols-12 lg:gap-12">
           
           {/* Left Column: Direct WhatsApp / Call Buttons and consult perks */}
-          <div className="col-span-12 lg:col-span-5 flex flex-col justify-between">
+          <div className="flex min-w-0 flex-col justify-between lg:col-span-5">
             <div className="rounded-3xl p-6 md:p-8 bg-neutral-950 border border-white/5 h-full flex flex-col justify-between">
               
               <div>
@@ -205,7 +205,7 @@ export default function ContactSection({ gym }: ContactSectionProps) {
           </div>
 
           {/* Right Column: Premium Form */}
-          <div className="col-span-12 lg:col-span-7">
+          <div className="min-w-0 lg:col-span-7">
             <div className="rounded-3xl p-6 md:p-8 bg-neutral-950 border border-white/5 relative">
               
               <h3 className="text-lg md:text-xl font-bold text-white uppercase tracking-wider font-display border-b border-white/5 pb-4 mb-6">

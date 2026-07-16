@@ -47,10 +47,10 @@ export default function Hero({ gym }: { gym: Gym }) {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] z-1" />
 
       {/* Content Area */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center lg:text-left">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+      <div className="relative z-10 mx-auto w-full min-w-0 max-w-7xl px-4 py-16 text-center sm:px-6 md:py-24 lg:px-8 lg:text-left">
+        <div className="grid min-w-0 grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
 
-          <div className="col-span-12 lg:col-span-7 flex flex-col justify-center">
+          <div className="flex min-w-0 flex-col justify-center lg:col-span-7">
             {/* Tagline Badge */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
@@ -67,7 +67,7 @@ export default function Hero({ gym }: { gym: Gym }) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-extrabold uppercase tracking-tight text-white font-display leading-[1.05]"
+              className="break-words text-3xl font-extrabold uppercase leading-[1.05] tracking-tight text-white font-display min-[360px]:text-4xl sm:text-5xl md:text-6xl xl:text-7xl"
             >
               {gym.name}<br />
               <span className="bg-gradient-to-r from-neon-green via-electric-blue to-white bg-clip-text text-transparent">
@@ -129,7 +129,7 @@ export default function Hero({ gym }: { gym: Gym }) {
             </motion.div>
           </div>
 
-          <div className="col-span-12 lg:col-span-5 relative mt-6 lg:mt-0 flex justify-center">
+          <div className="relative mt-6 flex min-w-0 justify-center lg:col-span-5 lg:mt-0">
             {/* Decorative Ambient Plate behind */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-electric-blue/20 blur-[80px]" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-neon-green/20 blur-[80px]" />
@@ -139,7 +139,7 @@ export default function Hero({ gym }: { gym: Gym }) {
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.25 }}
-              className="relative w-full max-w-sm glass-card rounded-2xl p-6 border border-white/10 shadow-2xl overflow-hidden group"
+              className="glass-card group relative w-full min-w-0 max-w-sm overflow-hidden rounded-2xl border border-white/10 p-5 shadow-2xl sm:p-6"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-neon-green/10 rounded-bl-full blur-xl" />
 

@@ -16,10 +16,10 @@ export function UserDetailsDialog({ user, open, onOpenChange }: UserDetailsDialo
           <DialogTitle>User Details</DialogTitle>
         </DialogHeader>
         {user && (
-          <div className="space-y-3 max-h-[70vh] overflow-y-auto pt-4 text-sm">
-            <div className="grid grid-cols-3 border-b pb-2">
+          <div className="max-h-[70vh] space-y-3 overflow-y-auto pt-4 text-sm [&>div]:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] [&>div>span]:min-w-0 [&>div>span]:break-words">
+            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,2fr)] border-b pb-2">
               <span className="text-muted-foreground text-right mr-4">Name:</span> 
-              <span className="col-span-2 font-medium">{user.name}</span>
+              <span className="min-w-0 break-words font-medium">{user.name}</span>
             </div>
             <div className="grid grid-cols-3 border-b pb-2">
               <span className="text-muted-foreground text-right mr-4">Email:</span> 

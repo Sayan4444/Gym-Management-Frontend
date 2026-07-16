@@ -130,22 +130,22 @@ export default function DashboardLayout({ role }: { role: string }) {
 
       <div className="min-h-screen md:pl-60">
         {/* Sticky topbar shared by admin, trainer, member, and super-admin dashboards. */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/5 bg-[#0A0A0A] px-5 text-white md:px-8">
+        <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center justify-between gap-2 border-b border-white/5 bg-[#0A0A0A] px-3 text-white min-[360px]:px-4 md:px-8">
           {/* Page status and backend-backed greeting. */}
-          <div className="ml-12 flex flex-col md:ml-0">
+          <div className="ml-11 flex min-w-0 flex-col min-[360px]:ml-12 md:ml-0">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs uppercase tracking-widest text-gray-500">{dashboardTitle}</span>
+              <span className="truncate font-mono text-[10px] uppercase tracking-wider text-gray-500 sm:text-xs sm:tracking-widest">{dashboardTitle}</span>
               <span className="inline-flex items-center rounded-full border border-[#39FF14]/10 bg-[#39FF14]/10 px-1.5 py-0.5 text-[9px] font-medium text-[#39FF14]">
                 <Sparkles className="mr-1 h-2.5 w-2.5" />
                 LIVE
               </span>
             </div>
-            <h2 className="-mt-0.5 text-sm font-bold uppercase tracking-tight text-white">
+            <h2 className="-mt-0.5 truncate text-xs font-bold uppercase tracking-tight text-white sm:text-sm">
               Good Morning, {currentUser?.name?.split(" ")[0] || roleLabels[role]}
             </h2>
           </div>
 
-          <div className="flex items-center gap-3 md:gap-4">
+          <div className="flex shrink-0 items-center gap-1.5 min-[360px]:gap-2 md:gap-4">
             {/* TODO: Wire this visual search input to global record search/filtering. */}
             <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
@@ -161,7 +161,7 @@ export default function DashboardLayout({ role }: { role: string }) {
               <button
                 type="button"
                 onClick={() => setQuickActionsOpen((open) => !open)}
-                className="flex h-8 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[#00BFFF] to-[#39FF14] text-black transition-all hover:shadow-[0_0_15px_rgba(0,191,255,0.4)]"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#00BFFF] to-[#39FF14] text-black transition-all hover:shadow-[0_0_15px_rgba(0,191,255,0.4)]"
                 aria-label="Quick action"
               >
                 <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
@@ -239,7 +239,7 @@ export default function DashboardLayout({ role }: { role: string }) {
         </header>
 
         {/* Routed dashboard page content renders here. */}
-        <main className="min-h-[calc(100vh-4rem)] bg-[#050505] p-5 md:p-8">
+        <main className="min-h-[calc(100vh-4rem)] min-w-0 overflow-x-hidden bg-[#050505] p-3 min-[360px]:p-4 sm:p-5 md:p-8">
           <Outlet />
         </main>
       </div>

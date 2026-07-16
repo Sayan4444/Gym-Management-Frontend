@@ -47,18 +47,18 @@ export default function LandingPage() {
       {/* Header */}
       <header className="border-b border-border/20 bg-background/90 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex min-w-0 items-center gap-2">
             <Dumbbell className="h-7 w-7 text-brand" />
-            <span className="font-display text-xl font-bold">{data.header.brandName}</span>
+            <span className="hidden truncate font-display text-xl font-bold min-[360px]:block">{data.header.brandName}</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
             <a href="/#benefits" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Benefits</a>
             <a href="#faq" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">FAQ</a>
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <ThemeToggle />
-            <Button onClick={() => navigate("/bookslot")} className="bg-brand text-brand-foreground hover:bg-brand/90">Book A Demo</Button>
+            <Button onClick={() => navigate("/bookslot")} className="bg-brand px-3 text-xs text-brand-foreground hover:bg-brand/90 sm:px-4 sm:text-sm">Book A Demo</Button>
           </div>
         </div>
       </header>

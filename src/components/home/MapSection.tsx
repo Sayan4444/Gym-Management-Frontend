@@ -35,10 +35,10 @@ export default function MapSection({ gym }: { gym: Gym }) {
         </div>
 
         {/* Map Grid */}
-        <div className="grid lg:grid-cols-12 gap-8 items-stretch max-w-6xl mx-auto">
+        <div className="mx-auto grid min-w-0 max-w-6xl grid-cols-1 items-stretch gap-8 lg:grid-cols-12">
 
           {/* Left: Beautiful Embedded IFrame Map */}
-          <div className="col-span-12 lg:col-span-7 rounded-3xl overflow-hidden min-h-[350px] lg:min-h-[480px] border border-white/10 shadow-2xl relative group">
+          <div className="group relative min-h-[350px] min-w-0 overflow-hidden rounded-3xl border border-white/10 shadow-2xl lg:col-span-7 lg:min-h-[480px]">
             {/* Standard embedded Google Map pointer pointing to a high premium sports block */}
             <iframe
               src={mapEmbedUrl}
@@ -67,7 +67,7 @@ export default function MapSection({ gym }: { gym: Gym }) {
           </div>
 
           {/* Right: Rich visual Contact detail and operational matrix cards */}
-          <div className="col-span-12 lg:col-span-5 flex flex-col justify-between gap-6">
+          <div className="flex min-w-0 flex-col justify-between gap-6 lg:col-span-5">
 
             {/* Contact details container */}
             <div className="rounded-3xl p-6 md:p-8 bg-neutral-900/60 border border-white/5 flex-1 select-none flex flex-col justify-between">

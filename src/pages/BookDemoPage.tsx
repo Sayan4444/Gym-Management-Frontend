@@ -50,13 +50,13 @@ export default function BookDemoPage() {
       {/* Header */}
       <header className="border-b border-border/20 bg-background/90 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex min-w-0 items-center gap-2">
             <Dumbbell className="h-7 w-7 text-brand" />
-            <span className="font-display text-xl font-bold">Transform 360 GYM Plus</span>
+            <span className="hidden truncate font-display text-lg font-bold min-[390px]:block sm:text-xl">Transform 360 GYM Plus</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <ThemeToggle />
-            <Button variant="ghost" onClick={() => navigate("/")} className="gap-2">
+            <Button variant="ghost" onClick={() => navigate("/")} className="gap-1 px-2 sm:gap-2 sm:px-4">
               <ArrowLeft className="h-4 w-4" /> Back
             </Button>
           </div>
