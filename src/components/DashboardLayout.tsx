@@ -82,7 +82,7 @@ export default function DashboardLayout({ role }: { role: string }) {
   const handleQuickAction = (actionType: string) => {
     const adminActions: Record<string, string> = {
       "add-member": "/admin?tab=members",
-      "create-invoice": "/admin?tab=payments",
+      "create-invoice": "/admin?tab=billing",
       "log-attendance": "/admin?tab=attendance&action=manual-checkin",
       "add-trainer": "/admin?tab=trainers",
     };

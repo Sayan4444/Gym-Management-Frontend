@@ -130,6 +130,7 @@ export interface Payment {
   invoice?: string;
   planName?: string;
   itemName?: string;
+  paymentMethod?: string;
 }
 
 export interface Attendance {

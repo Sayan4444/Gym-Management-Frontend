@@ -11,8 +11,9 @@ import PaymentsPage from "./PaymentsPage";
 import TrainersPage from "./TrainersPage";
 import SettingsPage from "./SettingsPage";
 import ReviewsPage from "./ReviewsPage";
+import PrintableBillingPage from "./PrintableBillingPage";
 
-const validAdminTabs = new Set(["dashboard", "members", "member", "attendance", "plans", "payments", "trainers", "reviews", "settings"]);
+const validAdminTabs = new Set(["dashboard", "members", "member", "attendance", "plans", "payments", "billing", "trainers", "reviews", "settings"]);
 
 export default function AdminPanel() {
   const [searchParams] = useSearchParams();
@@ -41,6 +42,9 @@ export default function AdminPanel() {
       break;
     case "payments":
       content = <PaymentsPage />;
+      break;
+    case "billing":
+      content = <PrintableBillingPage />;
       break;
     case "trainers":
       content = <TrainersPage />;

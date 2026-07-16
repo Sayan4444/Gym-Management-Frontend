@@ -33,6 +33,31 @@ export function useCreateOrder() {
   });
 }
 
+export interface IManualPaymentPayload {
+  userId: number;
+  amount: number;
+  planId?: number;
+  paymentMethod: "UPI" | "Cash" | "Card" | "Net Banking";
+}
+
+export interface IManualPaymentResponse {
+  message: string;
+  invoice: string;
+  payment: Payment;
+}
+
+export function useCreateManualPayment() {
+  const queryClient = useQueryClient();
+  return useMutation<IManualPaymentResponse, Error, IManualPaymentPayload>({
+    mutationFn: (data) => api.createManualPayment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["adminDashboardStats"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+    },
+  });
+}
+
 export interface IVerifyPaymentPayload {
   razorpayOrderId: string;
   razorpayPaymentId: string;
