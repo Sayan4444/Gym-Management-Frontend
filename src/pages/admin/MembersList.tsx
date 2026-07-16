@@ -1,13 +1,15 @@
 import { FormEvent, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { CheckSquare, ChevronLeft, ChevronRight, Crown, Download, Edit2, Plus, Search, Sparkles, Trash2, Users, X } from "lucide-react";
+import { CheckSquare, ChevronLeft, ChevronRight, CreditCard, Crown, Download, Edit2, Plus, Search, Sparkles, Trash2, Users, X } from "lucide-react";
 
+import { MemberAccessDialog } from "@/components/admin/MemberAccessDialog";
 import { ReusableDataTable, ReusableDataTableColumn } from "@/components/admin/ReusableDataTable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MembershipPlan, Subscription, User } from "@/data/types";
-import { CreateUserPayload, UpdateProfilePayload, useCreateUser, useDeleteProfile, useUpdateProfile, useUsers } from "@/hooks/useApi";
+import { CreateUserPayload, UpdateProfilePayload, useCreateUser, useDeleteProfile, useMembershipPlans, useUpdateProfile, useUsers } from "@/hooks/useApi";
+import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
 
 const statusOptions = ["All", "Active", "Expired", "Paused", "Upcoming", "Cancelled", "No Plan"] as const;
@@ -133,11 +135,13 @@ function MemberProfileDialog({
   open,
   onOpenChange,
   onEdit,
+  onManageAccess,
 }: {
   user: User | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit: (user: User) => void;
+  onManageAccess: (user: User) => void;
 }) {
   const subscription = user ? getPrimarySubscription(user) : undefined;
   const plan = subscription?.plan;
@@ -172,14 +176,24 @@ function MemberProfileDialog({
                   <p className="mt-1 font-mono text-xs text-gray-500">{user.phone || "No phone number"}</p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => onEdit(user)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-4 py-2.5 text-xs font-black text-black shadow-[0_0_18px_rgba(0,191,255,0.2)]"
-                >
-                  <Edit2 className="h-3.5 w-3.5" />
-                  Edit Details
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onManageAccess(user)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-4 py-2.5 text-xs font-black text-black shadow-[0_0_18px_rgba(0,191,255,0.2)]"
+                  >
+                    <CreditCard className="h-3.5 w-3.5" />
+                    Manage Access
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onEdit(user)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-xs font-black text-gray-200"
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
+                    Edit Details
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -377,10 +391,13 @@ function MemberFormFields({ form, setForm }: { form: MemberFormState; setForm: (
 
 export default function MembersList() {
   const membersQuery = useUsers({ role: "Member", include: "subscription,workout_plan" });
+  const plansQuery = useMembershipPlans();
   const members = useMemo(() => membersQuery.data?.users ?? [], [membersQuery.data?.users]);
+  const plans = useMemo(() => plansQuery.data?.memberships ?? [], [plansQuery.data?.memberships]);
   const createUser = useCreateUser();
   const updateProfile = useUpdateProfile();
   const deleteProfile = useDeleteProfile();
+  const { toast } = useToast();
 
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<(typeof statusOptions)[number]>("All");
@@ -391,7 +408,11 @@ export default function MembersList() {
   const [addForm, setAddForm] = useState<MemberFormState>(emptyForm);
   const [editingMember, setEditingMember] = useState<User | null>(null);
   const [editForm, setEditForm] = useState<MemberFormState>(emptyForm);
+  const [editingRole, setEditingRole] = useState<"Member" | "Trainer">("Member");
+  const [managingMemberId, setManagingMemberId] = useState<number | null>(null);
   const [pendingDeleteMember, setPendingDeleteMember] = useState<User | null>(null);
+
+  const managingMember = managingMemberId === null ? null : members.find((member) => member.id === managingMemberId) || null;
 
   const itemsPerPage = 6;
 
@@ -449,6 +470,7 @@ export default function MembersList() {
   const openEditModal = (member: User) => {
     setEditingMember(member);
     setEditForm(memberToForm(member));
+    setEditingRole(member.role === "Trainer" ? "Trainer" : "Member");
   };
 
   const handleAddSubmit = (event: FormEvent) => {
@@ -470,12 +492,17 @@ export default function MembersList() {
     if (!editingMember) return;
 
     updateProfile.mutate(
-      { id: editingMember.id, data: formToPayload(editForm) as UpdateProfilePayload },
+      { id: editingMember.id, data: { ...formToPayload(editForm), role: editingRole } as UpdateProfilePayload },
       {
         onSuccess: () => {
+          toast({
+            title: editingRole === "Trainer" ? "Member promoted to Trainer" : "Member profile updated",
+            description: editingRole !== editingMember.role ? "The biometric device role has been synchronized." : undefined,
+          });
           setEditingMember(null);
           setEditForm(emptyForm);
         },
+        onError: (error) => toast({ title: "Unable to update member", description: error.message, variant: "destructive" }),
       },
     );
   };
@@ -623,6 +650,14 @@ export default function MembersList() {
           </button>
           <button
             type="button"
+            onClick={() => setManagingMemberId(member.id)}
+            className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 text-gray-400 transition-all hover:bg-[#00BFFF]/10 hover:text-[#00BFFF]"
+            title="Manage Membership & Access"
+          >
+            <CreditCard className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
             onClick={() => setPendingDeleteMember(member)}
             disabled={deleteProfile.isPending}
             className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 text-gray-400 transition-all hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
@@ -733,6 +768,17 @@ export default function MembersList() {
           setSelectedUser(null);
           openEditModal(user);
         }}
+        onManageAccess={(user) => {
+          setSelectedUser(null);
+          setManagingMemberId(user.id);
+        }}
+      />
+
+      <MemberAccessDialog
+        member={managingMember}
+        plans={plans}
+        open={managingMemberId !== null}
+        onOpenChange={(open) => !open && setManagingMemberId(null)}
       />
 
       <Dialog open={!!selectedPlan} onOpenChange={(open) => !open && setSelectedPlan(null)}>
@@ -836,6 +882,23 @@ export default function MembersList() {
 
               <form onSubmit={handleUpdateSubmit}>
                 <MemberFormFields form={editForm} setForm={setEditForm} />
+                <div className="mt-4 rounded-xl border border-[#00BFFF]/15 bg-[#00BFFF]/[0.04] p-4">
+                  <label className="text-xs font-black uppercase tracking-wider text-[#00BFFF]" htmlFor="member-role-selector">
+                    Access role
+                  </label>
+                  <select
+                    id="member-role-selector"
+                    value={editingRole}
+                    onChange={(event) => setEditingRole(event.target.value as "Member" | "Trainer")}
+                    className="mt-2 w-full rounded-lg border border-white/10 bg-[#111] p-2.5 text-xs text-white focus:border-[#00BFFF] focus:outline-none"
+                  >
+                    <option value="Member" className="bg-neutral-900">Member</option>
+                    <option value="Trainer" className="bg-neutral-900">Trainer</option>
+                  </select>
+                  <p className="mt-2 text-[11px] leading-relaxed text-gray-500">
+                    Changing the role synchronizes biometric access immediately. Trainers receive permanent access; Members require an active subscription.
+                  </p>
+                </div>
                 <div className="mt-4 flex justify-end gap-3 border-t border-white/5 pt-4">
                   <button type="button" onClick={() => setEditingMember(null)} className="rounded-xl border border-white/10 bg-white/[0.02]/50 px-5 py-2.5 text-gray-400 hover:text-white">
                     Cancel

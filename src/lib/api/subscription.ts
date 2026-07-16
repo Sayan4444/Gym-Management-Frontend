@@ -1,9 +1,9 @@
-import { Subscription } from '../../data/types';
+import type { AssignSubscriptionPayload, UpdateSubscriptionPayload } from '../../hooks/apis/useSubscription';
 import { fetchApi } from './core';
 
 export const subscriptionApi = {
   // ----- Subscription Routes -----
-  assignSubscription: (data: Subscription) => fetchApi("/subscriptions", { method: "POST", body: JSON.stringify(data) }),
+  assignSubscription: (data: AssignSubscriptionPayload) => fetchApi("/subscriptions", { method: "POST", body: JSON.stringify(data) }),
   getSubscriptions: (gymId?: number, userId?: number) => {
     const params = new URLSearchParams();
     if (gymId) params.append("gym_id", gymId.toString());
@@ -11,6 +11,6 @@ export const subscriptionApi = {
     const search = params.toString() ? `?${params.toString()}` : "";
     return fetchApi(`/subscriptions${search}`);
   },
-  updateSubscription: (id: number , data: Subscription) => fetchApi(`/subscriptions/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  updateSubscription: (id: number, data: UpdateSubscriptionPayload) => fetchApi(`/subscriptions/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteSubscription: (id: number ) => fetchApi(`/subscriptions/${id}`, { method: "DELETE" }),
 };
