@@ -157,7 +157,7 @@ export default function DashboardLayout({ role }: { role: string }) {
             </div>
 
             {/* Quick action menu. Actions route to the existing role screens. */}
-            <div className="relative">
+            {role !== "member" && <div className="relative">
               <button
                 type="button"
                 onClick={() => setQuickActionsOpen((open) => !open)}
@@ -189,7 +189,7 @@ export default function DashboardLayout({ role }: { role: string }) {
                   </div>
                 </>
               )}
-            </div>
+            </div>}
 
             {/* TODO: Connect unread count and tray actions to a backend notifications API. */}
             <button

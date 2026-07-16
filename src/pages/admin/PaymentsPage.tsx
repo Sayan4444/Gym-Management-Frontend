@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { Eye, Printer, Search, Sparkles, X } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 
+import { PaymentReceiptDialog } from "@/components/PaymentReceiptDialog";
 import { Payment } from "@/data/types";
 import { useMe, usePayments } from "@/hooks/useApi";
 import { formatDate } from "@/lib/utils";
@@ -28,7 +28,8 @@ export default function PaymentsPage() {
   const [selectedInvoice, setSelectedInvoice] = useState<Payment | null>(null);
 
   const { data: me } = useMe();
-  const payments = usePayments().data?.payments || [];
+  const paymentsData = usePayments().data?.payments;
+  const payments = useMemo(() => paymentsData || [], [paymentsData]);
 
   const filteredPayments = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -139,103 +140,13 @@ export default function PaymentsPage() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {selectedInvoice && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-[#00BFFF]/35 bg-[#090909] p-6 shadow-2xl"
-              id="invoice-receipt-wrapper"
-            >
-              <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
-                <div className="flex items-center gap-1.5 font-mono text-xs font-black uppercase tracking-widest text-[#00BFFF]">
-                  <Sparkles className="h-4 w-4" />
-                  <span>TRANSFORM 360 PAY</span>
-                </div>
-                <button type="button" onClick={() => setSelectedInvoice(null)} className="rounded bg-white/5 p-1 text-gray-400 transition-colors hover:text-white">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="space-y-4 font-mono text-xs" id="print-area">
-                <div className="text-center font-sans">
-                  <h4 className="text-md font-extrabold text-white">{me?.gym?.name || "TRANSFORM 360 GYM PLUS"}</h4>
-                  <p className="mt-0.5 font-mono text-[10px] text-gray-500">{me?.gym?.address || "Gym payment receipt"}</p>
-                </div>
-
-                <div className="my-4 h-px border-t border-dashed border-white/20" />
-
-                <div className="space-y-1.5 text-[11px] text-gray-400">
-                  <div className="flex justify-between">
-                    <span>Invoice Ref:</span>
-                    <span className="font-bold text-white">{invoiceFor(selectedInvoice)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Transaction Date:</span>
-                    <span className="text-white">{formatDate(selectedInvoice.createdAt)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Client / Athlete:</span>
-                    <span className="max-w-[140px] truncate text-white">{selectedInvoice.userName || "Unknown"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Ath. Identifier:</span>
-                    <span className="text-white">#{selectedInvoice.userId}</span>
-                  </div>
-                </div>
-
-                <div className="my-4 h-px border-t border-dashed border-white/20" />
-
-                <div className="space-y-2">
-                  <div className="flex justify-between text-[10px] font-bold uppercase text-gray-500">
-                    <span>Itemized Benefit</span>
-                    <span>Total Cost</span>
-                  </div>
-                  <div className="flex justify-between pb-1 font-sans text-[11px] text-white">
-                    <div>
-                      <p className="font-semibold">{itemFor(selectedInvoice)}</p>
-                      <p className="font-mono text-[9px] text-gray-500">{selectedInvoice.paymentFor}</p>
-                    </div>
-                    <span className="font-mono text-gray-300">₹{formatCurrency(selectedInvoice.amount)}.00</span>
-                  </div>
-                </div>
-
-                <div className="my-4 h-px border-t border-dashed border-white/20" />
-
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-[11px] text-gray-400">
-                    <span>Subtotal:</span>
-                    <span>₹{formatCurrency(selectedInvoice.amount)}.00</span>
-                  </div>
-                  <div className="flex justify-between border-t border-white/5 pt-3 text-sm font-black text-white">
-                    <span>NET AMOUNT:</span>
-                    <span className="text-[#39FF14]">₹{formatCurrency(selectedInvoice.amount)}.00</span>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-5 text-center font-sans text-[10px] leading-relaxed text-gray-500">
-                  <p>Thank you for choosing Transform 360 Gym.</p>
-                  <p>This is a computer-generated receipt.</p>
-                </div>
-              </div>
-
-              <div className="mt-6 flex gap-2.5 border-t border-white/5 pt-4">
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.02] py-2.5 text-xs text-white transition-colors hover:bg-white/5"
-                  id="print-receipt-btn"
-                >
-                  <Printer className="h-4 w-4" />
-                  <span>Print Receipt</span>
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <PaymentReceiptDialog
+        payment={selectedInvoice}
+        gymName={me?.gym?.name}
+        gymAddress={me?.gym?.address}
+        gymPhone={me?.gym?.phone}
+        onClose={() => setSelectedInvoice(null)}
+      />
     </div>
   );
 }

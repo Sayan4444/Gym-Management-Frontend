@@ -46,7 +46,7 @@ function getNavItems(role: string): NavItem[] {
       { title: "Attendance", tab: "attendance", url: "/member?tab=attendance", icon: CalendarCheck },
       { title: "Subscription", tab: "subscription", url: "/member?tab=subscription", icon: Landmark },
       { title: "Add-ons", tab: "addons", url: "/member?tab=addons", icon: Box },
-      { title: "Payment History", tab: "orders", url: "/member?tab=orders", icon: CreditCard },
+      { title: "Order History", tab: "orders", url: "/member?tab=orders", icon: CreditCard },
       { title: "My Review", tab: "review", url: "/member?tab=review", icon: MessageSquareQuote },
     ],
     "super-admin": [

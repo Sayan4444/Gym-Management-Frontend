@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
-import { Loader2, Search } from "lucide-react";
+import { Eye, Loader2, Search } from "lucide-react";
 
 import { PaginationFooter } from "@/components/PaginationFooter";
+import { PaymentReceiptDialog } from "@/components/PaymentReceiptDialog";
+import { Payment } from "@/data/types";
 import { useAddons, useMe, useMembershipPlansByGym, usePayments } from "@/hooks/useApi";
 import { formatDate } from "@/lib/utils";
 
@@ -25,6 +27,7 @@ export default function MemberOrderHistory() {
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
 
   const filteredPayments = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -61,7 +64,7 @@ export default function MemberOrderHistory() {
   return (
     <div className="space-y-6" id="member-orders-panel">
       <div className="glass-card rounded-2xl border border-white/5 bg-gradient-to-tr from-[#111] to-[#00BFFF]/5 p-5">
-        <h1 className="text-xl font-black uppercase tracking-tight text-white">Payment History</h1>
+        <h1 className="text-xl font-black uppercase tracking-tight text-white">Order History</h1>
       </div>
 
       <div className="glass-card rounded-2xl border border-white/5 p-5 shadow-xl">
@@ -91,6 +94,7 @@ export default function MemberOrderHistory() {
                 <th className="p-4">Payment For</th>
                 <th className="p-4">Item</th>
                 <th className="p-4">Status</th>
+                <th className="p-4 text-center">Get Receipt</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.03]">
@@ -114,12 +118,23 @@ export default function MemberOrderHistory() {
                         {payment.status}
                       </span>
                     </td>
+                    <td className="p-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPayment(payment)}
+                        className="rounded-lg border border-white/5 bg-white/[0.01] p-1.5 text-gray-400 transition-colors hover:border-[#00BFFF]/40 hover:text-white"
+                        title="View Detailed Receipt"
+                        aria-label={`Get receipt for ${payment.invoice || `invoice ${payment.id}`}`}
+                      >
+                        <Eye className="inline h-3.5 w-3.5" />
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
               {pagedPayments.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-xs text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-xs text-gray-500">
                     No payments found.
                   </td>
                 </tr>
@@ -134,6 +149,17 @@ export default function MemberOrderHistory() {
           </div>
         )}
       </div>
+
+      <PaymentReceiptDialog
+        payment={selectedPayment}
+        gymName={me?.gym?.name}
+        gymAddress={me?.gym?.address}
+        gymPhone={me?.gym?.phone}
+        memberName={me?.name}
+        memberId={me?.id}
+        memberPhone={me?.phone}
+        onClose={() => setSelectedPayment(null)}
+      />
     </div>
   );
 }
