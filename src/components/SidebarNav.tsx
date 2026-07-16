@@ -91,11 +91,11 @@ export function SidebarNav({
       >
         <div className="flex items-center justify-between border-b border-white/5 p-6">
           <Link to={role === "super-admin" ? "/super-admin" : `/${role}`} className="flex min-w-0 items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-[#00BFFF] to-[#39FF14]">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-[#111]">
               {gymIcon ? (
-                <img src={gymIcon} alt={gymName} className="h-full w-full object-cover" />
+                <img src={gymIcon} alt={`${gymName} icon`} className="h-full w-full object-contain p-1" />
               ) : (
-                <span className="text-[10px] font-black text-black">T360</span>
+                <Dumbbell className="h-5 w-5 text-[#39FF14]" aria-hidden="true" />
               )}
             </div>
             <div className="min-w-0">

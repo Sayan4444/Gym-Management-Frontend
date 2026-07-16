@@ -45,7 +45,7 @@ export default function LoginPage({ domain }: { domain: string }) {
       },
       onError: (error) => {
         console.error("Login error:", error);
-        toast.error("Failed to login with Google");
+        toast.error(error instanceof Error ? error.message : "Failed to login with Google");
       }
     });
   };
@@ -201,7 +201,7 @@ export default function LoginPage({ domain }: { domain: string }) {
 
               <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
                 <p className="text-center text-xs font-medium leading-relaxed text-neutral-400">
-                  New users are registered as members automatically. Role upgrades are managed by gym admins.
+                  Accounts are created by gym administrators. Sign in with the Google email registered for your account.
                 </p>
               </div>
             </div>

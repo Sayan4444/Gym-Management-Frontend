@@ -152,7 +152,7 @@ export default function Header({ gym }: { gym: Gym }) {
                 to="/login"
                 className="relative group overflow-hidden px-5 py-2.5 rounded-lg bg-neon-green text-black font-extrabold text-sm tracking-wide shadow-lg shadow-neon-green/20 hover:shadow-neon-green/40 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
               >
-                <span className="relative z-10">LOGIN</span>
+                <span className="relative z-10">GO TO DASHBOARD</span>
                 <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0 opacity-20" />
               </Link>
             </div>
@@ -230,7 +230,7 @@ export default function Header({ gym }: { gym: Gym }) {
                   onClick={() => setIsOpen(false)}
                   className="py-3 px-6 rounded-lg bg-neon-green text-black font-extrabold text-center tracking-wider shadow-lg shadow-neon-green/30 cursor-pointer"
                 >
-                  LOGIN
+                  GO TO DASHBOARD
                 </Link>
                 <a
                   href="#contact"

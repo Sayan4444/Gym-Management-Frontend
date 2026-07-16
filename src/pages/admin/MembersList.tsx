@@ -507,7 +507,7 @@ export default function MembersList() {
     {
       key: "member",
       header: "Member",
-      width: "24%",
+      width: "23%",
       render: (member) => {
         const sub = getPrimarySubscription(member);
         const plan = sub?.plan;
@@ -540,14 +540,14 @@ export default function MembersList() {
     {
       key: "phone",
       header: "Phone",
-      width: "13%",
+      width: "12%",
       cellClassName: "font-mono text-xs font-semibold text-gray-300",
       render: (member) => <span className="block truncate">{member.phone || "—"}</span>,
     },
     {
       key: "plan",
       header: "Membership Plan",
-      width: "16%",
+      width: "15%",
       render: (member) => {
         const sub = getPrimarySubscription(member);
         const plan = sub?.plan;
@@ -566,22 +566,25 @@ export default function MembersList() {
       },
     },
     {
-      key: "expiry",
-      header: "Expiry Range",
-      width: "19%",
-      cellClassName: "font-mono text-[11px] text-gray-400",
+      key: "start-date",
+      header: "Start Date",
+      width: "11%",
+      headerClassName: "px-3",
+      cellClassName: "px-3 font-mono text-[11px] font-semibold text-gray-400",
       render: (member) => {
         const sub = getPrimarySubscription(member);
-
-        return sub ? (
-          <div className="flex min-w-0 items-center gap-1 whitespace-nowrap">
-            <span className="font-semibold">{formatDate(sub.startDate)}</span>
-            <span className="text-gray-600">to</span>
-            <span className="font-semibold text-gray-200">{formatDate(sub.endDate)}</span>
-          </div>
-        ) : (
-          "—"
-        );
+        return sub ? <span className="whitespace-nowrap">{formatDate(sub.startDate)}</span> : "—";
+      },
+    },
+    {
+      key: "end-date",
+      header: "End Date",
+      width: "11%",
+      headerClassName: "px-3",
+      cellClassName: "px-3 font-mono text-[11px] font-semibold text-gray-200",
+      render: (member) => {
+        const sub = getPrimarySubscription(member);
+        return sub ? <span className="whitespace-nowrap">{formatDate(sub.endDate)}</span> : "—";
       },
     },
     {

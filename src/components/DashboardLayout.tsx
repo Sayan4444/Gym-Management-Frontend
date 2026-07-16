@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, Check, Crown, LogOut, Menu, Plus, Search, Sparkles, User as UserIcon, X } from "lucide-react";
+import { Bell, Check, Crown, LogOut, Menu, Search, Sparkles, User as UserIcon, X } from "lucide-react";
 import { useMembershipPlans, useMe, useLogout, useSubscriptions } from "@/hooks/useApi";
 import { SidebarNav } from "./SidebarNav";
 import { roleLabels } from "@/lib/constants";
@@ -161,18 +161,16 @@ export default function DashboardLayout({ role }: { role: string }) {
               <button
                 type="button"
                 onClick={() => setQuickActionsOpen((open) => !open)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-[#00BFFF] to-[#39FF14] text-black transition-all hover:shadow-[0_0_15px_rgba(0,191,255,0.4)]"
-                aria-label="Quick action"
+                className="flex h-9 items-center justify-center whitespace-nowrap rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-2.5 text-[10px] font-black uppercase tracking-wide text-black transition-all hover:shadow-[0_0_15px_rgba(0,191,255,0.4)] min-[390px]:px-3 min-[390px]:text-xs"
+                aria-label="Quick Links"
               >
-                <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
+                Quick Links
               </button>
 
               {quickActionsOpen && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setQuickActionsOpen(false)} />
                   <div className="glass-card absolute right-0 z-40 mt-2.5 w-52 rounded-2xl border border-white/5 p-2 shadow-2xl">
-                    <p className="px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#39FF14]">Fast Executions</p>
-                    <div className="my-1 h-px bg-white/5" />
                     {[
                       { label: "Add Gym Member", actionType: "add-member" },
                       { label: "Issue Pending Invoice", actionType: "create-invoice" },
