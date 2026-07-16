@@ -40,6 +40,7 @@ function getNavItems(role: string): NavItem[] {
     trainer: [
       { title: "Dashboard", tab: "dashboard", url: "/trainer?tab=dashboard", icon: Activity },
       { title: "Workout Programs", tab: "workouts", url: "/trainer?tab=workouts", icon: Flame },
+      { title: "Attendance", tab: "attendance", url: "/trainer?tab=attendance", icon: CalendarCheck },
     ],
     member: [
       { title: "Dashboard", tab: "dashboard", url: "/member?tab=dashboard", icon: Activity },

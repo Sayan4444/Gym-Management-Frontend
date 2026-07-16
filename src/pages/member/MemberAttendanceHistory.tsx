@@ -13,8 +13,8 @@ function sourceClass(source: string) {
   return "border-white/10 bg-white/5 text-gray-300";
 }
 
-export default function MemberAttendanceHistory() {
-  const attendanceData = useAttendance().data;
+export default function MemberAttendanceHistory({ userId }: { userId?: number }) {
+  const attendanceData = useAttendance(userId ? { user_id: userId } : undefined).data;
   const attendance = useMemo(() => attendanceData?.attendance ?? [], [attendanceData?.attendance]);
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(attendance.length / ITEMS_PER_PAGE);
