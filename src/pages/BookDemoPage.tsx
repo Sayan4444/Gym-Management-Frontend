@@ -52,7 +52,7 @@ export default function BookDemoPage() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2">
             <Dumbbell className="h-7 w-7 text-brand" />
-            <span className="font-display text-xl font-bold">GymFlow</span>
+            <span className="font-display text-xl font-bold">Transform 360 GYM Plus</span>
           </Link>
           <div className="flex items-center gap-3">
             <ThemeToggle />
@@ -69,7 +69,7 @@ export default function BookDemoPage() {
             Book Your <span className="text-brand">Free Demo</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            See how GymFlow can transform your fitness business. Get a personalized demo from our experts.
+            See how Transform 360 GYM Plus can transform your fitness business. Get a personalized demo from our experts.
           </p>
         </div>
 
@@ -179,7 +179,7 @@ export default function BookDemoPage() {
       {/* Footer */}
       <footer className="border-t border-border/20 py-8 bg-card/30">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-sm text-muted-foreground">© 2026 GymFlow. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© 2026 Transform 360 GYM Plus. All rights reserved.</p>
         </div>
       </footer>
     </div>
