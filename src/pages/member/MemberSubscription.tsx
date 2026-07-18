@@ -1,58 +1,62 @@
-import { useMemo, useState } from "react";
-import { AlertCircle, CalendarCheck, Clock, CreditCard, Crown, History, Loader2, RotateCcw } from "lucide-react";
+import { useMemo } from "react";
+import { motion } from "motion/react";
+import { HelpCircle, Loader2, ShieldCheck } from "lucide-react";
 
-import { RenewSubscriptionDialog } from "@/components/member/RenewSubscriptionDialog";
+import { RazorpayButton } from "@/components/RazorpayButton";
+import type { MembershipPlan, PlanAddon } from "@/data/types";
 import { useMembershipPlansByGym, useMe } from "@/hooks/useApi";
 import { useToast } from "@/hooks/use-toast";
-import { formatDate } from "@/lib/utils";
 
-function statusClass(status: string) {
-  if (status === "Active" || status === "Paid") return "border-[#39FF14]/20 bg-[#39FF14]/10 text-[#39FF14]";
-  if (status === "Upcoming") return "border-[#00BFFF]/20 bg-[#00BFFF]/10 text-[#00BFFF]";
-  if (status === "Pending" || status === "Paused" || status === "Frozen") return "border-amber-400/20 bg-amber-400/10 text-amber-400";
-  if (status === "Expired" || status === "Cancelled" || status === "Failed") return "border-red-400/20 bg-red-400/10 text-red-400";
-  return "border-white/10 bg-white/5 text-gray-300";
-}
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(Number.isFinite(value) ? value : 0);
 
-function StatusBadge({ status }: { status: string }) {
-  return <span className={`inline-flex rounded-full border px-2.5 py-1 font-mono text-[10px] font-black uppercase ${statusClass(status)}`}>{status}</span>;
-}
+const formatDuration = (months: number) => `${months} ${months === 1 ? "Month" : "Months"}`;
 
-function DetailRow({ label, value, icon: Icon = CreditCard }: { label: string; value: string; icon?: typeof CreditCard }) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3 transition-colors hover:bg-white/[0.04]">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#00BFFF]/10">
-        <Icon className="h-4 w-4 text-[#00BFFF]" />
+const getPlanBadge = (plan: MembershipPlan) =>
+  plan.planIcon === "⭐" ? "VIP PREMIUM" : "STANDARD INDUCTION";
+
+const addonLabel = (planAddon: PlanAddon) => {
+  const suffix = planAddon.frequency ? ` (${planAddon.frequency})` : "";
+  return `${planAddon.addon?.name ?? `Addon #${planAddon.addonId}`}${suffix}`;
+};
+
+function PlanBenefits({ plan, isVip }: { plan: MembershipPlan; isVip: boolean }) {
+  const planAddons = plan.planAddons ?? [];
+
+  if (planAddons.length === 0) {
+    return (
+      <div className="flex items-start gap-2 text-[11px] text-gray-500">
+        <HelpCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-600" />
+        <span className="leading-tight">No included add-ons configured</span>
       </div>
-      <p className="min-w-0 flex-1 text-xs font-bold text-white">{label}</p>
-      <p className="shrink-0 font-mono text-xs text-gray-400">{value}</p>
+    );
+  }
+
+  return planAddons.map((planAddon) => (
+    <div
+      key={planAddon.id}
+      className="flex items-start gap-2 text-[11px] text-gray-400 transition-colors group-hover:text-gray-300"
+    >
+      <ShieldCheck className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${isVip ? "text-[#E5A823]" : "text-[#39FF14]"}`} />
+      <span className="leading-tight">{addonLabel(planAddon)}</span>
     </div>
-  );
+  ));
 }
 
 export default function MemberSubscription() {
-  const { data: me, isLoading: isAuthLoading } = useMe({ include: "gym,subscription,workout_plan,payments,user_addon" });
-  const gymPlans = useMembershipPlansByGym(me?.gymId).data?.memberships || [];
+  const { data: me, isLoading: isAuthLoading } = useMe({
+    include: "gym,subscription,workout_plan,payments,user_addon",
+  });
+  const plansQuery = useMembershipPlansByGym(me?.gymId);
   const { toast } = useToast();
-  const [showAddSubscriptionDialog, setShowAddSubscriptionDialog] = useState(false);
 
-  const subscriptions = me?.subscription || [];
-  const activeSub = subscriptions.find((subscription) => subscription.status === "Active");
-  const plan = activeSub?.plan;
-  const upcomingSubs = subscriptions
-    .filter((subscription) => subscription.status === "Upcoming")
-    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-  const nextUpcomingSub = upcomingSubs[0];
-  const upcomingPlan = nextUpcomingSub ? gymPlans.find((candidate) => candidate.id === nextUpcomingSub.planId) : undefined;
-  const previousSubscriptions = useMemo(
-    () =>
-      subscriptions
-        .filter((subscription) => subscription.status !== "Active" && subscription.status !== "Upcoming")
-        .sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime()),
-    [subscriptions],
+  const plans = useMemo(
+    () => [...(plansQuery.data?.memberships ?? [])].filter((plan) => plan.isActive).sort((a, b) => a.id - b.id),
+    [plansQuery.data?.memberships],
   );
   const prefill = { name: me?.name, email: me?.email, contact: me?.phone };
-  if (isAuthLoading) {
+
+  if (isAuthLoading || (Boolean(me?.gymId) && plansQuery.isLoading)) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-[#00BFFF]" />
@@ -62,145 +66,119 @@ export default function MemberSubscription() {
 
   return (
     <div className="space-y-6" id="member-subscription-panel">
-      <div className="glass-card flex flex-col justify-between gap-4 rounded-2xl border border-white/5 bg-gradient-to-tr from-[#111] to-[#39FF14]/5 p-5 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="mt-1 text-xl font-black uppercase tracking-tight text-white">Subscription</h1>
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowAddSubscriptionDialog(true)}
-          className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-4 py-2.5 text-xs font-black text-black transition-opacity hover:opacity-90"
-          id="buy-subscription-btn"
-        >
-          <RotateCcw className="h-4 w-4" />
-          Buy New Subscription
-        </button>
+      <div className="flex flex-col justify-between gap-5 rounded-2xl border border-white/5 bg-[#0d0d0d] p-5 shadow-xl sm:flex-row sm:items-center">
+        <h1 className="font-display text-2xl font-black tracking-tight text-white">Gym Membership Plans</h1>
+        <span className="w-fit rounded-lg bg-gradient-to-r from-gray-800 to-gray-700 px-3 py-1.5 text-xs font-bold text-white shadow">
+          Plans ({plans.length})
+        </span>
       </div>
 
-      {activeSub && plan ? (
-        <div className="glass-card rounded-2xl border border-white/5 bg-[#0a0a0a] p-6 shadow-2xl">
-          <div className="mb-5 flex items-center justify-between border-b border-white/5 pb-4">
-            <div>
-              <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-tight text-white">
-                <Crown className="h-4 w-4 text-[#39FF14]" />
-                Active Subscription
-              </h2>
-              <p className="mt-1 text-xs text-gray-500">Your current membership plan details</p>
-            </div>
-            <StatusBadge status={activeSub.status} />
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <DetailRow label="Plan" value={plan.name} />
-            <DetailRow label="Price" value={`₹${plan.price}/mo`} />
-            <DetailRow label="Duration" value={`${plan.durationMonths} month(s)`} />
-            <DetailRow label="Start Date" value={formatDate(activeSub.startDate)} icon={CalendarCheck} />
-            <DetailRow label="End Date" value={formatDate(activeSub.endDate)} icon={Clock} />
-          </div>
+      {plansQuery.isError ? (
+        <div className="rounded-2xl border border-red-400/10 bg-red-400/5 p-8 text-center text-sm text-red-300">
+          Membership plans could not be loaded. Please try again.
+        </div>
+      ) : plans.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-white/10 bg-[#0f0f0f]/65 p-8 text-center text-sm text-gray-400">
+          No membership plans are currently open for enrollment.
         </div>
       ) : (
-        <div className="glass-card flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-[#0a0a0a] px-6 py-16 text-center shadow-2xl">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10">
-            <AlertCircle className="h-8 w-8 text-amber-400" />
-          </div>
-          <p className="text-lg font-black text-white">No active subscription</p>
-          <p className="mt-1 text-sm text-gray-500">Purchase a subscription to access gym facilities and services.</p>
-          <button
-            type="button"
-            onClick={() => setShowAddSubscriptionDialog(true)}
-            className="mt-5 flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-4 py-2.5 text-xs font-black text-black"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Buy Subscription
-          </button>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {plans.map((plan, index) => {
+            const isVip = plan.planIcon === "⭐";
+            const glowClass = isVip
+              ? "border-[#E5A823]/30 bg-gradient-to-b from-[#16120c]/80 to-[#0a0805]/95 shadow-[0_0_25px_rgba(229,168,35,0.06)] hover:border-[#E5A823]/50 lg:scale-[1.01]"
+              : "border-white/5 bg-[#0f0f0f]/65 hover:border-white/10";
+            const subtitleColor = isVip
+              ? "text-[#E5A823] font-extrabold tracking-widest"
+              : "text-gray-400 font-bold";
+            const borderBottomGlow = isVip ? "border-b-2 border-b-[#E5A823]/40" : "";
+
+            return (
+              <motion.div
+                key={plan.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.04 }}
+                className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-5 transition-all duration-300 ${glowClass} ${borderBottomGlow}`}
+                id={`member-plan-card-${plan.id}`}
+              >
+                {isVip && (
+                  <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full bg-gradient-to-br from-[#E5A823]/15 to-transparent blur-2xl" />
+                )}
+
+                <div>
+                  <div className="mb-4 flex items-start justify-between border-b border-white/[0.04] pb-3">
+                    <div className="min-w-0">
+                      <span className={`font-mono text-[9.5px] uppercase ${subtitleColor}`}>{getPlanBadge(plan)}</span>
+                      <h2
+                        className="mt-1 truncate text-sm font-black leading-tight tracking-tight text-white group-hover:text-white/95"
+                        title={plan.name}
+                      >
+                        {plan.planIcon ? <span className="mr-1.5">{plan.planIcon}</span> : null}
+                        {plan.name}
+                      </h2>
+                    </div>
+                    <span className="ml-2 shrink-0 rounded border border-[#39FF14]/15 bg-[#39FF14]/10 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase text-[#39FF14]">
+                      Active
+                    </span>
+                  </div>
+
+                  <div className="mb-4 flex items-center justify-between border-b border-white/[0.03] py-1 font-mono">
+                    <span className="text-[10px] uppercase text-gray-500">Term</span>
+                    <span className="border-b border-[#39FF14]/30 text-xs font-black text-white">
+                      {formatDuration(plan.durationMonths).toUpperCase()}
+                    </span>
+                  </div>
+
+                  <div className="mb-4 space-y-1">
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-mono text-3xl font-black tracking-tight text-white">₹{formatCurrency(plan.price)}</span>
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 rounded border border-emerald-500/15 bg-emerald-500/10 px-2 py-1 font-mono text-[10px] text-emerald-400">
+                      <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-current" />
+                      <span>Enrollment currently open</span>
+                    </div>
+                  </div>
+
+                  {plan.description && <p className="mb-4 text-xs text-gray-400">{plan.description}</p>}
+
+                  {isVip && (
+                    <div className="mb-4 rounded-lg border border-[#E5A823]/10 bg-gradient-to-r from-[#E5A823]/10 to-transparent p-2">
+                      <p className="flex items-center gap-1 font-mono text-[9.5px] font-bold uppercase tracking-wider text-[#E5A823]">
+                        <span>★ VIP Perks:</span>
+                        <span className="text-white">Premium add-on bundle enabled</span>
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mb-5 space-y-2">
+                    <PlanBenefits plan={plan} isVip={isVip} />
+                  </div>
+                </div>
+
+                <div className="mt-auto border-t border-white/[0.04] pt-3">
+                  <RazorpayButton
+                    item={plan}
+                    type="Membership Plan"
+                    prefill={prefill}
+                    onSuccess={() =>
+                      toast({ title: "Payment successful!", description: `${plan.name} has been added to your subscriptions.` })
+                    }
+                    onError={() =>
+                      toast({
+                        title: "Payment failed",
+                        description: "Your payment could not be processed. Please try again.",
+                        variant: "destructive",
+                      })
+                    }
+                    className="h-auto w-full rounded-lg bg-gradient-to-r from-[#00BFFF] to-[#39FF14] py-2 text-[11px] font-black text-black shadow-none hover:opacity-90"
+                  />
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       )}
-
-      {nextUpcomingSub && upcomingPlan && (
-        <div className="glass-card rounded-2xl border border-[#00BFFF]/10 bg-[#0a0a0a] p-6 shadow-2xl">
-          <div className="mb-5 flex items-center justify-between border-b border-white/5 pb-4">
-            <div>
-              <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-tight text-white">
-                <Clock className="h-4 w-4 text-[#00BFFF]" />
-                Upcoming Subscription
-              </h2>
-              <p className="mt-1 text-xs text-gray-500">Your next plan will activate automatically</p>
-            </div>
-            <StatusBadge status={nextUpcomingSub.status} />
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <DetailRow label="Plan" value={upcomingPlan.name} />
-            <DetailRow label="Price" value={`₹${upcomingPlan.price}/mo`} />
-            <DetailRow label="Duration" value={`${upcomingPlan.durationMonths} month(s)`} />
-            <DetailRow label="Start Date" value={formatDate(nextUpcomingSub.startDate)} icon={CalendarCheck} />
-            <DetailRow label="End Date" value={formatDate(nextUpcomingSub.endDate)} icon={Clock} />
-          </div>
-        </div>
-      )}
-
-      <div className="glass-card rounded-2xl border border-white/5 bg-[#0a0a0a] p-6 shadow-2xl">
-        <div className="mb-5 flex items-center justify-between border-b border-white/5 pb-4">
-          <div>
-            <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-tight text-white">
-              <History className="h-4 w-4 text-[#00BFFF]" />
-              Previously Bought Subscriptions
-            </h2>
-          </div>
-        </div>
-
-        {previousSubscriptions.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs">
-              <thead>
-                <tr className="border-b border-white/5 bg-white/[0.01] font-mono text-[10px] uppercase tracking-widest text-gray-500">
-                  <th className="p-4">Plan</th>
-                  <th className="p-4">Bought On</th>
-                  <th className="p-4">Start Date</th>
-                  <th className="p-4">End Date</th>
-                  <th className="p-4">Price</th>
-                  <th className="p-4">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.03]">
-                {previousSubscriptions.map((subscription) => {
-                  const boughtPlan = subscription.plan || gymPlans.find((candidate) => candidate.id === subscription.planId);
-
-                  return (
-                    <tr key={subscription.id} className="transition-colors hover:bg-white/[0.02]">
-                      <td className="p-4 font-bold text-white">{boughtPlan?.name || "Membership Plan"}</td>
-                      <td className="p-4 font-mono text-gray-400">{formatDate(subscription.createdAt)}</td>
-                      <td className="p-4 font-mono text-gray-300">{formatDate(subscription.startDate)}</td>
-                      <td className="p-4 font-mono text-gray-400">{formatDate(subscription.endDate)}</td>
-                      <td className="p-4 font-mono font-black text-white">{boughtPlan ? `₹${boughtPlan.price.toFixed(2)}` : "-"}</td>
-                      <td className="p-4">
-                        <StatusBadge status={subscription.status} />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-white/5 bg-white/[0.02] px-6 py-10 text-center">
-            <p className="text-sm font-bold text-white">No previous subscriptions found.</p>
-          </div>
-        )}
-      </div>
-
-      <RenewSubscriptionDialog
-        open={showAddSubscriptionDialog}
-        onOpenChange={setShowAddSubscriptionDialog}
-        gymPlans={gymPlans}
-        prefill={prefill}
-        onSuccess={() => {
-          setShowAddSubscriptionDialog(false);
-          toast({ title: "Payment successful!", description: "Your subscription has been renewed." });
-        }}
-        onError={() => {
-          setShowAddSubscriptionDialog(false);
-          toast({ title: "Payment failed", description: "Your payment could not be processed. Please try again.", variant: "destructive" });
-        }}
-      />
     </div>
   );
 }
