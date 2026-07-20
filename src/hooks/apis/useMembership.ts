@@ -20,7 +20,7 @@ export function useMembershipPlans(gymId?: number) {
 export function useCreateMembershipPlan() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ gymId, data }: { gymId: number ; data: MembershipPlan }) => api.createMembershipPlan(gymId, data),
+    mutationFn: ({ data }: { data: MembershipPlan }) => api.createMembershipPlan(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["membership-plans"] });
     },
@@ -38,7 +38,7 @@ export interface UpdateMembershipPayload {
 export function useUpdateMembershipPlan() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ gymId, membershipId, data }: { gymId: number; membershipId: number; data: UpdateMembershipPayload }) => api.updateMembershipPlan(gymId, membershipId, data),
+    mutationFn: ({ membershipId, data }: { membershipId: number; data: UpdateMembershipPayload }) => api.updateMembershipPlan(membershipId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["membership-plans"] });
     },
@@ -48,7 +48,7 @@ export function useUpdateMembershipPlan() {
 export function useDeleteMembershipPlan() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ gymId, membershipId }: { gymId: number ; membershipId: number }) => api.deleteMembershipPlan(gymId, membershipId),
+    mutationFn: ({ membershipId }: { membershipId: number }) => api.deleteMembershipPlan(membershipId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["membership-plans"] });
     },

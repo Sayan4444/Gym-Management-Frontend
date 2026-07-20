@@ -8,9 +8,9 @@ export const membershipApi = {
   getMembershipPlansByGym: (gymId: number ) => fetchApi(`/gyms/${gymId}/memberships`),
   // An authenticated route hit by loggedin user
   getMembershipPlans: (gymId?: number) => fetchApi(gymId ? `/memberships?gym_id=${gymId}` : "/memberships"),
-  createMembershipPlan: (gymId: number , data: MembershipPlan) => fetchApi(`/gyms/${gymId}/memberships`, { method: "POST", body: JSON.stringify(data) }),
-  updateMembershipPlan: (gymId: number, membershipId: number, data: UpdateMembershipPayload) => fetchApi(`/gyms/${gymId}/memberships/${membershipId}`, { method: "PUT", body: JSON.stringify(data) }),
-  deleteMembershipPlan: (gymId: number , membershipId: number ) => fetchApi(`/gyms/${gymId}/memberships/${membershipId}`, { method: "DELETE" }),
+  createMembershipPlan: (data: MembershipPlan) => fetchApi("/gyms/memberships", { method: "POST", body: JSON.stringify(data) }),
+  updateMembershipPlan: (membershipId: number, data: UpdateMembershipPayload) => fetchApi(`/gyms/memberships/${membershipId}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteMembershipPlan: (membershipId: number) => fetchApi(`/gyms/memberships/${membershipId}`, { method: "DELETE" }),
 
   // ----- Plan Addon Routes -----
   addPlanAddon: (gymId: number, membershipId: number, data: { addon_id: number; frequency: number }) =>

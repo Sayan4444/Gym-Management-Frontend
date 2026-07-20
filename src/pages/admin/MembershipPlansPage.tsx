@@ -220,10 +220,10 @@ export default function MembershipPlansPage() {
       };
 
       if (editingPlan) {
-        await updatePlan.mutateAsync({ gymId, membershipId: editingPlan.id, data });
+        await updatePlan.mutateAsync({ membershipId: editingPlan.id, data });
         savedPlanId = editingPlan.id;
       } else {
-        const created = await createPlan.mutateAsync({ gymId, data: data as MembershipPlan });
+        const created = await createPlan.mutateAsync({ data: data as MembershipPlan });
         savedPlanId = (created as MembershipPlan).id;
       }
 
@@ -270,9 +270,9 @@ export default function MembershipPlansPage() {
   };
 
   const handleDeletePlan = () => {
-    if (!gymId || !pendingDeletePlan) return;
+    if (!pendingDeletePlan) return;
     deletePlan.mutate(
-      { gymId, membershipId: pendingDeletePlan.id },
+      { membershipId: pendingDeletePlan.id },
       {
         onSuccess: () => {
           toast({ title: "Plan deleted successfully" });
@@ -295,10 +295,9 @@ export default function MembershipPlansPage() {
   };
 
   const handleSaveAddon = () => {
-    if (!gymId) return;
     if (editingAddon) {
       updateAddon.mutate(
-        { gymId, addonId: editingAddon.id, data: { ...editingAddon, ...addonForm } as unknown as Addon },
+        { addonId: editingAddon.id, data: { ...editingAddon, ...addonForm } as unknown as Addon },
         {
           onSuccess: () => { toast({ title: "Add-on updated successfully" }); setIsAddonDialogOpen(false); },
           onError: (error) => toast({ title: "Error updating add-on", description: error.message, variant: "destructive" }),
@@ -306,7 +305,7 @@ export default function MembershipPlansPage() {
       );
     } else {
       createAddon.mutate(
-        { gymId, data: { ...addonForm, duration: 0 } as unknown as Addon },
+        { data: { ...addonForm, duration: 0 } as unknown as Addon },
         {
           onSuccess: () => { toast({ title: "Add-on created successfully" }); setIsAddonDialogOpen(false); setAddonForm({ name: "", description: "", price: 0, isActive: true }); },
           onError: (error) => toast({ title: "Error creating add-on", description: error.message, variant: "destructive" }),
@@ -316,9 +315,9 @@ export default function MembershipPlansPage() {
   };
 
   const handleDeleteAddon = (id: number) => {
-    if (!gymId || !confirm("Are you sure you want to delete this add-on?")) return;
+    if (!confirm("Are you sure you want to delete this add-on?")) return;
     deleteAddon.mutate(
-      { gymId, addonId: id },
+      { addonId: id },
       {
         onSuccess: () => toast({ title: "Add-on deleted successfully" }),
         onError: (error) => toast({ title: "Error deleting add-on", description: error.message, variant: "destructive" }),
@@ -327,9 +326,8 @@ export default function MembershipPlansPage() {
   };
 
   const handleToggleAddon = (addon: Addon, checked: boolean) => {
-    if (!gymId) return;
     updateAddon.mutate(
-      { gymId, addonId: addon.id, data: { ...addon, isActive: checked } as unknown as Addon },
+      { addonId: addon.id, data: { ...addon, isActive: checked } as unknown as Addon },
       {
         onSuccess: () => toast({ title: `Add-on ${checked ? "activated" : "deactivated"}` }),
         onError: (error) => toast({ title: "Error updating add-on", description: error.message, variant: "destructive" }),

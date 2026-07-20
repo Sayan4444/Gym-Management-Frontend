@@ -12,7 +12,7 @@ export function useAddons(gymId?: number) {
 export function useCreateAddon() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ gymId, data }: { gymId: number ; data: Addon }) => api.createAddon(gymId, data),
+    mutationFn: ({ data }: { data: Addon }) => api.createAddon(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["addons"] });
     },
@@ -22,7 +22,7 @@ export function useCreateAddon() {
 export function useUpdateAddon() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ gymId, addonId, data }: { gymId: number ; addonId: number ; data: Addon }) => api.updateAddon(gymId, addonId, data),
+    mutationFn: ({ addonId, data }: { addonId: number; data: Addon }) => api.updateAddon(addonId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["addons"] });
     },
@@ -32,7 +32,7 @@ export function useUpdateAddon() {
 export function useDeleteAddon() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ gymId, addonId }: { gymId: number ; addonId: number }) => api.deleteAddon(gymId, addonId),
+    mutationFn: ({ addonId }: { addonId: number }) => api.deleteAddon(addonId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["addons"] });
     },

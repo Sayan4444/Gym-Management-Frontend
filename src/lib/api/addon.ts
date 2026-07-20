@@ -5,7 +5,7 @@ export const addonApi = {
   // ----- Addon Routes -----
     getAddonsByGym: (gymId: number ) => fetchApi(`/gyms/${gymId}/addons`),
     getAddons: (gymId?: number) => fetchApi(gymId ? `/addons?gym_id=${gymId}` : "/addons"),
-    createAddon: (gymId: number , data: Addon) => fetchApi(`/gyms/${gymId}/addons`, { method: "POST", body: JSON.stringify(data) }),
-    updateAddon: (gymId: number , addonId: number , data: Addon) => fetchApi(`/gyms/${gymId}/addons/${addonId}`, { method: "PUT", body: JSON.stringify(data) }),
-    deleteAddon: (gymId: number , addonId: number ) => fetchApi(`/gyms/${gymId}/addons/${addonId}`, { method: "DELETE" }),
+    createAddon: (data: Addon) => fetchApi("/gyms/addons", { method: "POST", body: JSON.stringify(data) }),
+    updateAddon: (addonId: number, data: Addon) => fetchApi(`/gyms/addons/${addonId}`, { method: "PUT", body: JSON.stringify(data) }),
+    deleteAddon: (addonId: number) => fetchApi(`/gyms/addons/${addonId}`, { method: "DELETE" }),
 };
