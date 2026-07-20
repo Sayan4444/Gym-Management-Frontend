@@ -133,6 +133,21 @@ export interface Payment {
   paymentMethod?: string;
 }
 
+export interface Notification {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  userId: number;
+  gymId?: number;
+  type: string;
+  title: string;
+  message: string;
+  actionUrl?: string;
+  metadata?: Record<string, unknown>;
+  readAt?: string | null;
+  dismissedAt?: string | null;
+}
+
 export interface Attendance {
   id: number;
   createdAt: string;

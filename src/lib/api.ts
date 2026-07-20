@@ -12,6 +12,7 @@ import { attendanceApi } from './api/attendance';
 import { dashboardStatsApi } from './api/DashboardStats';
 import { bookDemoApi } from './api/bookDemo';
 import { reviewApi } from './api/review';
+import { notificationApi } from './api/notification';
 
 export { fetchApi, API_BASE_URL };
 
@@ -28,5 +29,6 @@ export const api = {
   ...attendanceApi,
   ...dashboardStatsApi,
   ...bookDemoApi,
-  ...reviewApi
+  ...reviewApi,
+  ...notificationApi
 };

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
 import { ProfileDialog } from "@/components/ProfileDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -9,8 +10,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, Check, Crown, LogOut, Menu, Search, Sparkles, User as UserIcon, X } from "lucide-react";
-import { useMembershipPlans, useMe, useLogout, useSubscriptions } from "@/hooks/useApi";
+import { Bell, Check, Crown, LogOut, Menu, Search, Sparkles, Trash2, User as UserIcon, X } from "lucide-react";
+import {
+  useDismissAllNotifications,
+  useDismissNotification,
+  useMarkAllNotificationsRead,
+  useMarkNotificationRead,
+  useMembershipPlans,
+  useMe,
+  useLogout,
+  useNotifications,
+  useSubscriptions,
+} from "@/hooks/useApi";
+import type { Notification } from "@/data/types";
 import { SidebarNav } from "./SidebarNav";
 import { roleLabels } from "@/lib/constants";
 
@@ -20,6 +32,21 @@ function formatSystemDate() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
+}
+
+function formatNotificationType(type: string) {
+  return type
+    .split(".")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" · ");
+}
+
+function formatNotificationTime(createdAt: string) {
+  try {
+    return formatDistanceToNow(new Date(createdAt), { addSuffix: true });
+  } catch {
+    return "Recently";
+  }
 }
 
 const dashboardTitles: Record<string, string> = {
@@ -38,13 +65,25 @@ export default function DashboardLayout({ role }: { role: string }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [notificationTrayOpen, setNotificationTrayOpen] = useState(false);
-  const [trayNotifications, setTrayNotifications] = useState([]);
 
   // Backend-backed user, subscription, and plan data used by the profile area.
   const subscriptionsData = useSubscriptions().data?.subscriptions;
   const membershipPlansData = useMembershipPlans().data?.memberships;
   const { data: currentUser } = useMe();
   const { mutate: logout } = useLogout();
+  const {
+    data: notificationData,
+    isLoading: notificationsLoading,
+    isError: notificationsError,
+    refetch: refetchNotifications,
+    fetchNextPage: fetchNextNotificationsPage,
+    hasNextPage: hasNextNotificationsPage,
+    isFetchingNextPage: fetchingNextNotificationsPage,
+  } = useNotifications();
+  const { mutate: markNotificationRead } = useMarkNotificationRead();
+  const { mutate: markAllNotificationsRead, isPending: markingAllRead } = useMarkAllNotificationsRead();
+  const { mutate: dismissNotification } = useDismissNotification();
+  const { mutate: dismissAllNotifications, isPending: dismissingAll } = useDismissAllNotifications();
 
   // Avatar fallback when the backend user has no profile photo.
   const initials = currentUser?.name
@@ -66,7 +105,8 @@ export default function DashboardLayout({ role }: { role: string }) {
     return Boolean(plan?.name.toLowerCase().includes("premium"));
   }, [currentUser, membershipPlansData, role, subscriptionsData]);
 
-  const unreadNotificationCount = trayNotifications.filter((notification) => notification.unread).length;
+  const trayNotifications = notificationData?.pages.flatMap((page) => page.notifications) ?? [];
+  const unreadNotificationCount = notificationData?.pages[0]?.unreadCount ?? 0;
 
   // Existing logout flow: calls backend logout hook, then returns to login.
   const handleLogout = () => {
@@ -109,6 +149,15 @@ export default function DashboardLayout({ role }: { role: string }) {
 
   const handleNotificationsOpen = () => {
     setNotificationTrayOpen(true);
+    void refetchNotifications();
+  };
+
+  const handleNotificationOpen = (notification: Notification) => {
+    if (!notification.readAt) markNotificationRead(notification.id);
+    if (notification.actionUrl?.startsWith("/")) {
+      navigate(notification.actionUrl);
+      setNotificationTrayOpen(false);
+    }
   };
 
   return (
@@ -191,7 +240,6 @@ export default function DashboardLayout({ role }: { role: string }) {
               )}
             </div>}
 
-            {/* TODO: Connect unread count and tray actions to a backend notifications API. */}
             <button
               type="button"
               onClick={handleNotificationsOpen}
@@ -200,8 +248,8 @@ export default function DashboardLayout({ role }: { role: string }) {
             >
               <Bell className="h-4 w-4" />
               {unreadNotificationCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-lg">
-                  {unreadNotificationCount}
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white shadow-lg">
+                  {unreadNotificationCount > 99 ? "99+" : unreadNotificationCount}
                 </span>
               )}
             </button>
@@ -245,7 +293,6 @@ export default function DashboardLayout({ role }: { role: string }) {
       {/* Existing profile dialog, opened from the avatar dropdown. */}
       {currentUser && <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} user={currentUser} />}
 
-      {/* TODO: This tray is UI-only until notifications are persisted on the backend. */}
       {notificationTrayOpen && (
         <>
           <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setNotificationTrayOpen(false)} />
@@ -266,46 +313,94 @@ export default function DashboardLayout({ role }: { role: string }) {
             </div>
 
             <div className="custom-scrollbar flex-1 space-y-3 overflow-y-auto p-5">
-              {trayNotifications.length > 0 ? (
-                trayNotifications.map((notification) => (
-                  <div key={notification.id} className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <span className="block font-mono text-[10px] italic text-gray-500">
-                          {notification.category} • {notification.time}
-                        </span>
-                        <p className="mt-1 text-xs leading-relaxed text-gray-300">{notification.message}</p>
+              {notificationsLoading ? (
+                <p className="py-16 text-center text-xs text-gray-500">Loading notifications...</p>
+              ) : notificationsError ? (
+                <div className="py-16 text-center">
+                  <p className="text-xs text-red-400">Notifications could not be loaded.</p>
+                  <button
+                    type="button"
+                    onClick={() => void refetchNotifications()}
+                    className="mt-3 rounded-lg border border-white/10 px-3 py-1.5 text-[10px] font-bold text-white hover:bg-white/5"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : trayNotifications.length > 0 ? (
+                <>
+                  {trayNotifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`rounded-xl border p-4 transition-colors ${
+                        notification.readAt ? "border-white/5 bg-white/[0.02]" : "border-[#39FF14]/15 bg-[#39FF14]/[0.035]"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <button type="button" onClick={() => handleNotificationOpen(notification)} className="min-w-0 flex-1 text-left">
+                          <span className="block font-mono text-[10px] italic text-gray-500">
+                            {formatNotificationType(notification.type)} • {formatNotificationTime(notification.createdAt)}
+                          </span>
+                          <p className="mt-1 text-xs font-bold text-white">{notification.title}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-gray-300">{notification.message}</p>
+                        </button>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className={`h-2 w-2 rounded-full ${notification.readAt ? "bg-white/15" : "bg-[#39FF14]"}`} />
+                          <button
+                            type="button"
+                            onClick={() => dismissNotification(notification.id)}
+                            className="rounded-md p-1 text-gray-600 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                            aria-label={`Dismiss ${notification.title}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </div>
-                      <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${notification.unread ? "bg-[#39FF14]" : "bg-white/15"}`} />
+                      {!notification.readAt && (
+                        <button
+                          type="button"
+                          onClick={() => markNotificationRead(notification.id)}
+                          className="mt-4 inline-flex items-center gap-1 rounded-lg border border-[#39FF14]/20 bg-[#39FF14]/10 px-2.5 py-1 text-[10px] font-bold text-[#39FF14]"
+                        >
+                          <Check className="h-3 w-3" />
+                          Mark Read
+                        </button>
+                      )}
                     </div>
-                    {notification.unread && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setTrayNotifications((items) =>
-                            items.map((item) => (item.id === notification.id ? { ...item, unread: false } : item)),
-                          )
-                        }
-                        className="mt-4 inline-flex items-center gap-1 rounded-lg border border-[#39FF14]/20 bg-[#39FF14]/10 px-2.5 py-1 text-[10px] font-bold text-[#39FF14]"
-                      >
-                        <Check className="h-3 w-3" />
-                        Mark Read
-                      </button>
-                    )}
-                  </div>
-                ))
+                  ))}
+                  {hasNextNotificationsPage && (
+                    <button
+                      type="button"
+                      onClick={() => void fetchNextNotificationsPage()}
+                      disabled={fetchingNextNotificationsPage}
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-xs font-bold text-gray-300 transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+                    >
+                      {fetchingNextNotificationsPage ? "Loading..." : "Load Older Notifications"}
+                    </button>
+                  )}
+                </>
               ) : (
                 <p className="py-16 text-center text-xs text-gray-500">Notification logs clear.</p>
               )}
             </div>
 
             <div className="space-y-2 border-t border-white/5 p-5">
+              {unreadNotificationCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => markAllNotificationsRead()}
+                  disabled={markingAllRead}
+                  className="w-full rounded-xl border border-[#39FF14]/15 bg-[#39FF14]/10 px-4 py-2.5 text-xs font-bold text-[#39FF14] transition-colors hover:bg-[#39FF14]/20 disabled:opacity-50"
+                >
+                  {markingAllRead ? "Marking..." : "Mark All Read"}
+                </button>
+              )}
               <button
                 type="button"
-                onClick={() => setTrayNotifications([])}
-                className="w-full rounded-xl border border-red-500/10 bg-red-500/10 px-4 py-2.5 text-xs font-bold text-red-400 transition-colors hover:bg-red-500 hover:text-white"
+                onClick={() => dismissAllNotifications()}
+                disabled={trayNotifications.length === 0 || dismissingAll}
+                className="w-full rounded-xl border border-red-500/10 bg-red-500/10 px-4 py-2.5 text-xs font-bold text-red-400 transition-colors hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Clear All Logs
+                {dismissingAll ? "Clearing..." : "Clear All Logs"}
               </button>
             </div>
           </aside>
