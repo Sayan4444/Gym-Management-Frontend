@@ -13,6 +13,7 @@ import { dashboardStatsApi } from './api/DashboardStats';
 import { bookDemoApi } from './api/bookDemo';
 import { reviewApi } from './api/review';
 import { notificationApi } from './api/notification';
+import { consultationApi } from './api/consultation';
 
 export { fetchApi, API_BASE_URL };
 
@@ -30,5 +31,6 @@ export const api = {
   ...dashboardStatsApi,
   ...bookDemoApi,
   ...reviewApi,
-  ...notificationApi
+  ...notificationApi,
+  ...consultationApi
 };

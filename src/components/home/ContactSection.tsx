@@ -1,8 +1,8 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Phone, CheckCircle2, MessageCircle, Send, Calendar, Sparkles } from 'lucide-react';
+import { Phone, CheckCircle2, MessageCircle, Calendar, Sparkles } from 'lucide-react';
 import { Gym } from '@/data/types';
-import { useBookDemo } from '@/hooks/apis/useBookDemo';
+import { useBookConsultation } from '@/hooks/apis/useBookConsultation';
 
 interface FormData {
   name: string;
@@ -25,7 +25,7 @@ export default function ContactSection({ gym }: ContactSectionProps) {
     message: '',
   });
 
-  const bookDemoMutation = useBookDemo();
+  const bookConsultationMutation = useBookConsultation(gym.id);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
 
@@ -80,7 +80,7 @@ export default function ContactSection({ gym }: ContactSectionProps) {
     e.preventDefault();
     if (!validateForm()) return;
 
-    bookDemoMutation.mutate(
+    bookConsultationMutation.mutate(
       {
         fullName: formData.name,
         mobile: formData.phone,
@@ -212,7 +212,7 @@ export default function ContactSection({ gym }: ContactSectionProps) {
                 SCHEDULE VISIT PROFILE
               </h3>
 
-              <form className="space-y-5">
+              <form className="space-y-5" onSubmit={handleFormSubmission}>
                 
                 {/* Full name input */}
                 <div className="flex flex-col">
@@ -322,12 +322,11 @@ export default function ContactSection({ gym }: ContactSectionProps) {
                 <div className="pt-4">
                   <button
                     type="submit"
-                    onClick={handleFormSubmission}
-                    disabled={bookDemoMutation.isPending}
+                    disabled={bookConsultationMutation.isPending}
                     className="w-full py-4 rounded-xl bg-neon-green text-black font-extrabold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transform active:scale-95 transition-all shadow-lg shadow-neon-green/15 cursor-pointer hover:bg-white disabled:opacity-50"
                   >
                     <Calendar className="w-4 h-4 text-black shrink-0" />
-                    {bookDemoMutation.isPending ? 'Scheduling...' : 'Book Consultation'}
+                    {bookConsultationMutation.isPending ? 'Scheduling...' : 'Book Consultation'}
                   </button>
                 </div>
 
