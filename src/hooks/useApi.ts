@@ -12,3 +12,4 @@ export * from "./apis/useDashboardStats";
 export * from "./apis/useBookDemo";
 export * from "./apis/useReview";
 export * from "./apis/useNotification";
+export * from "./apis/useBiometricDevice";

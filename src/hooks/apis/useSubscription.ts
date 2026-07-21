@@ -5,6 +5,7 @@ import { Subscription } from "@/data/types";
 export interface CreateSubscriptionPayload {
   userId: number;
   planId: number;
+  startDate?: string;
 }
 
 export interface UpdateSubscriptionPayload {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarPlus, Check, Pause, Play, RefreshCw, Trash2, XCircle } from "lucide-react";
+import { CalendarPlus, Check, History, Pause, Play, RefreshCw, Trash2, XCircle } from "lucide-react";
 
 import { MembershipPlan, Subscription, User } from "@/data/types";
 import { useCreateSubscription, useDeleteSubscription, useUpdateSubscription } from "@/hooks/useApi";
@@ -7,11 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
 
 function statusClass(status: string) {
-  if (status === "Active") return "border-[#39FF14]/20 bg-[#39FF14]/10 text-[#39FF14]";
-  if (status === "Upcoming") return "border-[#00BFFF]/20 bg-[#00BFFF]/10 text-[#00BFFF]";
-  if (status === "Paused") return "border-amber-400/20 bg-amber-400/10 text-amber-300";
-  if (status === "Cancelled" || status === "Expired") return "border-red-400/20 bg-red-400/10 text-red-300";
-  return "border-white/10 bg-white/5 text-gray-300";
+  if (status === "Active") return "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300";
+  if (status === "Upcoming") return "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300";
+  if (status === "Paused") return "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300";
+  if (status === "Cancelled" || status === "Expired") return "border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300";
+  return "border-border bg-muted text-muted-foreground";
 }
 
 function SubscriptionAccessRow({ subscription, plans }: { subscription: Subscription; plans: MembershipPlan[] }) {
@@ -64,46 +64,46 @@ function SubscriptionAccessRow({ subscription, plans }: { subscription: Subscrip
   };
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+    <div className="rounded-xl border border-border bg-background p-4 shadow-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-black text-white">{subscription.plan?.name || `Plan #${subscription.planId}`}</p>
+            <p className="text-sm font-semibold text-foreground">{subscription.plan?.name || `Plan #${subscription.planId}`}</p>
             <span className={`rounded-full border px-2 py-0.5 font-mono text-[9px] font-black uppercase ${statusClass(subscription.status)}`}>
               {subscription.status}
             </span>
           </div>
-          <p className="mt-1 font-mono text-[10px] text-gray-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             {formatDate(subscription.startDate)} — {formatDate(subscription.endDate)} · Subscription #{subscription.id}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {subscription.status === "Paused" || subscription.status === "Cancelled" ? (
+          {subscription.status === "Paused" ? (
             <button
               type="button"
               onClick={() => updateStatus("", "Subscription reactivated")}
               disabled={isBusy}
-              className="inline-flex items-center gap-1 rounded-lg border border-[#39FF14]/20 bg-[#39FF14]/10 px-3 py-1.5 text-[10px] font-black text-[#39FF14] disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 disabled:opacity-50 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300"
             >
               <Play className="h-3 w-3" /> Reactivate
             </button>
-          ) : (
+          ) : subscription.status !== "Cancelled" ? (
             <button
               type="button"
               onClick={() => updateStatus("Paused", "Subscription paused")}
               disabled={isBusy || subscription.status === "Expired"}
-              className="inline-flex items-center gap-1 rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-[10px] font-black text-amber-300 disabled:opacity-40"
+              className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-100 disabled:opacity-40 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
             >
               <Pause className="h-3 w-3" /> Pause
             </button>
-          )}
+          ) : null}
           {subscription.status !== "Cancelled" && (
             <button
               type="button"
               onClick={() => updateStatus("Cancelled", "Subscription cancelled")}
               disabled={isBusy}
-              className="inline-flex items-center gap-1 rounded-lg border border-red-400/20 bg-red-400/10 px-3 py-1.5 text-[10px] font-black text-red-300 disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
             >
               <XCircle className="h-3 w-3" /> Cancel
             </button>
@@ -111,16 +111,16 @@ function SubscriptionAccessRow({ subscription, plans }: { subscription: Subscrip
         </div>
       </div>
 
-      <div className="mt-4 grid gap-2 border-t border-white/5 pt-4 sm:grid-cols-[1fr_auto_auto]">
+      <div className="mt-4 grid gap-2 border-t border-border pt-4 sm:grid-cols-[1fr_auto_auto]">
         <select
           aria-label={`Plan for subscription ${subscription.id}`}
           value={planId}
           onChange={(event) => setPlanId(event.target.value)}
           disabled={isBusy}
-          className="rounded-xl border border-white/10 bg-[#111] px-3 py-2 text-xs text-white focus:border-[#00BFFF] focus:outline-none disabled:opacity-50"
+          className="rounded-lg border border-input bg-background px-3 py-2 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
         >
           {plans.map((plan) => (
-            <option key={plan.id} value={plan.id} className="bg-neutral-900">
+            <option key={plan.id} value={plan.id}>
               {plan.name} · {plan.durationMonths} month{plan.durationMonths === 1 ? "" : "s"}
             </option>
           ))}
@@ -129,7 +129,7 @@ function SubscriptionAccessRow({ subscription, plans }: { subscription: Subscrip
           type="button"
           onClick={changePlan}
           disabled={isBusy || Number(planId) === subscription.planId}
-          className="inline-flex items-center justify-center gap-1 rounded-xl border border-[#00BFFF]/20 bg-[#00BFFF]/10 px-3 py-2 text-[10px] font-black text-[#00BFFF] disabled:opacity-40"
+          className="inline-flex items-center justify-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-40 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300"
         >
           <RefreshCw className="h-3 w-3" /> Change Plan
         </button>
@@ -138,7 +138,7 @@ function SubscriptionAccessRow({ subscription, plans }: { subscription: Subscrip
           onClick={() => (confirmDelete ? removeSubscription() : setConfirmDelete(true))}
           onBlur={() => setConfirmDelete(false)}
           disabled={isBusy}
-          className="inline-flex items-center justify-center gap-1 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-[10px] font-black text-red-300 disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
         >
           <Trash2 className="h-3 w-3" /> {confirmDelete ? "Confirm Delete" : "Delete"}
         </button>
@@ -157,6 +157,7 @@ export function MemberAccessPanel({
   const createSubscription = useCreateSubscription();
   const { toast } = useToast();
   const [planId, setPlanId] = useState("");
+  const [startDate, setStartDate] = useState("");
 
   const activePlans = useMemo(() => plans.filter((plan) => plan.isActive), [plans]);
   const subscriptions = useMemo(
@@ -167,13 +168,14 @@ export function MemberAccessPanel({
 
   useEffect(() => {
     setPlanId(activePlans[0] ? String(activePlans[0].id) : "");
+    setStartDate("");
   }, [activePlans, member.id]);
 
   const createPlan = () => {
     if (!planId) return;
 
     createSubscription.mutate(
-      { userId: member.id, planId: Number(planId) },
+      { userId: member.id, planId: Number(planId), startDate: startDate || undefined },
       {
         onSuccess: () => {
           toast({
@@ -189,15 +191,17 @@ export function MemberAccessPanel({
   };
 
   return (
-    <div className="space-y-5 rounded-xl border bg-background p-4">
-      <section className="rounded-2xl border border-[#39FF14]/10 bg-[#39FF14]/[0.03] p-4">
+    <div className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+      <section className="rounded-xl border border-border bg-muted/20 p-4">
         <div className="mb-3 flex items-start gap-3">
-          <CalendarPlus className="mt-0.5 h-4 w-4 shrink-0 text-[#39FF14]" />
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <CalendarPlus className="h-4 w-4" />
+          </span>
           <div>
-            <h3 className="text-xs font-black uppercase text-white">
+            <h3 className="text-sm font-semibold text-foreground">
               {hasCurrentOrUpcoming ? "Create next subscription" : "Create active subscription"}
             </h3>
-            <p className="mt-1 text-[11px] leading-relaxed text-gray-500">
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
               {hasCurrentOrUpcoming
                 ? "Because this member already has current or upcoming access, the new plan will begin after that term ends."
                 : "This plan starts immediately and provisions the member on the biometric device."}
@@ -205,41 +209,56 @@ export function MemberAccessPanel({
           </div>
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+        <div className="grid gap-2 sm:grid-cols-[1fr_180px_auto]">
           <select
             aria-label="Membership plan for the new subscription"
             value={planId}
             onChange={(event) => setPlanId(event.target.value)}
             disabled={createSubscription.isPending || activePlans.length === 0}
-            className="rounded-xl border border-white/10 bg-[#111] px-3 py-2.5 text-xs text-white focus:border-[#39FF14] focus:outline-none disabled:opacity-50"
+            className="rounded-lg border border-input bg-background px-3 py-2.5 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
           >
             {activePlans.length === 0 && <option value="">No active plans available</option>}
             {activePlans.map((plan) => (
-              <option key={plan.id} value={plan.id} className="bg-neutral-900">
+              <option key={plan.id} value={plan.id}>
                 {plan.name} · ₹{plan.price.toFixed(2)} · {plan.durationMonths} month{plan.durationMonths === 1 ? "" : "s"}
               </option>
             ))}
           </select>
+          <input
+            type="date"
+            aria-label="Optional subscription start date"
+            value={startDate}
+            onChange={(event) => setStartDate(event.target.value)}
+            disabled={createSubscription.isPending}
+            className="rounded-lg border border-input bg-background px-3 py-2.5 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+            title="Optional start date. Leave blank to use the next available date."
+          />
           <button
             type="button"
             onClick={createPlan}
             disabled={!planId || createSubscription.isPending}
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-5 py-2.5 text-xs font-black text-black disabled:opacity-40"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
           >
             <Check className="h-3.5 w-3.5" />
             {createSubscription.isPending ? "Creating..." : hasCurrentOrUpcoming ? "Queue Plan" : "Create & Enable"}
           </button>
         </div>
+        <p className="mt-2 text-[11px] text-muted-foreground">Start date is optional. Leave it blank to begin on the member's next available subscription date.</p>
       </section>
 
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#00BFFF]">Subscription history</h3>
-          <span className="font-mono text-[10px] text-gray-600">{subscriptions.length} total</span>
+      <section className="rounded-xl border border-border bg-muted/20 p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <History className="h-4 w-4" />
+            </span>
+            <h3 className="text-sm font-semibold text-foreground">Subscription history</h3>
+          </div>
+          <span className="rounded-full border border-border bg-background px-2.5 py-1 text-xs text-muted-foreground">{subscriptions.length} total</span>
         </div>
 
         {subscriptions.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 px-5 py-8 text-center text-xs text-gray-500">
+          <div className="rounded-xl border border-dashed border-border bg-background px-5 py-8 text-center text-xs text-muted-foreground">
             No subscriptions created yet.
           </div>
         ) : (

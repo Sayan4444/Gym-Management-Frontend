@@ -12,8 +12,9 @@ import TrainersPage from "./TrainersPage";
 import SettingsPage from "./SettingsPage";
 import ReviewsPage from "./ReviewsPage";
 import PrintableBillingPage from "./PrintableBillingPage";
+import BiometricDevicePage from "./BiometricDevicePage";
 
-const validAdminTabs = new Set(["dashboard", "members", "member", "attendance", "plans", "payments", "billing", "trainers", "reviews", "settings"]);
+const validAdminTabs = new Set(["dashboard", "members", "member", "attendance", "biometric-device", "plans", "payments", "billing", "trainers", "reviews", "settings"]);
 
 export default function AdminPanel() {
   const [searchParams] = useSearchParams();
@@ -36,6 +37,9 @@ export default function AdminPanel() {
       break;
     case "attendance":
       content = <AttendancePage />;
+      break;
+    case "biometric-device":
+      content = <BiometricDevicePage />;
       break;
     case "plans":
       content = <MembershipPlansPage />;

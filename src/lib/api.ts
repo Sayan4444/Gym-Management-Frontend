@@ -14,6 +14,7 @@ import { bookDemoApi } from './api/bookDemo';
 import { reviewApi } from './api/review';
 import { notificationApi } from './api/notification';
 import { consultationApi } from './api/consultation';
+import { biometricDeviceApi } from './api/biometricDevice';
 
 export { fetchApi, API_BASE_URL };
 
@@ -32,5 +33,6 @@ export const api = {
   ...bookDemoApi,
   ...reviewApi,
   ...notificationApi,
-  ...consultationApi
+  ...consultationApi,
+  ...biometricDeviceApi,
 };

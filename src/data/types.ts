@@ -110,6 +110,7 @@ export interface Subscription {
   startDate: string;
   endDate: string;
   status: string;
+  inactiveAt?: string;
   plan?: MembershipPlan;
 }
 
