@@ -7,7 +7,7 @@ export interface ScheduleUserAddonPayload {
 
 export const userAddonApi = {
   // ----- User Addon Routes -----
-  assignUserAddon: (data: UserAddon) => fetchApi("/user-addons", { method: "POST", body: JSON.stringify(data) }),
+  createUserAddon: (data: UserAddon) => fetchApi("/user-addons", { method: "POST", body: JSON.stringify(data) }),
   getUserAddons: (gymId?: number, userId?: number) => {
     const params = new URLSearchParams();
     if (gymId) params.append("gym_id", gymId.toString());
@@ -20,4 +20,3 @@ export const userAddonApi = {
     fetchApi(`/user-addons/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
   deleteUserAddon: (id: number ) => fetchApi(`/user-addons/${id}`, { method: "DELETE" }),
 };
-

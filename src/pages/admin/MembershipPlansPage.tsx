@@ -686,7 +686,7 @@ export default function MembershipPlansPage() {
                   <div className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-3">
                     <div>
                       <p className="font-bold text-white">Enrollment Status</p>
-                      <p className="text-[10px] text-gray-500">Controls whether members can be assigned to this plan.</p>
+                      <p className="text-[10px] text-gray-500">Controls whether subscriptions can be created with this plan.</p>
                     </div>
                     <Switch checked={planForm.isActive} onCheckedChange={(checked) => setPlanForm({ ...planForm, isActive: checked })} />
                   </div>

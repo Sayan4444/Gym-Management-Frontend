@@ -3,10 +3,10 @@ import { api } from "@/lib/api";
 import { UserAddon } from "@/data/types";
 import type { ScheduleUserAddonPayload } from "@/lib/api/userAddon";
 
-export function useAssignUserAddon() {
+export function useCreateUserAddon() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: UserAddon) => api.assignUserAddon(data),
+        mutationFn: (data: UserAddon) => api.createUserAddon(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["user-addons"] });
         },

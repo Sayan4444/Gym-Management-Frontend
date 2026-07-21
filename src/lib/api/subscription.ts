@@ -1,9 +1,9 @@
-import type { AssignSubscriptionPayload, UpdateSubscriptionPayload } from '../../hooks/apis/useSubscription';
+import type { CreateSubscriptionPayload, UpdateSubscriptionPayload } from '../../hooks/apis/useSubscription';
 import { fetchApi } from './core';
 
 export const subscriptionApi = {
   // ----- Subscription Routes -----
-  assignSubscription: (data: AssignSubscriptionPayload) => fetchApi("/subscriptions", { method: "POST", body: JSON.stringify(data) }),
+  createSubscription: (data: CreateSubscriptionPayload) => fetchApi("/subscriptions", { method: "POST", body: JSON.stringify(data) }),
   getSubscriptions: (gymId?: number, userId?: number) => {
     const params = new URLSearchParams();
     if (gymId) params.append("gym_id", gymId.toString());

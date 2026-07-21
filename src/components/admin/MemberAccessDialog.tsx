@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarPlus, Check, Pause, Play, RefreshCw, ShieldCheck, Trash2, XCircle } from "lucide-react";
+import { CalendarPlus, Check, Pause, Play, RefreshCw, Trash2, XCircle } from "lucide-react";
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MembershipPlan, Subscription, User } from "@/data/types";
-import { useAssignSubscription, useDeleteSubscription, useUpdateSubscription } from "@/hooks/useApi";
+import { useCreateSubscription, useDeleteSubscription, useUpdateSubscription } from "@/hooks/useApi";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
 
@@ -148,134 +147,109 @@ function SubscriptionAccessRow({ subscription, plans }: { subscription: Subscrip
   );
 }
 
-export function MemberAccessDialog({
+export function MemberAccessPanel({
   member,
   plans,
-  open,
-  onOpenChange,
 }: {
-  member: User | null;
+  member: User;
   plans: MembershipPlan[];
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
 }) {
-  const assignSubscription = useAssignSubscription();
+  const createSubscription = useCreateSubscription();
   const { toast } = useToast();
   const [planId, setPlanId] = useState("");
 
   const activePlans = useMemo(() => plans.filter((plan) => plan.isActive), [plans]);
   const subscriptions = useMemo(
-    () => [...(member?.subscription || [])].sort((first, second) => new Date(second.startDate).getTime() - new Date(first.startDate).getTime()),
-    [member?.subscription],
+    () => [...(member.subscription || [])].sort((first, second) => new Date(second.startDate).getTime() - new Date(first.startDate).getTime()),
+    [member.subscription],
   );
   const hasCurrentOrUpcoming = subscriptions.some((subscription) => subscription.status === "Active" || subscription.status === "Upcoming");
 
   useEffect(() => {
-    if (!open) return;
     setPlanId(activePlans[0] ? String(activePlans[0].id) : "");
-  }, [activePlans, member?.id, open]);
+  }, [activePlans, member.id]);
 
-  const assignPlan = () => {
-    if (!member || !planId) return;
+  const createPlan = () => {
+    if (!planId) return;
 
-    assignSubscription.mutate(
+    createSubscription.mutate(
       { userId: member.id, planId: Number(planId) },
       {
         onSuccess: () => {
           toast({
-            title: hasCurrentOrUpcoming ? "Upcoming subscription assigned" : "Active subscription assigned",
+            title: hasCurrentOrUpcoming ? "Upcoming subscription created" : "Active subscription created",
             description: hasCurrentOrUpcoming
               ? "The plan will be provisioned when the current access term ends."
               : "The member has been sent to biometric access control.",
           });
         },
-        onError: (error) => toast({ title: "Unable to assign subscription", description: error.message, variant: "destructive" }),
+        onError: (error) => toast({ title: "Unable to create subscription", description: error.message, variant: "destructive" }),
       },
     );
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88vh] max-w-3xl overflow-y-auto border-[#00BFFF]/20 bg-[#090909] text-white shadow-[0_0_55px_rgba(0,191,255,0.14)]">
-        <DialogHeader>
-          <div className="flex items-center gap-2">
-            <span className="rounded-xl border border-[#00BFFF]/20 bg-[#00BFFF]/10 p-2 text-[#00BFFF]">
-              <ShieldCheck className="h-4 w-4" />
-            </span>
-            <div>
-              <DialogTitle className="text-base font-black uppercase tracking-tight">Membership & Biometric Access</DialogTitle>
-              <DialogDescription className="mt-1 text-xs text-gray-500">
-                {member ? `${member.name} · #${member.id}` : "Manage member access"}
-              </DialogDescription>
-            </div>
+    <div className="space-y-5 rounded-xl border bg-background p-4">
+      <section className="rounded-2xl border border-[#39FF14]/10 bg-[#39FF14]/[0.03] p-4">
+        <div className="mb-3 flex items-start gap-3">
+          <CalendarPlus className="mt-0.5 h-4 w-4 shrink-0 text-[#39FF14]" />
+          <div>
+            <h3 className="text-xs font-black uppercase text-white">
+              {hasCurrentOrUpcoming ? "Create next subscription" : "Create active subscription"}
+            </h3>
+            <p className="mt-1 text-[11px] leading-relaxed text-gray-500">
+              {hasCurrentOrUpcoming
+                ? "Because this member already has current or upcoming access, the new plan will begin after that term ends."
+                : "This plan starts immediately and provisions the member on the biometric device."}
+            </p>
           </div>
-        </DialogHeader>
+        </div>
 
-        {member && (
-          <div className="space-y-5 pt-2">
-            <section className="rounded-2xl border border-[#39FF14]/10 bg-[#39FF14]/[0.03] p-4">
-              <div className="mb-3 flex items-start gap-3">
-                <CalendarPlus className="mt-0.5 h-4 w-4 shrink-0 text-[#39FF14]" />
-                <div>
-                  <h3 className="text-xs font-black uppercase text-white">
-                    {hasCurrentOrUpcoming ? "Assign next subscription" : "Assign active subscription"}
-                  </h3>
-                  <p className="mt-1 text-[11px] leading-relaxed text-gray-500">
-                    {hasCurrentOrUpcoming
-                      ? "Because this member already has current or upcoming access, the new plan will begin after that term ends."
-                      : "This plan starts immediately and provisions the member on the biometric device."}
-                  </p>
-                </div>
-              </div>
+        <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+          <select
+            aria-label="Membership plan for the new subscription"
+            value={planId}
+            onChange={(event) => setPlanId(event.target.value)}
+            disabled={createSubscription.isPending || activePlans.length === 0}
+            className="rounded-xl border border-white/10 bg-[#111] px-3 py-2.5 text-xs text-white focus:border-[#39FF14] focus:outline-none disabled:opacity-50"
+          >
+            {activePlans.length === 0 && <option value="">No active plans available</option>}
+            {activePlans.map((plan) => (
+              <option key={plan.id} value={plan.id} className="bg-neutral-900">
+                {plan.name} · ₹{plan.price.toFixed(2)} · {plan.durationMonths} month{plan.durationMonths === 1 ? "" : "s"}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={createPlan}
+            disabled={!planId || createSubscription.isPending}
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-5 py-2.5 text-xs font-black text-black disabled:opacity-40"
+          >
+            <Check className="h-3.5 w-3.5" />
+            {createSubscription.isPending ? "Creating..." : hasCurrentOrUpcoming ? "Queue Plan" : "Create & Enable"}
+          </button>
+        </div>
+      </section>
 
-              <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-                <select
-                  aria-label="Membership plan to assign"
-                  value={planId}
-                  onChange={(event) => setPlanId(event.target.value)}
-                  disabled={assignSubscription.isPending || activePlans.length === 0}
-                  className="rounded-xl border border-white/10 bg-[#111] px-3 py-2.5 text-xs text-white focus:border-[#39FF14] focus:outline-none disabled:opacity-50"
-                >
-                  {activePlans.length === 0 && <option value="">No active plans available</option>}
-                  {activePlans.map((plan) => (
-                    <option key={plan.id} value={plan.id} className="bg-neutral-900">
-                      {plan.name} · ₹{plan.price.toFixed(2)} · {plan.durationMonths} month{plan.durationMonths === 1 ? "" : "s"}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={assignPlan}
-                  disabled={!planId || assignSubscription.isPending}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-5 py-2.5 text-xs font-black text-black disabled:opacity-40"
-                >
-                  <Check className="h-3.5 w-3.5" />
-                  {assignSubscription.isPending ? "Assigning..." : hasCurrentOrUpcoming ? "Queue Plan" : "Assign & Enable"}
-                </button>
-              </div>
-            </section>
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#00BFFF]">Subscription history</h3>
+          <span className="font-mono text-[10px] text-gray-600">{subscriptions.length} total</span>
+        </div>
 
-            <section>
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#00BFFF]">Subscription history</h3>
-                <span className="font-mono text-[10px] text-gray-600">{subscriptions.length} total</span>
-              </div>
-
-              {subscriptions.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-white/10 px-5 py-8 text-center text-xs text-gray-500">
-                  No subscriptions assigned yet.
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {subscriptions.map((subscription) => (
-                    <SubscriptionAccessRow key={subscription.id} subscription={subscription} plans={plans} />
-                  ))}
-                </div>
-              )}
-            </section>
+        {subscriptions.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-white/10 px-5 py-8 text-center text-xs text-gray-500">
+            No subscriptions created yet.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {subscriptions.map((subscription) => (
+              <SubscriptionAccessRow key={subscription.id} subscription={subscription} plans={plans} />
+            ))}
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </section>
+    </div>
   );
 }

@@ -1,12 +1,39 @@
 import { FormEvent, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { CheckSquare, ChevronLeft, ChevronRight, CreditCard, Crown, Download, Edit2, Plus, Search, Sparkles, Trash2, Users, X } from "lucide-react";
+import {
+  Activity,
+  CalendarDays,
+  CheckSquare,
+  ChevronLeft,
+  ChevronRight,
+  CreditCard,
+  Crown,
+  Download,
+  Droplets,
+  Edit2,
+  HeartPulse,
+  Mail,
+  MapPin,
+  Phone,
+  Plus,
+  Search,
+  ShieldAlert,
+  Sparkles,
+  Trash2,
+  UserRound,
+  X,
+} from "lucide-react";
 
-import { MemberAccessDialog } from "@/components/admin/MemberAccessDialog";
+import { MemberAccessPanel } from "@/components/admin/MemberAccessDialog";
 import { ReusableDataTable, ReusableDataTableColumn } from "@/components/admin/ReusableDataTable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { MembershipPlan, Subscription, User } from "@/data/types";
 import { CreateUserPayload, UpdateProfilePayload, useCreateUser, useDeleteProfile, useMembershipPlans, useUpdateProfile, useUsers } from "@/hooks/useApi";
 import { useToast } from "@/hooks/use-toast";
@@ -121,270 +148,132 @@ function memberToForm(member: User): MemberFormState {
   };
 }
 
-function DetailItem({ label, value }: { label: string; value?: string | number | null }) {
-  return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-      <p className="mb-1 font-mono text-[10px] uppercase tracking-wider text-gray-500">{label}</p>
-      <p className="min-h-5 text-sm font-semibold text-white">{value || "Not provided"}</p>
-    </div>
-  );
-}
-
-function MemberProfileDialog({
-  user,
-  open,
-  onOpenChange,
-  onEdit,
-  onManageAccess,
-}: {
-  user: User | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onEdit: (user: User) => void;
-  onManageAccess: (user: User) => void;
-}) {
-  const subscription = user ? getPrimarySubscription(user) : undefined;
-  const plan = subscription?.plan;
-  const status = subscription?.status || "No Plan";
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl overflow-hidden border-white/10 bg-[#090909] p-0 text-white shadow-[0_0_50px_rgba(0,191,255,0.16)]">
-        {user && (
-          <>
-            <div className="relative border-b border-white/5 bg-[radial-gradient(circle_at_top_left,rgba(0,191,255,0.18),transparent_34%),radial-gradient(circle_at_top_right,rgba(57,255,20,0.12),transparent_28%)] p-6">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                <Avatar className="h-20 w-20 rounded-2xl border border-white/15 shadow-2xl">
-                  {user.photoUrl && <AvatarImage src={user.photoUrl} alt={user.name} className="object-cover" />}
-                  <AvatarFallback className="rounded-2xl bg-[#00BFFF]/10 text-xl font-black text-[#00BFFF]">{getInitials(user.name)}</AvatarFallback>
-                </Avatar>
-
-                <div className="min-w-0 flex-1">
-                  <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="rounded border border-[#00BFFF]/10 bg-[#00BFFF]/5 px-2 py-1 font-mono text-[10px] font-bold text-[#00BFFF]">#{user.id}</span>
-                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${getStatusClass(status)}`}>{status}</span>
-                    {plan?.name?.toLowerCase().includes("premium") && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-yellow-400/20 bg-yellow-400/10 px-2 py-0.5 text-[10px] font-bold text-yellow-300">
-                        <Crown className="h-3 w-3 fill-yellow-300" /> Premium
-                      </span>
-                    )}
-                  </div>
-                  <DialogHeader>
-                    <DialogTitle className="truncate text-2xl font-black uppercase tracking-tight text-white">{user.name}</DialogTitle>
-                  </DialogHeader>
-                  <p className="mt-1 truncate font-mono text-xs text-gray-400">{user.email}</p>
-                  <p className="mt-1 font-mono text-xs text-gray-500">{user.phone || "No phone number"}</p>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onManageAccess(user)}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-4 py-2.5 text-xs font-black text-black shadow-[0_0_18px_rgba(0,191,255,0.2)]"
-                  >
-                    <CreditCard className="h-3.5 w-3.5" />
-                    Manage Access
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onEdit(user)}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-xs font-black text-gray-200"
-                  >
-                    <Edit2 className="h-3.5 w-3.5" />
-                    Edit Details
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="max-h-[62vh] space-y-5 overflow-y-auto p-6">
-              <div>
-                <h4 className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-[#39FF14]">Membership Matrix</h4>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                  <DetailItem label="Plan" value={plan?.name} />
-                  <DetailItem label="Started" value={subscription?.startDate ? formatDate(subscription.startDate) : undefined} />
-                  <DetailItem label="Ends" value={subscription?.endDate ? formatDate(subscription.endDate) : undefined} />
-                </div>
-              </div>
-
-              <div>
-                <h4 className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-[#00BFFF]">Member Profile</h4>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <DetailItem label="Gender" value={user.gender} />
-                  <DetailItem label="Date of Birth" value={user.dob ? formatDate(user.dob) : undefined} />
-                  <DetailItem label="Height" value={user.height ? `${user.height} cm` : undefined} />
-                  <DetailItem label="Weight" value={user.weight ? `${user.weight} kg` : undefined} />
-                  <DetailItem label="Blood Group" value={user.bloodGroup} />
-                  <DetailItem label="Address" value={user.address} />
-                  <DetailItem label="Timings" value={user.timings} />
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-white/5 bg-white/[0.015] p-4">
-                <h4 className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-red-300">Health & Emergency</h4>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <DetailItem label="Emergency Contact" value={user.emergencyContactName} />
-                  <DetailItem label="Emergency Phone" value={user.emergencyContactPhone} />
-                </div>
-                <div className="mt-3 rounded-xl border border-white/5 bg-black/20 p-3">
-                  <p className="mb-1 font-mono text-[10px] uppercase tracking-wider text-gray-500">Medical Conditions</p>
-                  <p className="text-sm leading-relaxed text-gray-300">{user.medicalConditions || "No medical conditions recorded."}</p>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 function MemberFormFields({ form, setForm }: { form: MemberFormState; setForm: (form: MemberFormState) => void }) {
   return (
-    <div className="space-y-4 font-sans text-xs">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="space-y-8">
+      <fieldset className="space-y-4">
+        <legend className="mb-1 flex w-full items-center gap-2 border-b pb-2 text-sm font-semibold text-foreground">
+          <UserRound className="h-4 w-4 text-primary" /> Personal Information
+        </legend>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <label className="font-bold text-gray-400">Member Full Name *</label>
-          <input
+            <Label htmlFor="member-form-name" className="flex items-center gap-1.5 text-xs font-medium"><UserRound className="h-3 w-3 text-muted-foreground" />Full Name *</Label>
+          <Input
+              id="member-form-name"
             type="text"
             required
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
             placeholder="e.g. Samir Patel"
-            className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
           />
         </div>
         <div className="space-y-1.5">
-          <label className="font-bold text-gray-400">Email Address *</label>
-          <input
+            <Label htmlFor="member-form-email" className="flex items-center gap-1.5 text-xs font-medium"><Mail className="h-3 w-3 text-muted-foreground" />Email *</Label>
+          <Input
+              id="member-form-email"
             type="email"
             required
             value={form.email}
             onChange={(event) => setForm({ ...form, email: event.target.value })}
             placeholder="member@example.com"
-            className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
           />
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="space-y-1.5">
-          <label className="font-bold text-gray-400">Mobile Number</label>
-          <input
+            <Label htmlFor="member-form-phone" className="flex items-center gap-1.5 text-xs font-medium"><Phone className="h-3 w-3 text-muted-foreground" />Phone</Label>
+          <Input
+              id="member-form-phone"
             type="text"
             value={form.phone}
             onChange={(event) => setForm({ ...form, phone: event.target.value })}
             placeholder="+91 91234 56789"
-            className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
           />
         </div>
         <div className="space-y-1.5">
-          <label className="font-bold text-gray-400">Date of Birth</label>
-          <input
+            <Label htmlFor="member-form-dob" className="flex items-center gap-1.5 text-xs font-medium"><CalendarDays className="h-3 w-3 text-muted-foreground" />Date of Birth</Label>
+          <Input
+              id="member-form-dob"
             type="date"
             value={form.dob}
             onChange={(event) => setForm({ ...form, dob: event.target.value })}
-            className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
           />
         </div>
         <div className="space-y-1.5">
-          <label className="font-bold text-gray-400">Gender</label>
-          <select
-            value={form.gender}
-            onChange={(event) => setForm({ ...form, gender: event.target.value })}
-            className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
-          >
-            <option value="Male" className="bg-neutral-900">Male</option>
-            <option value="Female" className="bg-neutral-900">Female</option>
-            <option value="Other" className="bg-neutral-900">Other</option>
-          </select>
+            <Label className="flex items-center gap-1.5 text-xs font-medium"><UserRound className="h-3 w-3 text-muted-foreground" />Gender</Label>
+            <Select value={form.gender} onValueChange={(value) => setForm({ ...form, gender: value })}>
+              <SelectTrigger><SelectValue placeholder="Select gender" /></SelectTrigger>
+              <SelectContent><SelectItem value="Male">Male</SelectItem><SelectItem value="Female">Female</SelectItem><SelectItem value="Other">Other</SelectItem></SelectContent>
+            </Select>
         </div>
-      </div>
+        </div>
+      </fieldset>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <fieldset className="space-y-4">
+        <legend className="mb-1 flex w-full items-center gap-2 border-b pb-2 text-sm font-semibold text-foreground">
+          <Activity className="h-4 w-4 text-primary" /> Physical Information
+        </legend>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
-          <label className="font-bold text-gray-400">Height (cm)</label>
-          <input
+            <Label htmlFor="member-form-height" className="text-xs font-medium">Height (cm)</Label>
+          <Input
+              id="member-form-height"
             type="number"
             value={form.height}
             onChange={(event) => setForm({ ...form, height: event.target.value })}
-            className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
           />
         </div>
         <div className="space-y-1.5">
-          <label className="font-bold text-gray-400">Weight (kg)</label>
-          <input
+            <Label htmlFor="member-form-weight" className="text-xs font-medium">Weight (kg)</Label>
+          <Input
+              id="member-form-weight"
             type="number"
             value={form.weight}
             onChange={(event) => setForm({ ...form, weight: event.target.value })}
-            className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
           />
         </div>
         <div className="space-y-1.5">
-          <label className="font-bold text-gray-400">Blood Group</label>
-          <input
-            type="text"
-            value={form.bloodGroup}
-            onChange={(event) => setForm({ ...form, bloodGroup: event.target.value })}
-            className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
-          />
+            <Label className="flex items-center gap-1.5 text-xs font-medium"><Droplets className="h-3 w-3 text-muted-foreground" />Blood Group</Label>
+            <Select value={form.bloodGroup} onValueChange={(value) => setForm({ ...form, bloodGroup: value })}>
+              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>{["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => <SelectItem key={group} value={group}>{group}</SelectItem>)}</SelectContent>
+            </Select>
         </div>
-      </div>
+        </div>
+      </fieldset>
 
-      <div className="space-y-1.5">
-        <label className="font-bold text-gray-400">Address</label>
-        <input
-          type="text"
-          value={form.address}
-          onChange={(event) => setForm({ ...form, address: event.target.value })}
-          className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
-        />
-      </div>
-
-      <div className="space-y-1.5">
-        <label className="font-bold text-gray-400">Timings</label>
-        <input
-          type="text"
-          value={form.timings}
-          onChange={(event) => setForm({ ...form, timings: event.target.value })}
-          placeholder="e.g. 06:00 AM - 11:00 AM"
-          className="w-full rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
-        />
-      </div>
-
-      <div className="space-y-3 rounded-xl border border-white/5 bg-white/[0.01] p-4">
-        <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#39FF14]">Emergency contact index</h4>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <div className="space-y-1">
-            <label className="text-[10px] text-gray-400">Contact Person</label>
-            <input
+      <fieldset className="space-y-4">
+        <legend className="mb-1 flex w-full items-center gap-2 border-b pb-2 text-sm font-semibold text-foreground">
+          <ShieldAlert className="h-4 w-4 text-primary" /> Emergency Contact
+        </legend>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="member-form-emergency-name" className="text-xs font-medium">Contact Name</Label>
+            <Input
+              id="member-form-emergency-name"
               type="text"
               value={form.emergencyContactName}
               onChange={(event) => setForm({ ...form, emergencyContactName: event.target.value })}
-              className="w-full rounded border border-white/5 bg-[#111] p-2 text-xs text-white focus:border-[#39FF14]"
             />
           </div>
-          <div className="space-y-1">
-            <label className="text-[10px] text-gray-400">Emergency Phone</label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="member-form-emergency-phone" className="text-xs font-medium">Contact Phone</Label>
+            <Input
+              id="member-form-emergency-phone"
               type="text"
               value={form.emergencyContactPhone}
               onChange={(event) => setForm({ ...form, emergencyContactPhone: event.target.value })}
-              className="w-full rounded border border-white/5 bg-[#111] p-2 text-xs text-white focus:border-[#39FF14]"
             />
           </div>
         </div>
-      </div>
+      </fieldset>
 
-      <div className="space-y-1.5">
-        <label className="font-bold text-gray-400">Medical Conditions</label>
-        <textarea
-          value={form.medicalConditions}
-          onChange={(event) => setForm({ ...form, medicalConditions: event.target.value })}
-          rows={3}
-          className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.02] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
-        />
-      </div>
+      <fieldset className="space-y-4">
+        <legend className="mb-1 flex w-full items-center gap-2 border-b pb-2 text-sm font-semibold text-foreground">
+          <HeartPulse className="h-4 w-4 text-primary" /> Medical & Address
+        </legend>
+        <div className="space-y-1.5"><Label htmlFor="member-form-medical" className="text-xs font-medium">Medical Conditions</Label><Textarea id="member-form-medical" value={form.medicalConditions} onChange={(event) => setForm({ ...form, medicalConditions: event.target.value })} rows={2} /></div>
+        <div className="space-y-1.5"><Label htmlFor="member-form-address" className="flex items-center gap-1.5 text-xs font-medium"><MapPin className="h-3 w-3 text-muted-foreground" />Address</Label><Textarea id="member-form-address" value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} rows={2} /></div>
+        <div className="space-y-1.5"><Label htmlFor="member-form-timings" className="text-xs font-medium">Timings</Label><Input id="member-form-timings" value={form.timings} onChange={(event) => setForm({ ...form, timings: event.target.value })} placeholder="e.g. 06:00 AM - 11:00 AM" /></div>
+      </fieldset>
     </div>
   );
 }
@@ -402,17 +291,17 @@ export default function MembersList() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<(typeof statusOptions)[number]>("All");
   const [page, setPage] = useState(1);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<{ plan: MembershipPlan; subscription: Subscription } | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addForm, setAddForm] = useState<MemberFormState>(emptyForm);
   const [editingMember, setEditingMember] = useState<User | null>(null);
   const [editForm, setEditForm] = useState<MemberFormState>(emptyForm);
   const [editingRole, setEditingRole] = useState<"Member" | "Trainer">("Member");
-  const [managingMemberId, setManagingMemberId] = useState<number | null>(null);
   const [pendingDeleteMember, setPendingDeleteMember] = useState<User | null>(null);
 
-  const managingMember = managingMemberId === null ? null : members.find((member) => member.id === managingMemberId) || null;
+  const currentEditingMember = editingMember
+    ? members.find((member) => member.id === editingMember.id) || editingMember
+    : null;
 
   const itemsPerPage = 6;
 
@@ -513,7 +402,6 @@ export default function MembersList() {
 
     deleteProfile.mutate(member.id, {
       onSuccess: () => {
-        if (selectedUser?.id === member.id) setSelectedUser(null);
         if (editingMember?.id === member.id) setEditingMember(null);
         setPendingDeleteMember(null);
       },
@@ -553,7 +441,7 @@ export default function MembersList() {
             <div className="flex min-w-0 flex-col">
               <button
                 type="button"
-                onClick={() => setSelectedUser(member)}
+                onClick={() => openEditModal(member)}
                 className="truncate text-left text-xs font-bold text-white transition-colors hover:text-[#00BFFF]"
               >
                 {member.name}
@@ -574,7 +462,7 @@ export default function MembersList() {
     {
       key: "plan",
       header: "Membership Plan",
-      width: "14%",
+      width: "10%",
       render: (member) => {
         const sub = getPrimarySubscription(member);
         const plan = sub?.plan;
@@ -632,39 +520,15 @@ export default function MembersList() {
       headerClassName: "px-2 text-center",
       cellClassName: "px-2",
       render: (member) => (
-        <div className="flex items-center justify-center gap-1">
-          <button
-            type="button"
-            onClick={() => setSelectedUser(member)}
-            className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 text-gray-400 transition-all hover:bg-[#00BFFF]/10 hover:text-[#00BFFF]"
-            title="View Profile"
-          >
-            <Users className="h-3.5 w-3.5" />
-          </button>
+        <div className="flex items-center justify-center">
           <button
             type="button"
             onClick={() => openEditModal(member)}
-            className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 text-gray-400 transition-all hover:bg-[#39FF14]/10 hover:text-[#39FF14]"
-            title="Edit Details"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-gray-300 transition-colors hover:border-[#00BFFF]/30 hover:bg-[#00BFFF]/10 hover:text-[#00BFFF]"
+            aria-label={`Manage ${member.name}`}
           >
             <Edit2 className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setManagingMemberId(member.id)}
-            className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 text-gray-400 transition-all hover:bg-[#00BFFF]/10 hover:text-[#00BFFF]"
-            title="Manage Membership & Access"
-          >
-            <CreditCard className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setPendingDeleteMember(member)}
-            disabled={deleteProfile.isPending}
-            className="rounded-lg border border-white/5 bg-white/[0.02] p-1.5 text-gray-400 transition-all hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
-            title="Delete Member"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
+            Manage
           </button>
         </div>
       ),
@@ -761,27 +625,6 @@ export default function MembersList() {
         </div>
       </div>
 
-      <MemberProfileDialog
-        user={selectedUser}
-        open={!!selectedUser}
-        onOpenChange={(open) => !open && setSelectedUser(null)}
-        onEdit={(user) => {
-          setSelectedUser(null);
-          openEditModal(user);
-        }}
-        onManageAccess={(user) => {
-          setSelectedUser(null);
-          setManagingMemberId(user.id);
-        }}
-      />
-
-      <MemberAccessDialog
-        member={managingMember}
-        plans={plans}
-        open={managingMemberId !== null}
-        onOpenChange={(open) => !open && setManagingMemberId(null)}
-      />
-
       <Dialog open={!!selectedPlan} onOpenChange={(open) => !open && setSelectedPlan(null)}>
         <DialogContent className="max-w-md border-white/10 bg-[#090909] text-white">
           <DialogHeader>
@@ -863,56 +706,79 @@ export default function MembersList() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {editingMember && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#39FF14]/35 bg-[#090909] p-6 shadow-[0_0_40px_rgba(57,255,20,0.15)]"
-            >
-              <div className="mb-5 flex items-center justify-between border-b border-white/5 pb-4">
-                <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-white">
-                  Edit Details - <span className="text-[#39FF14]">#{editingMember.id}</span>
-                </h3>
-                <button type="button" onClick={() => setEditingMember(null)} className="rounded bg-white/5 p-1.5 text-gray-400 transition-colors hover:text-white">
-                  <X className="h-4 w-4" />
-                </button>
+      <Dialog open={!!editingMember} onOpenChange={(open) => !open && setEditingMember(null)}>
+        <DialogContent className="flex max-h-[85vh] w-[95vw] flex-col gap-0 overflow-hidden border-border p-0 shadow-2xl sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px]">
+          {editingMember && (
+            <>
+              <div className="border-b p-6 pb-4">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2 text-xl">
+                    <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-primary/10">
+                      {editingMember.photoUrl ? <img src={editingMember.photoUrl} alt={editingMember.name} className="h-full w-full object-cover" /> : <UserRound className="h-5 w-5 text-primary" />}
+                    </span>
+                    Edit Member Profile
+                  </DialogTitle>
+                  <DialogDescription>View and update this member's profile, membership, and access settings.</DialogDescription>
+                </DialogHeader>
               </div>
 
-              <form onSubmit={handleUpdateSubmit}>
-                <MemberFormFields form={editForm} setForm={setEditForm} />
-                <div className="mt-4 rounded-xl border border-[#00BFFF]/15 bg-[#00BFFF]/[0.04] p-4">
-                  <label className="text-xs font-black uppercase tracking-wider text-[#00BFFF]" htmlFor="member-role-selector">
-                    Access role
-                  </label>
-                  <select
-                    id="member-role-selector"
-                    value={editingRole}
-                    onChange={(event) => setEditingRole(event.target.value as "Member" | "Trainer")}
-                    className="mt-2 w-full rounded-lg border border-white/10 bg-[#111] p-2.5 text-xs text-white focus:border-[#00BFFF] focus:outline-none"
-                  >
-                    <option value="Member" className="bg-neutral-900">Member</option>
-                    <option value="Trainer" className="bg-neutral-900">Trainer</option>
-                  </select>
-                  <p className="mt-2 text-[11px] leading-relaxed text-gray-500">
-                    Changing the role synchronizes biometric access immediately. Trainers receive permanent access; Members require an active subscription.
-                  </p>
+              <form onSubmit={handleUpdateSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <div className="custom-scrollbar flex-1 space-y-8 overflow-y-auto bg-accent/5 p-6">
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <Avatar className="h-24 w-24 border-4 border-background bg-primary/10 shadow-sm">
+                      {editingMember.photoUrl && <AvatarImage src={editingMember.photoUrl} alt={editingMember.name} className="object-cover" />}
+                      <AvatarFallback className="bg-primary/10 text-2xl font-semibold text-primary">{getInitials(editingMember.name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold text-foreground">{editingMember.name}</h3>
+                      <p className="text-sm text-muted-foreground">{editingMember.email}</p>
+                    </div>
+                  </div>
+
+                  <MemberFormFields form={editForm} setForm={setEditForm} />
+
+                  <fieldset className="space-y-4">
+                    <legend className="mb-1 flex w-full items-center gap-2 border-b pb-2 text-sm font-semibold text-foreground">
+                      <CreditCard className="h-4 w-4 text-primary" /> Access Control Settings
+                    </legend>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium">Access Role</Label>
+                      <Select value={editingRole} onValueChange={(value) => setEditingRole(value as "Member" | "Trainer")}>
+                        <SelectTrigger id="member-role-selector"><SelectValue /></SelectTrigger>
+                        <SelectContent><SelectItem value="Member">Member</SelectItem><SelectItem value="Trainer">Trainer</SelectItem></SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">Role changes synchronize biometric access immediately. Trainers receive permanent access; members require an active subscription.</p>
+                    </div>
+                    {currentEditingMember && <MemberAccessPanel member={currentEditingMember} plans={plans} />}
+                  </fieldset>
                 </div>
-                <div className="mt-4 flex justify-end gap-3 border-t border-white/5 pt-4">
-                  <button type="button" onClick={() => setEditingMember(null)} className="rounded-xl border border-white/10 bg-white/[0.02]/50 px-5 py-2.5 text-gray-400 hover:text-white">
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={updateProfile.isPending} className="rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-6 py-2.5 font-black text-black disabled:opacity-50">
-                    {updateProfile.isPending ? "Applying..." : "Apply Modifications"}
-                  </button>
+
+                <div className="border-t bg-card p-6 pt-4">
+                  <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <Button
+                      variant="outline"
+                      type="button"
+                      className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                      onClick={() => {
+                        setPendingDeleteMember(editingMember);
+                        setEditingMember(null);
+                      }}
+                      disabled={updateProfile.isPending}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete Profile
+                    </Button>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                      <Button variant="outline" type="button" onClick={() => setEditingMember(null)} disabled={updateProfile.isPending}>Cancel</Button>
+                      <Button type="submit" disabled={updateProfile.isPending}>{updateProfile.isPending ? "Saving..." : "Save Changes"}</Button>
+                    </DialogFooter>
+                  </div>
                 </div>
               </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <AnimatePresence>
         {pendingDeleteMember && (

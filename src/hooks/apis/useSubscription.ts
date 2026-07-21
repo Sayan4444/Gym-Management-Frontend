@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Subscription } from "@/data/types";
 
-export interface AssignSubscriptionPayload {
+export interface CreateSubscriptionPayload {
   userId: number;
   planId: number;
 }
@@ -20,10 +20,10 @@ function invalidateAccessQueries(queryClient: ReturnType<typeof useQueryClient>)
   queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
 }
 
-export function useAssignSubscription() {
+export function useCreateSubscription() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: AssignSubscriptionPayload) => api.assignSubscription(data),
+    mutationFn: (data: CreateSubscriptionPayload) => api.createSubscription(data),
     onSuccess: () => {
       invalidateAccessQueries(queryClient);
     },
