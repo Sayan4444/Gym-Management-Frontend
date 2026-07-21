@@ -524,7 +524,7 @@ export default function MembersList() {
     {
       key: "id",
       header: "Member ID",
-      width: "10%",
+      width: "9%",
       render: (member) => (
         <span className="inline-flex rounded border border-[#00BFFF]/10 bg-[#00BFFF]/5 px-2 py-1 font-mono text-xs font-bold text-[#00BFFF]">
           #{member.id}
@@ -534,7 +534,7 @@ export default function MembersList() {
     {
       key: "member",
       header: "Member",
-      width: "23%",
+      width: "21%",
       render: (member) => {
         const sub = getPrimarySubscription(member);
         const plan = sub?.plan;
@@ -567,14 +567,14 @@ export default function MembersList() {
     {
       key: "phone",
       header: "Phone",
-      width: "12%",
+      width: "11%",
       cellClassName: "font-mono text-xs font-semibold text-gray-300",
       render: (member) => <span className="block truncate">{member.phone || "—"}</span>,
     },
     {
       key: "plan",
       header: "Membership Plan",
-      width: "15%",
+      width: "14%",
       render: (member) => {
         const sub = getPrimarySubscription(member);
         const plan = sub?.plan;
@@ -617,7 +617,7 @@ export default function MembersList() {
     {
       key: "status",
       header: "Status",
-      width: "10%",
+      width: "9%",
       render: (member) => {
         const sub = getPrimarySubscription(member);
         const status = sub?.status || "No Plan";
@@ -628,10 +628,11 @@ export default function MembersList() {
     {
       key: "actions",
       header: "Actions",
-      width: "8%",
-      headerClassName: "text-center",
+      width: "14%",
+      headerClassName: "px-2 text-center",
+      cellClassName: "px-2",
       render: (member) => (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1">
           <button
             type="button"
             onClick={() => setSelectedUser(member)}
