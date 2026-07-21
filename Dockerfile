@@ -1,12 +1,12 @@
 # Stage 1: Build the React application
-FROM oven/bun:1 AS builder
+FROM oven/bun:1.3.14 AS builder
 WORKDIR /app
 
-# Copy the package.json and bun.lockb
-COPY package.json bun.lockb ./
+# Copy the package.json and Bun lockfile
+COPY package.json bun.lock ./
 
 # Install dependencies using bun
-RUN bun install
+RUN bun install --frozen-lockfile
 
 # Copy the rest of the application code
 COPY . .
@@ -15,7 +15,7 @@ COPY . .
 RUN bun run build
 
 # Stage 2: Serve the application
-FROM oven/bun:1-alpine
+FROM oven/bun:1.3.14-alpine
 WORKDIR /app
 
 # Copy built assets from builder stage
