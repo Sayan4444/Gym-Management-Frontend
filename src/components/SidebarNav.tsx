@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useGym, useMe } from "@/hooks/useApi";
 import { cn } from "@/lib/utils";
+import { GymBrand } from "@/components/GymBrand";
 
 interface NavItem {
   title: string;
@@ -79,7 +80,7 @@ export function SidebarNav({
 
   const me = useMe().data;
   const gym = useGym(me?.gymId).data;
-  const gymName = role === "super-admin" ? "Transform 360" : gym?.name || "Transform 360";
+  const gymName = role === "super-admin" ? "Transform 360 GYM Plus" : gym?.name || "Transform 360 GYM Plus";
   const gymIcon = role !== "super-admin" && gym?.gymIcon ? gym.gymIcon : null;
 
   return (
@@ -88,24 +89,17 @@ export function SidebarNav({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-white/5 bg-[#0A0A0A] text-white transition-transform duration-300 md:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-80 max-w-full flex-col border-r border-white/5 bg-[#0A0A0A] text-white transition-transform duration-300 md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex items-center justify-between border-b border-white/5 p-6">
-          <Link to={role === "super-admin" ? "/super-admin" : `/${role}`} className="flex min-w-0 items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-[#111]">
-              {gymIcon ? (
-                <img src={gymIcon} alt={`${gymName} icon`} className="h-full w-full object-contain p-1" />
-              ) : (
-                <Dumbbell className="h-5 w-5 text-[#39FF14]" aria-hidden="true" />
-              )}
-            </div>
-            <div className="min-w-0">
-              <h1 className="truncate text-sm font-bold uppercase tracking-tight text-white">
-                {gymName.split(" ")[0] || "Transform"} <span className="text-[#00BFFF]">360</span>
-              </h1>
-            </div>
+        <div className="flex items-center justify-between gap-2 border-b border-white/5 p-4">
+          <Link to={role === "super-admin" ? "/super-admin" : `/${role}`} className="group min-w-0">
+            <GymBrand
+              name={gymName}
+              icon={gymIcon}
+              className="transition-transform duration-300 group-hover:scale-[1.02]"
+            />
           </Link>
           <button
             type="button"

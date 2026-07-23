@@ -161,7 +161,7 @@ export default function DashboardLayout({ role }: { role: string }) {
       {/* Role-aware left navigation. Links still route to the existing role tabs. */}
       <SidebarNav role={role} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="min-h-screen md:pl-60">
+      <div className="min-h-screen md:pl-80">
         {/* Sticky topbar shared by admin, trainer, member, and super-admin dashboards. */}
         <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center justify-between gap-2 border-b border-white/5 bg-[#0A0A0A] px-3 text-white min-[360px]:px-4 md:px-8">
           {/* Page status and backend-backed greeting. */}

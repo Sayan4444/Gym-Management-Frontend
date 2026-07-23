@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Dumbbell, Calendar, Phone } from 'lucide-react';
+import { Menu, X, Calendar, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Gym } from '@/data/types';
 import { useFeaturedReviews } from '@/hooks/useApi';
+import { GymBrand } from '@/components/GymBrand';
 
 interface NavLink {
   label: string;
@@ -90,21 +91,11 @@ export default function Header({ gym }: { gym: Gym }) {
               }}
               className="group flex shrink-0 cursor-pointer items-center gap-2"
             >
-              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-electric-blue to-neon-green text-black transition-transform duration-300 group-hover:scale-105">
-                {gym.gymIcon ? (
-                  <img src={gym.gymIcon} alt={gym.name} className="h-full w-full object-cover" />
-                ) : (
-                  <Dumbbell className="w-5 h-5 text-black font-extrabold" />
-                )}
-              </div>
-              <div className="flex flex-col">
-                <span className="whitespace-nowrap text-lg font-black leading-none tracking-tight text-white md:text-xl">
-                  {gym.name}
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-neutral-400 -mt-0.5">
-                  Fitness Club
-                </span>
-              </div>
+              <GymBrand
+                name={gym.name}
+                icon={gym.gymIcon}
+                className="transition-transform duration-300 group-hover:scale-[1.02]"
+              />
             </a>
 
             {/* Centered desktop navigation */}

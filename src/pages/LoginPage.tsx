@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useGoogleLogin as useGoogleLoginMutation } from "@/hooks/apis/useAuth";
 import { useGymIDFromDomain, useGym } from "../hooks/useApi";
 import { API_BASE_URL } from "@/lib/api/core";
+import { GymBrand } from "@/components/GymBrand";
 
 const devLoginOptions = [
   { role: "SuperAdmin", label: "Super Admin", icon: Crown },
@@ -77,23 +78,13 @@ export default function LoginPage({ domain }: { domain: string }) {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]" />
       </div>
 
-      <header className="relative z-10 mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="rounded-lg bg-gradient-to-br from-electric-blue to-neon-green p-2 text-black transition-transform duration-300 group-hover:scale-105">
-            {gym?.gymIcon ? (
-              <img src={gym.gymIcon} alt={gym.name} className="h-5 w-5 rounded object-cover" />
-            ) : (
-              <Dumbbell className="h-5 w-5 text-black" />
-            )}
-          </div>
-          <div className="flex flex-col">
-            <span className="font-display text-lg font-black uppercase leading-none tracking-tight text-white md:text-xl">
-              TRANSFORM <span className="text-neon-green">360</span>
-            </span>
-            <span className="-mt-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">
-              GYM Plus
-            </span>
-          </div>
+      <header className="relative z-10 flex h-20 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link to="/" className="group">
+          <GymBrand
+            name={gym?.name || "Transform 360 GYM Plus"}
+            icon={gym?.gymIcon}
+            className="transition-transform duration-300 group-hover:scale-[1.02]"
+          />
         </Link>
 
         <Link
