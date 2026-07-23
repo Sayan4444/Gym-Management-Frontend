@@ -120,30 +120,14 @@ export default function DashboardLayout({ role }: { role: string }) {
   };
 
   const handleQuickAction = (actionType: string) => {
-    const adminActions: Record<string, string> = {
+    const quickLinkRoutes: Record<string, string> = {
       "add-member": "/admin?tab=members",
       "create-invoice": "/admin?tab=billing",
       "log-attendance": "/admin?tab=attendance&action=manual-checkin",
       "add-trainer": "/admin?tab=trainers",
     };
 
-    // TODO: Replace trainer/member placeholder quick-action routes with real workflows.
-    const trainerActions: Record<string, string> = {
-      "add-member": "/trainer?tab=dashboard",
-      "create-invoice": "/trainer?tab=dashboard",
-      "log-attendance": "/trainer?tab=dashboard",
-      "add-trainer": "/trainer?tab=workouts",
-    };
-
-    const memberActions: Record<string, string> = {
-      "add-member": "/member?tab=dashboard",
-      "create-invoice": "/member?tab=orders",
-      "log-attendance": "/member?tab=attendance",
-      "add-trainer": "/member?tab=subscription",
-    };
-
-    const routeMap = role === "admin" ? adminActions : role === "trainer" ? trainerActions : memberActions;
-    navigate(routeMap[actionType] || `/${role}`);
+    navigate(quickLinkRoutes[actionType] || "/admin");
     setQuickActionsOpen(false);
   };
 
@@ -205,40 +189,42 @@ export default function DashboardLayout({ role }: { role: string }) {
               />
             </div>
 
-            {/* Quick action menu. Actions route to the existing role screens. */}
-            {role !== "member" && <div className="relative">
-              <button
-                type="button"
-                onClick={() => setQuickActionsOpen((open) => !open)}
-                className="flex h-9 items-center justify-center whitespace-nowrap rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-2.5 text-[10px] font-black uppercase tracking-wide text-black transition-all hover:shadow-[0_0_15px_rgba(0,191,255,0.4)] min-[390px]:px-3 min-[390px]:text-xs"
-                aria-label="Quick Links"
-              >
-                Quick Links
-              </button>
+            {/* Admin-only quick links menu. */}
+            {role === "admin" && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setQuickActionsOpen((open) => !open)}
+                  className="flex h-9 items-center justify-center whitespace-nowrap rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-2.5 text-[10px] font-black uppercase tracking-wide text-black transition-all hover:shadow-[0_0_15px_rgba(0,191,255,0.4)] min-[390px]:px-3 min-[390px]:text-xs"
+                  aria-label="Quick Links"
+                >
+                  Quick Links
+                </button>
 
-              {quickActionsOpen && (
-                <>
-                  <div className="fixed inset-0 z-30" onClick={() => setQuickActionsOpen(false)} />
-                  <div className="glass-card absolute right-0 z-40 mt-2.5 w-52 rounded-2xl border border-white/5 p-2 shadow-2xl">
-                    {[
-                      { label: "Add Gym Member", actionType: "add-member" },
-                      { label: "Issue Pending Invoice", actionType: "create-invoice" },
-                      { label: "Log Daily Attendance", actionType: "log-attendance" },
-                      { label: "Onboard Fitness Trainer", actionType: "add-trainer" },
-                    ].map((action) => (
-                      <button
-                        key={action.actionType}
-                        type="button"
-                        onClick={() => handleQuickAction(action.actionType)}
-                        className="flex w-full items-center rounded-xl px-3 py-2 text-left text-xs text-white transition-colors hover:bg-white/5 hover:text-[#00BFFF]"
-                      >
-                        {action.label}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>}
+                {quickActionsOpen && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setQuickActionsOpen(false)} />
+                    <div className="glass-card absolute right-0 z-40 mt-2.5 w-52 rounded-2xl border border-white/5 p-2 shadow-2xl">
+                      {[
+                        { label: "Add Gym Member", actionType: "add-member" },
+                        { label: "Issue Pending Invoice", actionType: "create-invoice" },
+                        { label: "Log Daily Attendance", actionType: "log-attendance" },
+                        { label: "Onboard Fitness Trainer", actionType: "add-trainer" },
+                      ].map((action) => (
+                        <button
+                          key={action.actionType}
+                          type="button"
+                          onClick={() => handleQuickAction(action.actionType)}
+                          className="flex w-full items-center rounded-xl px-3 py-2 text-left text-xs text-white transition-colors hover:bg-white/5 hover:text-[#00BFFF]"
+                        >
+                          {action.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
 
             <button
               type="button"
