@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Calendar, Phone } from 'lucide-react';
+import { Menu, X, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Gym } from '@/data/types';
 import { useFeaturedReviews } from '@/hooks/useApi';
@@ -23,7 +23,6 @@ export default function Header({ gym }: { gym: Gym }) {
       { label: 'Services', href: '#services' },
       { label: 'Gallery', href: '#gallery' },
       { label: 'Pricing', href: '#pricing' },
-      { label: 'Results', href: '#transformations' },
       ...(hasReviews ? [{ label: 'Reviews', href: '#reviews' }] : []),
       { label: 'Location', href: '#location' },
       { label: 'Contact', href: '#contact' },
@@ -127,17 +126,6 @@ export default function Header({ gym }: { gym: Gym }) {
                 })}
               </nav>
 
-              <a
-                href="#contact"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLinkClick('#contact');
-                }}
-                className="flex items-center gap-1 whitespace-nowrap px-2 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:text-neon-green xl:px-4"
-              >
-                <Calendar className="w-4 h-4" />
-                Book Trial
-              </a>
             </div>
 
             {/* Dashboard CTA */}
