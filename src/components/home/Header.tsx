@@ -79,8 +79,8 @@ export default function Header({ gym }: { gym: Gym }) {
             : 'bg-transparent py-5 border-b border-white/0'
           }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="flex w-full items-center justify-between">
             {/* Logo */}
             <a
               href="#home"
@@ -88,7 +88,7 @@ export default function Header({ gym }: { gym: Gym }) {
                 e.preventDefault();
                 handleLinkClick('#home');
               }}
-              className="flex items-center gap-2 group cursor-pointer"
+              className="group flex shrink-0 cursor-pointer items-center gap-2"
             >
               <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-electric-blue to-neon-green text-black transition-transform duration-300 group-hover:scale-105">
                 {gym.gymIcon ? (
@@ -98,7 +98,7 @@ export default function Header({ gym }: { gym: Gym }) {
                 )}
               </div>
               <div className="flex flex-col">
-                <span className="text-lg md:text-xl font-black tracking-tight text-white leading-none">
+                <span className="whitespace-nowrap text-lg font-black leading-none tracking-tight text-white md:text-xl">
                   {gym.name}
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-neutral-400 -mt-0.5">
@@ -107,55 +107,56 @@ export default function Header({ gym }: { gym: Gym }) {
               </div>
             </a>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-7">
-              {navLinks.map((link) => {
-                const isActive = activeSection === link.href.replace('#', '');
-                return (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleLinkClick(link.href);
-                    }}
-                    className={`text-sm font-semibold tracking-wide transition-colors relative py-1.5 ${isActive ? 'text-neon-green' : 'text-neutral-400 hover:text-white'
-                      }`}
-                  >
-                    {link.label}
-                    {isActive && (
-                      <motion.span
-                        layoutId="activeNavIndicator"
-                        className="absolute bottom-0 left-0 w-full h-[2px] bg-neon-green"
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                  </a>
-                );
-              })}
-            </nav>
+            {/* Centered desktop navigation */}
+            <div className="hidden min-w-0 flex-1 items-center justify-center gap-2 px-2 lg:flex xl:gap-6 xl:px-8">
+              <nav className="flex items-center gap-2 xl:gap-6">
+                {navLinks.map((link) => {
+                  const isActive = activeSection === link.href.replace('#', '');
+                  return (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleLinkClick(link.href);
+                      }}
+                      className={`relative whitespace-nowrap py-1.5 text-sm font-semibold tracking-wide transition-colors ${isActive ? 'text-neon-green' : 'text-neutral-400 hover:text-white'
+                        }`}
+                    >
+                      {link.label}
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeNavIndicator"
+                          className="absolute bottom-0 left-0 w-full h-[2px] bg-neon-green"
+                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                        />
+                      )}
+                    </a>
+                  );
+                })}
+              </nav>
 
-            {/* CTA Buttons */}
-            <div className="hidden lg:flex items-center gap-4">
               <a
                 href="#contact"
                 onClick={(e) => {
                   e.preventDefault();
                   handleLinkClick('#contact');
                 }}
-                className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-white hover:text-neon-green transition-colors py-2 px-4"
+                className="flex items-center gap-1 whitespace-nowrap px-2 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:text-neon-green xl:px-4"
               >
                 <Calendar className="w-4 h-4" />
                 Book Trial
               </a>
-              <Link
-                to="/login"
-                className="relative group overflow-hidden px-5 py-2.5 rounded-lg bg-neon-green text-black font-extrabold text-sm tracking-wide shadow-lg shadow-neon-green/20 hover:shadow-neon-green/40 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
-              >
-                <span className="relative z-10">GO TO DASHBOARD</span>
-                <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0 opacity-20" />
-              </Link>
             </div>
+
+            {/* Dashboard CTA */}
+            <Link
+              to="/login"
+              className="group relative hidden shrink-0 transform cursor-pointer overflow-hidden whitespace-nowrap rounded-lg bg-neon-green px-4 py-2.5 text-sm font-extrabold tracking-wide text-black shadow-lg shadow-neon-green/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-neon-green/40 lg:block xl:px-5"
+            >
+              <span className="relative z-10">GO TO DASHBOARD</span>
+              <div className="absolute inset-0 z-0 translate-y-full bg-white opacity-20 transition-transform duration-300 ease-out group-hover:translate-y-0" />
+            </Link>
 
             {/* Mobile Menu Toggle */}
             <div className="flex items-center gap-4 lg:hidden">
