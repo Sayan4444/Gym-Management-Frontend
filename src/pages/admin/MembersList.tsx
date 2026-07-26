@@ -294,9 +294,9 @@ export default function MembersList() {
   const [selectedPlan, setSelectedPlan] = useState<{ plan: MembershipPlan; subscription: Subscription } | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addForm, setAddForm] = useState<MemberFormState>(emptyForm);
+  const [addRole, setAddRole] = useState<"GymAdmin" | "Trainer" | "Member">("Member");
   const [editingMember, setEditingMember] = useState<User | null>(null);
   const [editForm, setEditForm] = useState<MemberFormState>(emptyForm);
-  const [editingRole, setEditingRole] = useState<"Member" | "Trainer">("Member");
   const [pendingDeleteMember, setPendingDeleteMember] = useState<User | null>(null);
 
   const currentEditingMember = editingMember
@@ -359,17 +359,17 @@ export default function MembersList() {
   const openEditModal = (member: User) => {
     setEditingMember(member);
     setEditForm(memberToForm(member));
-    setEditingRole(member.role === "Trainer" ? "Trainer" : "Member");
   };
 
   const handleAddSubmit = (event: FormEvent) => {
     event.preventDefault();
     createUser.mutate(
-      { ...formToPayload(addForm), role: "Member" },
+      { ...formToPayload(addForm), role: addRole },
       {
         onSuccess: () => {
           setIsAddOpen(false);
           setAddForm(emptyForm);
+          setAddRole("Member");
           setPage(1);
         },
       },
@@ -381,13 +381,10 @@ export default function MembersList() {
     if (!editingMember) return;
 
     updateProfile.mutate(
-      { id: editingMember.id, data: { ...formToPayload(editForm), role: editingRole } as UpdateProfilePayload },
+      { id: editingMember.id, data: formToPayload(editForm) as UpdateProfilePayload },
       {
         onSuccess: () => {
-          toast({
-            title: editingRole === "Trainer" ? "Member promoted to Trainer" : "Member profile updated",
-            description: editingRole !== editingMember.role ? "The biometric device role has been synchronized." : undefined,
-          });
+          toast({ title: "Member profile updated" });
           setEditingMember(null);
           setEditForm(emptyForm);
         },
@@ -586,7 +583,10 @@ export default function MembersList() {
 
           <button
             type="button"
-            onClick={() => setIsAddOpen(true)}
+            onClick={() => {
+              setAddRole("Member");
+              setIsAddOpen(true);
+            }}
             className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00BFFF] to-[#39FF14] px-4 py-2.5 text-xs font-black text-black shadow-[0_0_15px_rgba(0,191,255,0.25)] transition-all hover:shadow-[0_0_20px_rgba(57,255,20,0.4)]"
             id="add-member-btn"
           >
@@ -675,7 +675,7 @@ export default function MembersList() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#00BFFF]/35 bg-[#090909] p-6 shadow-[0_0_40px_rgba(0,191,255,0.15)]"
+              className="max-h-[90vh] w-[95vw] overflow-y-auto rounded-2xl border border-[#00BFFF]/35 bg-[#090909] p-6 shadow-[0_0_40px_rgba(0,191,255,0.15)] sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px]"
             >
               <div className="mb-5 flex items-center justify-between border-b border-white/5 pb-4">
                 <div className="flex items-center gap-2">
@@ -690,6 +690,23 @@ export default function MembersList() {
               </div>
 
               <form onSubmit={handleAddSubmit}>
+                <fieldset className="mb-8 space-y-4">
+                  <legend className="mb-1 flex w-full items-center gap-2 border-b pb-2 text-sm font-semibold text-foreground">
+                    <CreditCard className="h-4 w-4 text-primary" /> Access Control
+                  </legend>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="onboard-member-role" className="text-xs font-medium">Access Role</Label>
+                    <Select value={addRole} onValueChange={(value) => setAddRole(value as typeof addRole)}>
+                      <SelectTrigger id="onboard-member-role"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="GymAdmin">Admin</SelectItem>
+                        <SelectItem value="Trainer">Trainer</SelectItem>
+                        <SelectItem value="Member">Member</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">Member is selected by default for new profiles.</p>
+                  </div>
+                </fieldset>
                 <MemberFormFields form={addForm} setForm={setAddForm} />
                 <div className="mt-4 flex justify-end gap-3 border-t border-white/5 pt-4">
                   <button type="button" onClick={() => setIsAddOpen(false)} className="rounded-xl border border-white/5 bg-white/[0.02] px-5 py-2.5 font-bold text-gray-400 transition-colors hover:bg-white/5 hover:text-white">
@@ -741,14 +758,6 @@ export default function MembersList() {
                     <legend className="mb-1 flex w-full items-center gap-2 border-b pb-2 text-sm font-semibold text-foreground">
                       <CreditCard className="h-4 w-4 text-primary" /> Access Control Settings
                     </legend>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-medium">Access Role</Label>
-                      <Select value={editingRole} onValueChange={(value) => setEditingRole(value as "Member" | "Trainer")}>
-                        <SelectTrigger id="member-role-selector"><SelectValue /></SelectTrigger>
-                        <SelectContent><SelectItem value="Member">Member</SelectItem><SelectItem value="Trainer">Trainer</SelectItem></SelectContent>
-                      </Select>
-                      <p className="text-xs text-muted-foreground">Role changes synchronize biometric access immediately. Trainers receive permanent access; members require an active subscription.</p>
-                    </div>
                     {currentEditingMember && <MemberAccessPanel member={currentEditingMember} plans={plans} />}
                   </fieldset>
                 </div>

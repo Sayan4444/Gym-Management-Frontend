@@ -34,12 +34,11 @@ function getTrainerSchedule(trainer: User) {
   return trainer.timings?.trim();
 }
 
-function trainerFormToPayload(form: TrainerFormState): CreateUserPayload {
+function trainerFormToPayload(form: TrainerFormState): Omit<CreateUserPayload, "role"> {
   return {
     name: form.name.trim(),
     email: form.email.trim() || `${form.name.toLowerCase().replace(/\s+/g, ".")}@transform360.com`,
     phone: form.phone.trim(),
-    role: "Trainer",
     timings: form.timings.trim() || null,
   };
 }
@@ -239,7 +238,6 @@ export default function TrainersPage() {
   const [addForm, setAddForm] = useState<TrainerFormState>(defaultTrainerForm);
   const [editingTrainer, setEditingTrainer] = useState<User | null>(null);
   const [editForm, setEditForm] = useState<TrainerFormState>(defaultTrainerForm);
-  const [editingRole, setEditingRole] = useState<"Trainer" | "Member">("Trainer");
   const [pendingDeleteTrainer, setPendingDeleteTrainer] = useState<User | null>(null);
 
   const availableMembers = useMemo(
@@ -270,7 +268,7 @@ export default function TrainersPage() {
   const handleCreateSubmit = (event: FormEvent) => {
     event.preventDefault();
 
-    createUser.mutate(trainerFormToPayload(addForm), {
+    createUser.mutate({ ...trainerFormToPayload(addForm), role: "Trainer" }, {
       onSuccess: () => {
         toast({ title: "Trainer onboarded successfully" });
         setIsAddOpen(false);
@@ -285,13 +283,10 @@ export default function TrainersPage() {
     if (!editingTrainer) return;
 
     updateProfile.mutate(
-      { id: editingTrainer.id, data: { ...trainerFormToPayload(editForm), role: editingRole } as UpdateProfilePayload },
+      { id: editingTrainer.id, data: trainerFormToPayload(editForm) as UpdateProfilePayload },
       {
         onSuccess: () => {
-          toast({
-            title: editingRole === "Member" ? "Trainer changed to Member" : "Trainer updated successfully",
-            description: editingRole !== editingTrainer.role ? "The biometric device role has been synchronized." : undefined,
-          });
+          toast({ title: "Trainer updated successfully" });
           setEditingTrainer(null);
           setEditForm(defaultTrainerForm);
         },
@@ -490,24 +485,6 @@ export default function TrainersPage() {
 
               <form onSubmit={handleUpdateSubmit} className="space-y-4 font-sans text-xs">
                 <TrainerFormFields form={editForm} setForm={setEditForm} />
-
-                <div className="rounded-xl border border-[#00BFFF]/15 bg-[#00BFFF]/[0.04] p-4">
-                  <label className="font-black uppercase tracking-wider text-[#00BFFF]" htmlFor="trainer-role-selector">
-                    Access role
-                  </label>
-                  <select
-                    id="trainer-role-selector"
-                    value={editingRole}
-                    onChange={(event) => setEditingRole(event.target.value as "Trainer" | "Member")}
-                    className="mt-2 w-full rounded-lg border border-white/10 bg-[#111] p-2.5 text-white focus:border-[#00BFFF] focus:outline-none"
-                  >
-                    <option value="Trainer" className="bg-neutral-900">Trainer</option>
-                    <option value="Member" className="bg-neutral-900">Member</option>
-                  </select>
-                  <p className="mt-2 text-[11px] leading-relaxed text-gray-500">
-                    Changing this trainer to a Member removes permanent access. They will need an active subscription to stay enabled on the biometric device.
-                  </p>
-                </div>
 
                 <div className="flex justify-end gap-3 border-t border-white/5 pt-4">
                   <button type="button" onClick={() => setEditingTrainer(null)} className="rounded-xl border border-white/5 px-5 py-2.5 text-gray-400 hover:text-white">
